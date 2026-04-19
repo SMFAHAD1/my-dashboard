@@ -1,0 +1,50 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: sans-serif; background: #f5f5f5; color: #222; }
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: #1e1e2e;
+  color: white;
+}
+.brand { font-weight: 700; font-size: 18px; margin-right: auto; }
+.navbar a {
+  color: #aaa;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.navbar a:hover { background: #2a2a3e; color: white; }
+.navbar a.active { background: #378ADD; color: white; }
+
+.main-content { padding: 32px 24px; max-width: 800px; margin: 0 auto; }
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid #eee;
+}
+input, select, textarea {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+input:focus { border-color: #378ADD; }
+button {
+  padding: 8px 18px;
+  background: #378ADD;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+button:hover { background: #185FA5; }
