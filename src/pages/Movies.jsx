@@ -44,10 +44,10 @@ function YearAnalysis({ movies }) {
 
   if (movies.length === 0) return null;
 
-  // Build per-year stats
+  // Build per-year stats grouped by START WATCHING year
   const yearMap = {};
   movies.forEach(m => {
-    const yr = m.year || "Unknown";
+    const yr = m.startDate ? m.startDate.split("-")[0] : "Not set";
     if (!yearMap[yr]) {
       yearMap[yr] = { year: yr, total: 0, movie: 0, series: 0, documentary: 0, anime: 0, imdbSum: 0, imdbCount: 0, items: [] };
     }
@@ -59,8 +59,8 @@ function YearAnalysis({ movies }) {
   });
 
   const years = Object.values(yearMap).sort((a, b) => {
-    if (a.year === "Unknown") return 1;
-    if (b.year === "Unknown") return -1;
+    if (a.year === "Not set") return 1;
+    if (b.year === "Not set") return -1;
     return b.year.localeCompare(a.year);
   });
 
@@ -72,13 +72,14 @@ function YearAnalysis({ movies }) {
   return (
     <div style={{ marginTop: 36 }}>
       {/* Section header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
         <div style={{ flex: 1, height: 1, background: "#eee" }} />
         <span style={{ fontSize: 13, fontWeight: 600, color: "#555", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
-          📅 YEAR-BY-YEAR ANALYSIS
+          📅 YEAR-BY-YEAR WATCHED ANALYSIS
         </span>
         <div style={{ flex: 1, height: 1, background: "#eee" }} />
       </div>
+      <p style={{ fontSize: 11, color: "#aaa", textAlign: "center", marginBottom: 18 }}>Grouped by start watching year</p>
 
       {/* Summary pills */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
@@ -125,7 +126,7 @@ function YearAnalysis({ movies }) {
                 style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", cursor: "pointer", userSelect: "none" }}
               >
                 {/* Year label */}
-                <span style={{ fontWeight: 600, fontSize: 15, minWidth: 52, color: "#222" }}>{y.year}</span>
+                <span style={{ fontWeight: 600, fontSize: 15, minWidth: 52, color: y.year === "Not set" ? "#aaa" : "#222" }}>{y.year}</span>
 
                 {/* Bar track */}
                 <div style={{ flex: 1, height: 8, background: "#eee", borderRadius: 99, overflow: "hidden" }}>
