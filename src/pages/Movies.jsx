@@ -268,7 +268,9 @@ export default function Movies() {
         setMovies(prev => [...prev, entry]);
       }
       setForm({ ...formDefaults });
-    } catch {}
+    } catch (error) {
+      console.error("Failed to fetch movie details:", error);
+    }
     setLoading(false);
   }
 

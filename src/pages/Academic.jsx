@@ -754,8 +754,6 @@ export default function Academic() {
   const pending        = tasks.filter(t => !t.done).length;
   const done           = tasks.filter(t => t.done).length;
 
-  let colorOffset = 0;
-
   return (
     <div>
       <h2 style={{ marginBottom: 20 }}>Academic</h2>
@@ -819,13 +817,15 @@ export default function Academic() {
         </p>
       )}
 
-      {terms.map(term => {
+      {terms.map((term, index) => {
+        const colorOffset = terms
+          .slice(0, index)
+          .reduce((sum, currentTerm) => sum + currentTerm.courses.length, 0);
         const block = (
           <TermBlock key={term.id} term={term}
             onUpdateTerm={updateTerm} onDeleteTerm={deleteTerm}
             colorOffset={colorOffset} />
         );
-        colorOffset += term.courses.length;
         return block;
       })}
 
