@@ -34,8 +34,6 @@ const TERM_STATUS_STYLES = {
 };
 
 // ── CGPA helpers ──────────────────────────────────────────────────────────
-// Accepts: letter grade (A+, A, A-, B+…) OR direct 0–4 numeric score only.
-// Percentage marks (50–100) are NOT accepted here.
 function gradeToPoint(grade) {
   if (!grade) return null;
   const g = grade.trim().toUpperCase();
@@ -45,10 +43,9 @@ function gradeToPoint(grade) {
     "C+": 2.50, "C": 2.25, "D": 2.0, "F": 0.0,
   };
   if (letterMap[g] !== undefined) return letterMap[g];
-  // Direct 0–4 numeric entry only
   const num = parseFloat(g);
   if (!isNaN(num)) {
-    if (num <= 4.0) return Math.max(0, num);   // direct 0–4 entry
+    if (num <= 4.0) return Math.max(0, num);
     if (num >= 90) return 4.0;
     if (num >= 85) return 3.7;
     if (num >= 80) return 3.3;
@@ -65,11 +62,16 @@ function gradeToPoint(grade) {
 
 function gradeLabel(p) {
   if (p === null || p === undefined) return "";
-  if (p >= 4) return "A+";  if (p >= 3.75) return "A";
-  if (p >= 3.5)  return "A-";  if (p >= 3.25) return "B+";
-  if (p >= 3.00) return "B";   if (p >= 2.75)  return "B-";
-  if (p >= 2.5) return "C+";  if (p >= 2.25) return "C";
-  if (p >= 2.00) return "D";   return "F";
+  if (p >= 4)    return "A+";
+  if (p >= 3.75) return "A";
+  if (p >= 3.5)  return "A-";
+  if (p >= 3.25) return "B+";
+  if (p >= 3.00) return "B";
+  if (p >= 2.75) return "B-";
+  if (p >= 2.5)  return "C+";
+  if (p >= 2.25) return "C";
+  if (p >= 2.00) return "D";
+  return "F";
 }
 
 function cgpaColor(v) {
@@ -79,7 +81,6 @@ function cgpaColor(v) {
   return { color: "#A32D2D", bg: "#fce8e8" };
 }
 
-// Term GPA = Σ(credit × gradePoint) / totalCompletedCourses
 function calcTermGPA(courses) {
   const eligible = courses.filter(
     c => c.status === "completed" && c.credit > 0 && gradeToPoint(c.grade) !== null
@@ -89,7 +90,6 @@ function calcTermGPA(courses) {
   return weightedSum / eligible.length;
 }
 
-// Final CGPA = Σ(termGPA for each completed term) / number of completed terms
 function calcFinalCGPA(terms) {
   const gpas = terms
     .filter(t => t.status === "completed")
@@ -99,6 +99,17 @@ function calcFinalCGPA(terms) {
   return gpas.reduce((s, g) => s + g, 0) / gpas.length;
 }
 
+// ── Shared style helpers ──────────────────────────────────────────────────
+const labelStyle = { fontSize: 11, color: "#888", display: "block", marginBottom: 3 };
+
+function pill(bg, color) {
+  return { fontSize: 11, padding: "3px 10px", borderRadius: 99, background: bg, color, fontWeight: 500 };
+}
+
+function statBox(bg, color) {
+  return { padding: "10px 16px", borderRadius: 10, background: bg, color, textAlign: "center", minWidth: 80 };
+}
+
 // ── Overall CGPA Summary ──────────────────────────────────────────────────
 function CGPASummary({ terms }) {
   const completedTermsWithGPA = terms.filter(
@@ -106,10 +117,10 @@ function CGPASummary({ terms }) {
   );
   if (completedTermsWithGPA.length === 0) return null;
 
-  const finalCGPA  = calcFinalCGPA(terms);
+  const finalCGPA = calcFinalCGPA(terms);
   const { color, bg } = cgpaColor(finalCGPA);
-  const totalCourses  = terms.reduce((s, t) => s + t.courses.length, 0);
-  const totalCredits  = terms.reduce((s, t) =>
+  const totalCourses = terms.reduce((s, t) => s + t.courses.length, 0);
+  const totalCredits = terms.reduce((s, t) =>
     s + t.courses.filter(c => c.status === "completed" && c.credit > 0)
                   .reduce((cs, c) => cs + c.credit, 0), 0);
 
@@ -120,9 +131,9 @@ function CGPASummary({ terms }) {
         flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: "#555", letterSpacing: 0.4 }}>📊 OVERALL CGPA</span>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <span style={pill("#e8f0fe","#185FA5")}>{totalCourses} courses</span>
-          <span style={pill("#f3e8ff","#6B21A8")}>{totalCredits} credits</span>
-          <span style={pill("#e8f5e9","#3B6D11")}>{completedTermsWithGPA.length} term{completedTermsWithGPA.length !== 1 ? "s" : ""} done</span>
+          <span style={pill("#e8f0fe", "#185FA5")}>{totalCourses} courses</span>
+          <span style={pill("#f3e8ff", "#6B21A8")}>{totalCredits} credits</span>
+          <span style={pill("#e8f5e9", "#3B6D11")}>{completedTermsWithGPA.length} term{completedTermsWithGPA.length !== 1 ? "s" : ""} done</span>
         </div>
       </div>
 
@@ -248,8 +259,8 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
             background: tStyle.bg, color: tStyle.color, cursor: "pointer" }}>
           {TERM_STATUS_OPTIONS.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
         </select>
-        <span style={pill("#e8f0fe","#185FA5")}>{term.courses.length} course{term.courses.length !== 1 ? "s" : ""}</span>
-        {totalCredits > 0 && <span style={pill("#f3e8ff","#6B21A8")}>{totalCredits} cr</span>}
+        <span style={pill("#e8f0fe", "#185FA5")}>{term.courses.length} course{term.courses.length !== 1 ? "s" : ""}</span>
+        {totalCredits > 0 && <span style={pill("#f3e8ff", "#6B21A8")}>{totalCredits} cr</span>}
         {termGPA !== null && (
           <span style={{ fontSize: 12, fontWeight: 700, padding: "3px 12px", borderRadius: 99,
             background: cgpaColor(termGPA).bg, color: cgpaColor(termGPA).color }}>
@@ -385,7 +396,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
                       </div>
                       <span style={{ fontSize: 11, fontWeight: 700, color: col.color, minWidth: 28, textAlign: "right" }}>{gp.toFixed(1)}</span>
                       <span style={{ fontSize: 10, color: "#aaa", minWidth: 46, textAlign: "right" }}>
-                        {c.credit}×{gp.toFixed(1)}={( c.credit * gp).toFixed(2)}
+                        {c.credit}×{gp.toFixed(1)}={(c.credit * gp).toFixed(2)}
                       </span>
                     </div>
                   );
@@ -440,20 +451,21 @@ function ClassTests({ terms }) {
 
   function deleteTest(id) { setTests(prev => prev.filter(t => t.id !== id)); }
 
-  const testSubjects  = [...new Set(tests.map(t => t.subject).filter(Boolean))];
-  const scoredTests   = tests.filter(t => t.score !== null);
-  const overallAvg    = scoredTests.length > 0
+  const testSubjects = [...new Set(tests.map(t => t.subject).filter(Boolean))];
+  const scoredTests  = tests.filter(t => t.score !== null);
+  const overallAvg   = scoredTests.length > 0
     ? scoredTests.reduce((s, t) => s + (t.score / t.total) * 100, 0) / scoredTests.length
     : null;
 
+  // FIX: was using st.count (undefined) — now uses st.length correctly
   function subjectStats(subj) {
     const st = tests.filter(t => t.subject === subj && t.score !== null);
     if (st.length === 0) return null;
-    const pcts    = st.map(t => (t.score / t.total) * 100);
-    const avg     = pcts.reduce((s, p) => s + p, 0) / pcts.length;
-    const best3   = [...st].sort((a, b) => (b.score / b.total) - (a.score / a.total)).slice(0, 3);
+    const pcts     = st.map(t => (t.score / t.total) * 100);
+    const avg      = pcts.reduce((s, p) => s + p, 0) / pcts.length;
+    const best3    = [...st].sort((a, b) => (b.score / b.total) - (a.score / a.total)).slice(0, 3);
     const best3avg = best3.reduce((s, t) => s + (t.score / t.total) * 100, 0) / best3.length;
-    return { count: st.count, all: st, avg, best3, best3avg };
+    return { count: st.length, all: st, avg, best3, best3avg };
   }
 
   const displayTests = activeTab === "all" ? tests : tests.filter(t => t.subject === activeTab);
@@ -505,7 +517,7 @@ function ClassTests({ terms }) {
         <>
           {/* Overall stats */}
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
-            <div style={statBox("#e8f0fe","#185FA5")}>
+            <div style={statBox("#e8f0fe", "#185FA5")}>
               <div style={{ fontSize: 20, fontWeight: 700 }}>{tests.length}</div>
               <div style={{ fontSize: 10, marginTop: 1 }}>Total Tests</div>
             </div>
@@ -515,7 +527,7 @@ function ClassTests({ terms }) {
                 <div style={{ fontSize: 10, marginTop: 1 }}>Overall Avg</div>
               </div>
             )}
-            <div style={statBox("#e8f5e9","#3B6D11")}>
+            <div style={statBox("#e8f5e9", "#3B6D11")}>
               <div style={{ fontSize: 20, fontWeight: 700 }}>{testSubjects.length}</div>
               <div style={{ fontSize: 10, marginTop: 1 }}>Subjects</div>
             </div>
@@ -544,6 +556,7 @@ function ClassTests({ terms }) {
                             background: avgCol.bg, color: avgCol.color }}>Avg {stats.avg.toFixed(1)}%</span>
                         </div>
                         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          {/* FIX: was stats.count (undefined) — now uses stats.all.length */}
                           <span style={{ fontSize: 11, color: col.color, opacity: 0.75 }}>
                             {stats.all.length} test{stats.all.length !== 1 ? "s" : ""}
                           </span>
@@ -564,7 +577,7 @@ function ClassTests({ terms }) {
                           {stats.best3.map((t, idx) => {
                             const pct = (t.score / t.total) * 100;
                             const tc  = cgpaColor(pct / 25);
-                            const medals = ["🥇","🥈","🥉"];
+                            const medals = ["🥇", "🥈", "🥉"];
                             return (
                               <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 7 }}>
                                 <span style={{ fontSize: 13, minWidth: 20 }}>{medals[idx]}</span>
@@ -690,8 +703,8 @@ function ClassTests({ terms }) {
 
 // ── Main Component ────────────────────────────────────────────────────────
 export default function Academic() {
-  const [terms, setTerms]               = useState([]);
-  const [newTermName, setNewTermName]   = useState("");
+  const [terms, setTerms]                 = useState([]);
+  const [newTermName, setNewTermName]     = useState("");
   const [newTermStatus, setNewTermStatus] = useState("ongoing");
 
   const [tasks, setTasks]               = useState([]);
@@ -732,14 +745,14 @@ export default function Academic() {
     low:    { bg: "#e8f5e9", color: "#3B6D11", label: "Low" },
   };
 
-  const allCourses      = terms.flatMap(t => t.courses);
-  const totalCourses    = allCourses.length;
-  const ongoingCourses  = allCourses.filter(c => c.status === "ongoing").length;
-  const completedCount  = allCourses.filter(c => c.status === "completed").length;
-  const totalCredits    = allCourses.filter(c => c.status === "completed").reduce((s, c) => s + (c.credit || 0), 0);
-  const finalCGPA       = calcFinalCGPA(terms);
-  const pending         = tasks.filter(t => !t.done).length;
-  const done            = tasks.filter(t => t.done).length;
+  const allCourses     = terms.flatMap(t => t.courses);
+  const totalCourses   = allCourses.length;
+  const ongoingCourses = allCourses.filter(c => c.status === "ongoing").length;
+  const completedCount = allCourses.filter(c => c.status === "completed").length;
+  const totalCredits   = allCourses.filter(c => c.status === "completed").reduce((s, c) => s + (c.credit || 0), 0);
+  const finalCGPA      = calcFinalCGPA(terms);
+  const pending        = tasks.filter(t => !t.done).length;
+  const done           = tasks.filter(t => t.done).length;
 
   let colorOffset = 0;
 
@@ -751,16 +764,16 @@ export default function Academic() {
       {(terms.length > 0 || tasks.length > 0) && (
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
           {[
-            { label: "Terms",          value: terms.length,    bg: "#e8f0fe", color: "#185FA5" },
-            { label: "Total Courses",  value: totalCourses,    bg: "#e0f7fa", color: "#0B6E74" },
-            { label: "Ongoing",        value: ongoingCourses,  bg: "#fff8e1", color: "#854F0B" },
-            { label: "Completed",      value: completedCount,  bg: "#e8f5e9", color: "#3B6D11" },
-            { label: "Credits Earned", value: totalCredits,    bg: "#f3e8ff", color: "#6B21A8" },
+            { label: "Terms",          value: terms.length,   bg: "#e8f0fe", color: "#185FA5" },
+            { label: "Total Courses",  value: totalCourses,   bg: "#e0f7fa", color: "#0B6E74" },
+            { label: "Ongoing",        value: ongoingCourses, bg: "#fff8e1", color: "#854F0B" },
+            { label: "Completed",      value: completedCount, bg: "#e8f5e9", color: "#3B6D11" },
+            { label: "Credits Earned", value: totalCredits,   bg: "#f3e8ff", color: "#6B21A8" },
             finalCGPA !== null
               ? { label: "CGPA", value: finalCGPA.toFixed(2), bg: cgpaColor(finalCGPA).bg, color: cgpaColor(finalCGPA).color }
               : null,
-            { label: "Pending Tasks",  value: pending,         bg: "#fce8e8", color: "#A32D2D" },
-            { label: "Done Tasks",     value: done,            bg: "#e8f5e9", color: "#3B6D11" },
+            { label: "Pending Tasks", value: pending, bg: "#fce8e8", color: "#A32D2D" },
+            { label: "Done Tasks",    value: done,    bg: "#e8f5e9", color: "#3B6D11" },
           ].filter(Boolean).map(s => (
             <div key={s.label} style={{ flex: 1, minWidth: 80, padding: "12px 14px", borderRadius: 10,
               background: s.bg, color: s.color, textAlign: "center" }}>
@@ -901,15 +914,4 @@ export default function Academic() {
       </div>
     </div>
   );
-}
-
-// ── Shared style helpers ──────────────────────────────────────────────────
-const labelStyle = { fontSize: 11, color: "#888", display: "block", marginBottom: 3 };
-
-function pill(bg, color) {
-  return { fontSize: 11, padding: "3px 10px", borderRadius: 99, background: bg, color, fontWeight: 500 };
-}
-
-function statBox(bg, color) {
-  return { padding: "10px 16px", borderRadius: 10, background: bg, color, textAlign: "center", minWidth: 80 };
 }
