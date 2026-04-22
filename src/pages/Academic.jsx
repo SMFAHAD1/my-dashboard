@@ -44,19 +44,7 @@ function gradeToPoint(grade) {
   };
   if (letterMap[g] !== undefined) return letterMap[g];
   const num = parseFloat(g);
-  if (!isNaN(num)) {
-    if (num <= 4.0) return Math.max(0, num);
-    if (num >= 90) return 4.0;
-    if (num >= 85) return 3.7;
-    if (num >= 80) return 3.3;
-    if (num >= 75) return 3.0;
-    if (num >= 70) return 2.7;
-    if (num >= 65) return 2.3;
-    if (num >= 60) return 2.0;
-    if (num >= 55) return 1.7;
-    if (num >= 50) return 1.0;
-    return 0.0;
-  }
+  if (!isNaN(num) && num >= 0 && num <= 4.0) return num;
   return null;
 }
 
@@ -81,22 +69,41 @@ function cgpaColor(v) {
   return { color: "#A32D2D", bg: "#fce8e8" };
 }
 
-function calcTermGPA(courses) {
-  const eligible = courses.filter(
+function getEligibleCourses(courses) {
+  return courses.filter(
     c => c.status === "completed" && c.credit > 0 && gradeToPoint(c.grade) !== null
   );
-  if (eligible.length === 0) return null;
-  const weightedSum = eligible.reduce((s, c) => s + c.credit * gradeToPoint(c.grade), 0);
-  return weightedSum / eligible.length;
+}
+
+function calcTermTotalCredits(courses) {
+  return getEligibleCourses(courses).reduce((sum, course) => sum + course.credit, 0);
+}
+
+function calcTermQualityPoints(courses) {
+  return getEligibleCourses(courses).reduce(
+    (sum, course) => sum + course.credit * gradeToPoint(course.grade),
+    0
+  );
+}
+
+function calcTermGPA(courses) {
+  const totalCredits = calcTermTotalCredits(courses);
+  if (totalCredits === 0) return null;
+  return calcTermQualityPoints(courses) / totalCredits;
 }
 
 function calcFinalCGPA(terms) {
-  const gpas = terms
-    .filter(t => t.status === "completed")
-    .map(t => calcTermGPA(t.courses))
-    .filter(g => g !== null);
-  if (gpas.length === 0) return null;
-  return gpas.reduce((s, g) => s + g, 0) / gpas.length;
+  const completedTerms = terms.filter(t => t.status === "completed");
+  const totalCredits = completedTerms.reduce(
+    (sum, term) => sum + calcTermTotalCredits(term.courses),
+    0
+  );
+  if (totalCredits === 0) return null;
+  const totalQualityPoints = completedTerms.reduce(
+    (sum, term) => sum + calcTermQualityPoints(term.courses),
+    0
+  );
+  return totalQualityPoints / totalCredits;
 }
 
 // ── Shared style helpers ──────────────────────────────────────────────────
@@ -235,10 +242,9 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
   }
 
   const termGPA = calcTermGPA(term.courses);
-  const eligibleCourses = term.courses.filter(
-    c => c.status === "completed" && c.credit > 0 && gradeToPoint(c.grade) !== null
-  );
-  const totalCredits = eligibleCourses.reduce((s, c) => s + c.credit, 0);
+  const eligibleCourses = getEligibleCourses(term.courses);
+  const totalCredits = calcTermTotalCredits(term.courses);
+  const totalQualityPoints = calcTermQualityPoints(term.courses);
   const tStyle = TERM_STATUS_STYLES[term.status] || TERM_STATUS_STYLES.ongoing;
 
   return (
@@ -291,9 +297,9 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
                   onChange={e => setCourseCredit(e.target.value)} placeholder="3" style={{ width: "100%" }} />
               </div>
               <div style={{ minWidth: 100 }}>
-                <label style={labelStyle}>Grade / Score</label>
+                <label style={labelStyle}>Grade / GPA</label>
                 <input value={courseGrade} onChange={e => setCourseGrade(e.target.value)}
-                  placeholder="A / 3.5 / 85" style={{ width: "100%" }} />
+                  placeholder="A / A- / 3.5" style={{ width: "100%" }} />
               </div>
               <div style={{ minWidth: 105 }}>
                 <label style={labelStyle}>Status</label>
@@ -317,7 +323,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
                 <input type="date" value={courseEnd} onChange={e => setCourseEnd(e.target.value)} />
               </div>
               <div style={{ fontSize: 10, color: "#bbb", alignSelf: "flex-end", paddingBottom: 6, flex: 2 }}>
-                Grade: A+/A/B+… or 0–4 score or percentage
+                Use letter grades or GPA values from 0.0 to 4.0 only
               </div>
               <button onClick={addCourse} style={{ alignSelf: "flex-end" }}>Add Course</button>
             </div>
@@ -405,9 +411,9 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4,
                   paddingTop: 6, borderTop: "0.5px solid #eee" }}>
                   <span style={{ fontSize: 11, color: "#888" }}>
-                    Σ(credit×GP) = {eligibleCourses.reduce((s, c) => s + c.credit * gradeToPoint(c.grade), 0).toFixed(2)}
+                    Sum(credit x GP) = {totalQualityPoints.toFixed(2)}
                   </span>
-                  <span style={{ fontSize: 11, color: "#888" }}>÷ {eligibleCourses.length} courses</span>
+                  <span style={{ fontSize: 11, color: "#888" }}>/ {totalCredits.toFixed(1)} credits</span>
                   <span style={{ fontSize: 12, fontWeight: 700, color: cgpaColor(termGPA).color }}>
                     = {termGPA.toFixed(2)}
                   </span>
@@ -915,3 +921,4 @@ export default function Academic() {
     </div>
   );
 }
+
