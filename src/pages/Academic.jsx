@@ -434,7 +434,7 @@ function ClassTests({ terms }) {
   const [testSubject, setTestSubject] = useState("");
   const [testDate, setTestDate]       = useState("");
   const [testScore, setTestScore]     = useState("");
-  const [testTotal, setTestTotal]     = useState("100");
+  const [testTotal, setTestTotal]     = useState("");
   const [activeTab, setActiveTab]     = useState("all");
 
   const allCourseNames = [
@@ -443,25 +443,21 @@ function ClassTests({ terms }) {
   const subjectOptions = [...new Set([...allCourseNames, ...tests.map(t => t.subject).filter(Boolean)])];
 
   function addTest() {
-    if (!testTitle.trim()) return;
+    if (!testTitle.trim() || testTotal === "") return;
     setTests(prev => [...prev, {
       id: Date.now(),
       title: testTitle.trim(),
       subject: testSubject.trim(),
       date: testDate,
       score: testScore !== "" ? parseFloat(testScore) : null,
-      total: testTotal !== "" ? parseFloat(testTotal) : 100,
+      total: parseFloat(testTotal),
     }]);
-    setTestTitle(""); setTestSubject(""); setTestDate(""); setTestScore(""); setTestTotal("100");
+    setTestTitle(""); setTestSubject(""); setTestDate(""); setTestScore(""); setTestTotal("");
   }
 
   function deleteTest(id) { setTests(prev => prev.filter(t => t.id !== id)); }
 
   const testSubjects = [...new Set(tests.map(t => t.subject).filter(Boolean))];
-  const scoredTests  = tests.filter(t => t.score !== null);
-  const overallAvg   = scoredTests.length > 0
-    ? scoredTests.reduce((s, t) => s + (t.score / t.total) * 100, 0) / scoredTests.length
-    : null;
 
   // FIX: was using st.count (undefined) — now uses st.length correctly
   function subjectStats(subj) {
@@ -527,12 +523,6 @@ function ClassTests({ terms }) {
               <div style={{ fontSize: 20, fontWeight: 700 }}>{tests.length}</div>
               <div style={{ fontSize: 10, marginTop: 1 }}>Total Tests</div>
             </div>
-            {overallAvg !== null && (
-              <div style={statBox(cgpaColor(overallAvg / 25).bg, cgpaColor(overallAvg / 25).color)}>
-                <div style={{ fontSize: 20, fontWeight: 700 }}>{overallAvg.toFixed(1)}%</div>
-                <div style={{ fontSize: 10, marginTop: 1 }}>Overall Avg</div>
-              </div>
-            )}
             <div style={statBox("#e8f5e9", "#3B6D11")}>
               <div style={{ fontSize: 20, fontWeight: 700 }}>{testSubjects.length}</div>
               <div style={{ fontSize: 10, marginTop: 1 }}>Subjects</div>
@@ -921,4 +911,3 @@ export default function Academic() {
     </div>
   );
 }
-
