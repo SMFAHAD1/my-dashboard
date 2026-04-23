@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const APIKEY = "trilogy";
 const today = new Date().toISOString().split("T")[0];
@@ -201,7 +202,7 @@ function YearAnalysis({ movies }) {
 
 // ── Main Component ─────────────────────────────────────────────────────
 export default function Movies() {
-  const [movies, setMovies] = useState([]);
+  const [movies, setMovies] = useLocalStorage("dashboard-movies", []);
   const [form, setForm] = useState({ ...formDefaults });
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -268,9 +269,7 @@ export default function Movies() {
         setMovies(prev => [...prev, entry]);
       }
       setForm({ ...formDefaults });
-    } catch (error) {
-      console.error("Failed to fetch movie details:", error);
-    }
+    } catch {}
     setLoading(false);
   }
 
