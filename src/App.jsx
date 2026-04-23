@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
-import Planner from "./pages/Planner";
+import Planner from "./pages/MyPlan";
 import Books from "./pages/Books";
 import Movies from "./pages/Movies";
 import Academic from "./pages/Academic";
