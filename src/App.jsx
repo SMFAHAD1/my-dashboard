@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
-import Planner from "./pages/MyPlan";
+import MyPlan from "./pages/MyPlan";
 import Books from "./pages/Books";
 import Movies from "./pages/Movies";
 import Academic from "./pages/Academic";
@@ -11,7 +11,7 @@ export default function App() {
     <BrowserRouter>
       <nav className="navbar">
         <span className="brand">My Dashboard</span>
-        <NavLink to="/">Planner</NavLink>
+        <NavLink to="/">MyPlan</NavLink>
         <NavLink to="/books">Books</NavLink>
         <NavLink to="/movies">Movies</NavLink>
         <NavLink to="/academic">Academic</NavLink>
@@ -19,7 +19,7 @@ export default function App() {
       </nav>
       <div className="main-content">
         <Routes>
-          <Route path="/" element={<Planner />} />
+          <Route path="/" element={<MyPlan />} />
           <Route path="/books" element={<Books />} />
           <Route path="/movies" element={<Movies />} />
           <Route path="/academic" element={<Academic />} />
