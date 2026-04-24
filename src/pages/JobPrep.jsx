@@ -48,8 +48,8 @@ export default function JobPrep() {
   const [filter, setFilter] = useState("all");
 
   const [reqTitle, setReqTitle] = useState("");
-  const [reqLink, setReqLink] = useState("");
   const [reqNotes, setReqNotes] = useState("");
+  const [reqLinks, setReqLinks] = useState([""]);
 
   const [skillName, setSkillName] = useState("");
   const [skillLevel, setSkillLevel] = useState("learning");
@@ -113,14 +113,26 @@ export default function JobPrep() {
       {
         id: Date.now(),
         title: reqTitle.trim(),
-        link: reqLink.trim(),
         notes: reqNotes.trim(),
+        links: reqLinks.map((link) => link.trim()).filter(Boolean),
         done: false,
       },
     ]);
     setReqTitle("");
-    setReqLink("");
     setReqNotes("");
+    setReqLinks([""]);
+  }
+
+  function updateReqLink(index, value) {
+    setReqLinks((prev) => prev.map((link, i) => (i === index ? value : link)));
+  }
+
+  function addReqLinkField() {
+    setReqLinks((prev) => [...prev, ""]);
+  }
+
+  function removeReqLinkField(index) {
+    setReqLinks((prev) => (prev.length === 1 ? [""] : prev.filter((_, i) => i !== index)));
   }
 
   function toggleRequirement(id) {
@@ -254,29 +266,41 @@ export default function JobPrep() {
           <label style={labelSt}>Notes</label>
           <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Interview notes, contact person, follow-up..." style={{ width: "100%" }} />
         </div>
-      </div>
-
-      <div className="card" style={{ marginBottom: 16 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-          <div>
-            <p style={{ fontSize: 14, fontWeight: 600 }}>Requirements Box</p>
-            <p style={{ fontSize: 11, color: "#888", marginTop: 2 }}>{requirementDone}/{requirements.length} completed</p>
+        <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid #eee" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 600 }}>Requirements</p>
+              <p style={{ fontSize: 11, color: "#888", marginTop: 2 }}>{requirementDone}/{requirements.length} completed</p>
+            </div>
           </div>
-        </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 10 }}>
-          <div style={{ flex: 2, minWidth: 160 }}>
-            <label style={labelSt}>Requirement</label>
-            <input value={reqTitle} onChange={(e) => setReqTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addRequirement()} placeholder="e.g. Resume, Cover letter, Portfolio" style={{ width: "100%" }} />
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 10 }}>
+            <div style={{ flex: 2, minWidth: 180 }}>
+              <label style={labelSt}>Requirement</label>
+              <input value={reqTitle} onChange={(e) => setReqTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addRequirement()} placeholder="e.g. Resume, Cover letter, Portfolio" style={{ width: "100%" }} />
+            </div>
+            <div style={{ flex: 2, minWidth: 180 }}>
+              <label style={labelSt}>Notes</label>
+              <input value={reqNotes} onChange={(e) => setReqNotes(e.target.value)} placeholder="Optional note" style={{ width: "100%" }} />
+            </div>
+            <button onClick={addRequirement} style={{ alignSelf: "flex-end" }}>Add Requirement</button>
           </div>
-          <div style={{ flex: 2, minWidth: 160 }}>
-            <label style={labelSt}>Link</label>
-            <input value={reqLink} onChange={(e) => setReqLink(e.target.value)} placeholder="https://..." style={{ width: "100%" }} />
+          <div style={{ marginBottom: 10 }}>
+            <label style={labelSt}>Links</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {reqLinks.map((link, index) => (
+                <div key={index} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <input
+                    value={link}
+                    onChange={(e) => updateReqLink(index, e.target.value)}
+                    placeholder={`https://... (${index + 1})`}
+                    style={{ width: "100%" }}
+                  />
+                  <button onClick={() => removeReqLinkField(index)} style={smallBtn} type="button">Remove</button>
+                </div>
+              ))}
+              <button onClick={addReqLinkField} style={{ ...smallBtn, width: "fit-content" }} type="button">Add Link</button>
+            </div>
           </div>
-          <div style={{ flex: 2, minWidth: 160 }}>
-            <label style={labelSt}>Notes</label>
-            <input value={reqNotes} onChange={(e) => setReqNotes(e.target.value)} placeholder="Optional note" style={{ width: "100%" }} />
-          </div>
-          <button onClick={addRequirement} style={{ alignSelf: "flex-end" }}>Add Requirement</button>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {requirements.length === 0 && <p style={{ fontSize: 13, color: "#bbb", padding: "8px 0" }}>No requirements added yet.</p>}
@@ -288,11 +312,15 @@ export default function JobPrep() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontWeight: 500, fontSize: 13, textDecoration: r.done ? "line-through" : "none", color: r.done ? "#aaa" : "inherit" }}>{r.title}</p>
                 {r.notes && <p style={{ fontSize: 11, color: "#888", marginTop: 2 }}>{r.notes}</p>}
-                {r.link && (
-                  <a href={normalizeUrl(r.link)} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: "#185FA5", marginTop: 3, display: "inline-block" }}>
-                    {r.link}
-                  </a>
-                )}
+                {(Array.isArray(r.links) && r.links.length > 0) || r.link ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 4 }}>
+                    {(Array.isArray(r.links) && r.links.length > 0 ? r.links : [r.link]).map((link, index) => (
+                      <a key={`${r.id}-${index}`} href={normalizeUrl(link)} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: "#185FA5", display: "inline-block" }}>
+                        {link}
+                      </a>
+                    ))}
+                  </div>
+                ) : null}
               </div>
               <button onClick={() => setRequirements((prev) => prev.filter((x) => x.id !== r.id))} style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 12 }}>
                 Remove
@@ -461,3 +489,13 @@ export default function JobPrep() {
 }
 
 const labelSt = { fontSize: 11, color: "#888", display: "block", marginBottom: 3 };
+const smallBtn = {
+  padding: "6px 10px",
+  background: "#fff",
+  color: "#555",
+  border: "1px solid #e0e0e0",
+  borderRadius: 8,
+  cursor: "pointer",
+  fontSize: 11,
+  whiteSpace: "nowrap",
+};
