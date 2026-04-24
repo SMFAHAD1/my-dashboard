@@ -1,20 +1,20 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap");
 
 :root {
-  --bg: #080808;
-  --surface: #121212;
-  --surface2: #1a1a1a;
-  --border: #313131;
-  --accent: #f1f1f1;
-  --accent2: #cfcfcf;
-  --success: #f1f1f1;
-  --warning: #d9d9d9;
-  --danger: #bbbbbb;
-  --text: #f5f5f5;
-  --muted: #9b9b9b;
+  --bg: #121417;
+  --surface: #1b2026;
+  --surface2: #252c35;
+  --border: #46515f;
+  --accent: #ffffff;
+  --accent2: #d7e4f7;
+  --success: #eaf7ef;
+  --warning: #fff4d6;
+  --danger: #ffe2e2;
+  --text: #f7f9fc;
+  --muted: #b3c0cf;
   --radius: 12px;
   --radius-sm: 8px;
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
   --font: "DM Sans", sans-serif;
   --mono: "DM Mono", monospace;
 }
@@ -35,7 +35,10 @@ body,
 
 body {
   font-family: var(--font);
-  background: var(--bg);
+  background:
+    radial-gradient(circle at top right, rgba(111, 180, 255, 0.18), transparent 26%),
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 24%),
+    linear-gradient(180deg, #171b20 0%, var(--bg) 100%);
   color: var(--text);
   min-height: 100vh;
   line-height: 1.6;
@@ -59,8 +62,9 @@ textarea {
 
 .sidebar {
   width: 240px;
-  background: linear-gradient(180deg, #111111 0%, #090909 100%);
+  background: linear-gradient(180deg, #212833 0%, #181d25 100%);
   border-right: 1px solid var(--border);
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.16);
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
@@ -115,13 +119,14 @@ textarea {
 }
 
 .nav-link:hover {
-  background: var(--surface2);
+  background: rgba(255, 255, 255, 0.09);
   color: var(--text);
 }
 
 .nav-link.active {
-  background: rgba(255, 255, 255, 0.12);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(173, 211, 255, 0.14));
   color: var(--accent);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .nav-icon {
@@ -132,8 +137,8 @@ textarea {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -170,6 +175,7 @@ textarea {
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 16px;
+  box-shadow: var(--shadow);
 }
 
 .card-title {
@@ -194,6 +200,7 @@ textarea {
   border-radius: var(--radius);
   padding: 16px 20px;
   text-align: center;
+  box-shadow: var(--shadow);
 }
 
 .stat-value {
@@ -233,7 +240,8 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--accent);
+  border-color: #a8ccff;
+  box-shadow: 0 0 0 3px rgba(135, 185, 255, 0.16);
 }
 
 input::placeholder,
@@ -271,12 +279,12 @@ select option {
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: #fff;
+  background: linear-gradient(135deg, #ffffff 0%, #dcecff 100%);
+  color: #111827;
 }
 
 .btn-primary:hover {
-  background: #d9d9d9;
+  background: linear-gradient(135deg, #ffffff 0%, #cde3ff 100%);
   color: #111111;
   transform: translateY(-1px);
 }
@@ -290,7 +298,7 @@ select option {
 }
 
 .btn-danger:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .btn-ghost {
@@ -300,8 +308,9 @@ select option {
 }
 
 .btn-ghost:hover {
-  border-color: #d7d7d7;
-  color: #f1f1f1;
+  border-color: #dce7f4;
+  color: #f7f9fc;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .table-wrap {
@@ -326,7 +335,7 @@ th {
 
 td {
   padding: 11px 14px;
-  border-bottom: 1px solid rgba(46, 50, 72, 0.5);
+  border-bottom: 1px solid rgba(150, 170, 198, 0.22);
   vertical-align: middle;
 }
 
@@ -335,7 +344,7 @@ tr:last-child td {
 }
 
 tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .badge {
@@ -347,27 +356,27 @@ tr:hover td {
 }
 
 .badge-green {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--success);
 }
 
 .badge-yellow {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--warning);
 }
 
 .badge-red {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--danger);
 }
 
 .badge-blue {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(160, 205, 255, 0.16);
   color: var(--accent);
 }
 
 .badge-purple {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--accent2);
 }
 
@@ -382,7 +391,7 @@ tr:hover td {
 .progress-fill {
   height: 100%;
   border-radius: 4px;
-  background: var(--accent);
+  background: linear-gradient(90deg, #ffffff 0%, #a8ccff 100%);
   transition: width 0.4s ease;
 }
 
