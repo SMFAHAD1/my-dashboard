@@ -122,6 +122,7 @@ export default function Books() {
   const [readingTitle, setReadingTitle] = useState("");
   const [readingAuthor, setReadingAuthor] = useState("");
   const [readingRating, setReadingRating] = useState("0");
+  const [readingCover, setReadingCover] = useState("");
   const [readingAdded, setReadingAdded] = useState(today);
   const [readingStart, setReadingStart] = useState("");
   const [readingFinish, setReadingFinish] = useState("");
@@ -142,6 +143,7 @@ export default function Books() {
         title: readingTitle.trim(),
         author: readingAuthor.trim(),
         rating: readingRating !== "" ? Number(readingRating) : 0,
+        coverUrl: readingCover.trim(),
         addedDate: readingAdded,
         startDate: readingStart,
         finishDate: readingFinish,
@@ -150,6 +152,7 @@ export default function Books() {
     setReadingTitle("");
     setReadingAuthor("");
     setReadingRating("0");
+    setReadingCover("");
     setReadingAdded(today);
     setReadingStart("");
     setReadingFinish("");
@@ -239,6 +242,10 @@ export default function Books() {
               style={{ width: "100%" }}
             />
           </div>
+          <div style={{ flex: 2, minWidth: 180 }}>
+            <label style={labelStyle}>Poster / Cover URL</label>
+            <input value={readingCover} onChange={(event) => setReadingCover(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
+          </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginTop: 10 }}>
           <div style={{ flex: 1, minWidth: 130 }}>
@@ -259,12 +266,59 @@ export default function Books() {
         </div>
       </div>
 
+      {readingBooks.length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <div className="card-title">Main List</div>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cover</th>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>Rating</th>
+                  <th>Added</th>
+                  <th>Start</th>
+                  <th>Finish</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {readingBooks.map((book) => (
+                  <tr key={book.id}>
+                    <td>
+                      {book.coverUrl ? (
+                        <img src={book.coverUrl} alt={book.title} style={{ width: 34, height: 48, objectFit: "cover", borderRadius: 4 }} />
+                      ) : (
+                        <div style={{ width: 34, height: 48, borderRadius: 4, background: "#242424" }} />
+                      )}
+                    </td>
+                    <td>{book.title}</td>
+                    <td>{book.author || "-"}</td>
+                    <td>{book.rating ? `${formatRating(book.rating)}/10` : "-"}</td>
+                    <td>{book.addedDate ? formatDate(book.addedDate) : "-"}</td>
+                    <td>{book.startDate ? formatDate(book.startDate) : "-"}</td>
+                    <td>{book.finishDate ? formatDate(book.finishDate) : "-"}</td>
+                    <td><button onClick={() => deleteBook(book.id)} style={ghostButtonStyle}>Remove</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 8 }}>
         {readingBooks.length === 0 && (
           <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: "20px 0" }}>No books yet.</p>
         )}
         {readingBooks.map((book) => (
           <div key={book.id} className="card" style={{ padding: "12px 16px", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 0 }}>
+            {book.coverUrl ? (
+              <img src={book.coverUrl} alt={book.title} style={{ width: 54, height: 76, objectFit: "cover", borderRadius: 6, flexShrink: 0 }} />
+            ) : (
+              <div style={{ width: 54, height: 76, borderRadius: 6, background: "#1f1f1f", flexShrink: 0 }} />
+            )}
             <div style={{ flex: 1 }}>
               <p style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>{book.title}</p>
               {book.author && <p style={{ fontSize: 12, color: "#a4a4a4", marginBottom: 4 }}>{book.author}</p>}

@@ -434,6 +434,53 @@ export default function Movies() {
         </p>
       )}
 
+      {movies.length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <div className="card-title">Main List</div>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Poster</th>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Country</th>
+                  <th>Your Rating</th>
+                  <th>IMDb</th>
+                  <th>Added</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {movies.map((movie) => (
+                  <tr key={movie.id}>
+                    <td>
+                      {movie.poster ? (
+                        <img src={movie.poster} alt={movie.title} style={{ width: 34, height: 50, objectFit: "cover", borderRadius: 4 }} />
+                      ) : (
+                        <div style={{ width: 34, height: 50, background: "#242424", borderRadius: 4 }} />
+                      )}
+                    </td>
+                    <td>{movie.title}</td>
+                    <td>{TYPE_META[movie.type]?.label || movie.type}</td>
+                    <td>{movie.country || "-"}</td>
+                    <td>{formatDecimal(movie.rating)}</td>
+                    <td>{movie.imdbRating || "-"}</td>
+                    <td>{movie.addedDate ? formatDate(movie.addedDate) : "-"}</td>
+                    <td>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button onClick={() => startEdit(movie.id)} style={ghostButtonStyle}>Edit</button>
+                        <button onClick={() => deleteMovie(movie.id)} style={ghostButtonStyle}>Remove</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 14 }}>
         {movies.map((movie) => (
           <div key={movie.id} className="card" style={{ padding: 0, overflow: "hidden", position: "relative", outline: editId === movie.id ? "2px solid #f2f2f2" : "none" }}>

@@ -8,11 +8,11 @@ import JobPrep from "./pages/JobPrep.jsx";
 
 const NAV_ITEMS = [
   { to: "/", label: "My Plan", icon: "MP" },
+  { to: "/academic", label: "Academic", icon: "AC" },
   { to: "/university", label: "University", icon: "UN" },
+  { to: "/jobprep", label: "Job Prep", icon: "JP" },
   { to: "/books", label: "Books", icon: "BK" },
   { to: "/movies", label: "Movies", icon: "MV" },
-  { to: "/academic", label: "Academic", icon: "AC" },
-  { to: "/jobprep", label: "Job Prep", icon: "JP" },
 ];
 
 export default function App() {
@@ -46,11 +46,11 @@ export default function App() {
           <Routes>
             <Route path="/" element={<MyPlan />} />
             <Route path="/my-plan" element={<Navigate to="/" replace />} />
+            <Route path="/academic" element={<Academic />} />
             <Route path="/university" element={<University />} />
+            <Route path="/jobprep" element={<JobPrep />} />
             <Route path="/books" element={<Books />} />
             <Route path="/movies" element={<Movies />} />
-            <Route path="/academic" element={<Academic />} />
-            <Route path="/jobprep" element={<JobPrep />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
