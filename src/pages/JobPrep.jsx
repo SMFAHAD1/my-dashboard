@@ -10,6 +10,11 @@ function formatDate(value) {
   return `${parseInt(day, 10)} ${months[parseInt(month, 10) - 1]} ${year}`;
 }
 
+function normalizeUrl(value) {
+  if (!value) return "";
+  return value.startsWith("http://") || value.startsWith("https://") ? value : `https://${value}`;
+}
+
 function Divider({ label }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "26px 0 14px" }}>
@@ -37,6 +42,7 @@ const SKILL_LEVELS = {
 };
 
 const RESOURCE_TYPES = ["Course", "Book", "Platform", "YouTube", "Article", "Practice", "Other"];
+const EMPTY_LINK = { label: "", url: "" };
 
 export default function JobPrep() {
   const [applications, setApplications] = useLocalStorage("dashboard-jobs-applications", [], 1);
@@ -50,7 +56,7 @@ export default function JobPrep() {
   const [requirement, setRequirement] = useState("");
   const [appDate, setAppDate] = useState(today);
   const [deadline, setDeadline] = useState("");
-  const [link, setLink] = useState("");
+  const [appLinks, setAppLinks] = useState([{ ...EMPTY_LINK }]);
   const [salary, setSalary] = useState("");
   const [notes, setNotes] = useState("");
   const [usage, setUsage] = useState("");
@@ -58,17 +64,33 @@ export default function JobPrep() {
 
   const [skillName, setSkillName] = useState("");
   const [skillLevel, setSkillLevel] = useState("learning");
-  const [skillLink, setSkillLink] = useState("");
+  const [skillLinks, setSkillLinks] = useState([{ ...EMPTY_LINK }]);
   const [skillNotes, setSkillNotes] = useState("");
 
   const [resourceTitle, setResourceTitle] = useState("");
   const [resourceType, setResourceType] = useState("Course");
-  const [resourceLink, setResourceLink] = useState("");
+  const [resourceLinks, setResourceLinks] = useState([{ ...EMPTY_LINK }]);
   const [resourceNotes, setResourceNotes] = useState("");
 
-  function normalizeUrl(value) {
-    if (!value) return "";
-    return value.startsWith("http://") || value.startsWith("https://") ? value : `https://${value}`;
+  function cleanLinks(links) {
+    return links
+      .map((item) => ({
+        label: item.label.trim(),
+        url: item.url.trim(),
+      }))
+      .filter((item) => item.url);
+  }
+
+  function updateLinkItem(setter, index, field, value) {
+    setter((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, [field]: value } : item)));
+  }
+
+  function addLinkItem(setter) {
+    setter((current) => [...current, { ...EMPTY_LINK }]);
+  }
+
+  function removeLinkItem(setter, index) {
+    setter((current) => (current.length === 1 ? [{ ...EMPTY_LINK }] : current.filter((_, itemIndex) => itemIndex !== index)));
   }
 
   function addApplication() {
@@ -85,7 +107,7 @@ export default function JobPrep() {
         requirement: requirement.trim(),
         appDate,
         deadline,
-        link: link.trim(),
+        links: cleanLinks(appLinks),
         salary: salary.trim(),
         notes: notes.trim(),
         usage: usage.trim(),
@@ -99,7 +121,7 @@ export default function JobPrep() {
     setRequirement("");
     setAppDate(today);
     setDeadline("");
-    setLink("");
+    setAppLinks([{ ...EMPTY_LINK }]);
     setSalary("");
     setNotes("");
     setUsage("");
@@ -123,13 +145,13 @@ export default function JobPrep() {
         id: Date.now(),
         name: skillName.trim(),
         level: skillLevel,
-        link: skillLink.trim(),
+        links: cleanLinks(skillLinks),
         notes: skillNotes.trim(),
       },
     ]);
     setSkillName("");
     setSkillLevel("learning");
-    setSkillLink("");
+    setSkillLinks([{ ...EMPTY_LINK }]);
     setSkillNotes("");
   }
 
@@ -145,14 +167,14 @@ export default function JobPrep() {
         id: Date.now(),
         title: resourceTitle.trim(),
         type: resourceType,
-        link: resourceLink.trim(),
+        links: cleanLinks(resourceLinks),
         notes: resourceNotes.trim(),
         done: false,
       },
     ]);
     setResourceTitle("");
     setResourceType("Course");
-    setResourceLink("");
+    setResourceLinks([{ ...EMPTY_LINK }]);
     setResourceNotes("");
   }
 
@@ -170,6 +192,7 @@ export default function JobPrep() {
     ...item,
     status: item.status === "requirement" ? "ongoing" : item.status,
     requirement: item.requirement || (item.status === "requirement" ? "Requirement pending" : ""),
+    links: item.links?.filter((linkItem) => linkItem?.url) || (item.link ? [{ label: "Job Link", url: item.link }] : []),
   }));
   const counts = Object.keys(APP_STATUS).reduce((accumulator, key) => {
     accumulator[key] = normalizedApplications.filter((item) => item.status === key).length;
@@ -260,9 +283,34 @@ export default function JobPrep() {
             <label style={labelStyle}>Expected Salary</label>
             <input value={salary} onChange={(event) => setSalary(event.target.value)} placeholder="e.g. 50000" style={{ width: "100%" }} />
           </div>
-          <div>
-            <label style={labelStyle}>Job Link</label>
-            <input value={link} onChange={(event) => setLink(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
+          <div style={{ gridColumn: "1 / -1" }}>
+            <label style={labelStyle}>Links</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {appLinks.map((linkItem, index) => (
+                <div key={`app-link-${index}`} style={{ display: "grid", gridTemplateColumns: "minmax(140px, 0.8fr) minmax(220px, 1.8fr) auto", gap: 8, alignItems: "center" }}>
+                  <input
+                    value={linkItem.label}
+                    onChange={(event) => updateLinkItem(setAppLinks, index, "label", event.target.value)}
+                    placeholder="Label"
+                    style={{ width: "100%" }}
+                  />
+                  <input
+                    value={linkItem.url}
+                    onChange={(event) => updateLinkItem(setAppLinks, index, "url", event.target.value)}
+                    placeholder="https://..."
+                    style={{ width: "100%" }}
+                  />
+                  <button type="button" onClick={() => removeLinkItem(setAppLinks, index)} style={smallGhostButton}>
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <div>
+                <button type="button" onClick={() => addLinkItem(setAppLinks)} style={smallGhostButton}>
+                  Add Link
+                </button>
+              </div>
+            </div>
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
             <label style={labelStyle}>Notes</label>
@@ -410,10 +458,6 @@ export default function JobPrep() {
               ))}
             </select>
           </div>
-          <div style={{ flex: 2, minWidth: 180 }}>
-            <label style={labelStyle}>Link</label>
-            <input value={skillLink} onChange={(event) => setSkillLink(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
-          </div>
         </div>
         <div>
           <label style={labelStyle}>Notes</label>
@@ -423,6 +467,35 @@ export default function JobPrep() {
             placeholder="What to study, roadmap, reminders..."
             style={{ width: "100%", minHeight: 84 }}
           />
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <label style={labelStyle}>Links</label>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {skillLinks.map((linkItem, index) => (
+              <div key={`skill-link-${index}`} style={{ display: "grid", gridTemplateColumns: "minmax(140px, 0.8fr) minmax(220px, 1.8fr) auto", gap: 8, alignItems: "center" }}>
+                <input
+                  value={linkItem.label}
+                  onChange={(event) => updateLinkItem(setSkillLinks, index, "label", event.target.value)}
+                  placeholder="Label"
+                  style={{ width: "100%" }}
+                />
+                <input
+                  value={linkItem.url}
+                  onChange={(event) => updateLinkItem(setSkillLinks, index, "url", event.target.value)}
+                  placeholder="https://..."
+                  style={{ width: "100%" }}
+                />
+                <button type="button" onClick={() => removeLinkItem(setSkillLinks, index)} style={smallGhostButton}>
+                  Remove
+                </button>
+              </div>
+            ))}
+            <div>
+              <button type="button" onClick={() => addLinkItem(setSkillLinks)} style={smallGhostButton}>
+                Add Link
+              </button>
+            </div>
+          </div>
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
           <button onClick={addSkill} style={buttonStyle}>
@@ -435,6 +508,7 @@ export default function JobPrep() {
         {skills.length === 0 && <p style={{ fontSize: 13, color: "#9a9a9a", padding: "12px 0" }}>No skills added yet.</p>}
         {skills.map((skill) => {
           const meta = SKILL_LEVELS[skill.level];
+          const skillLinksList = skill.links?.filter((linkItem) => linkItem?.url) || (skill.link ? [{ label: "Link", url: skill.link }] : []);
           return (
             <div key={skill.id} className="card" style={{ marginBottom: 0, borderLeft: `3px solid ${meta.border}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
@@ -454,10 +528,14 @@ export default function JobPrep() {
                       {meta.label}
                     </span>
                   </div>
-                  {skill.link && (
-                    <a href={normalizeUrl(skill.link)} target="_blank" rel="noreferrer" style={{ display: "block", fontSize: 12, color: "#dcdcdc", marginBottom: 4 }}>
-                      {skill.link}
-                    </a>
+                  {skillLinksList.length > 0 && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: skill.notes ? 4 : 0 }}>
+                      {skillLinksList.map((linkItem, index) => (
+                        <a key={`${skill.id}-link-${index}`} href={normalizeUrl(linkItem.url)} target="_blank" rel="noreferrer" style={{ display: "block", fontSize: 12, color: "#dcdcdc" }}>
+                          {linkItem.label || `Link ${index + 1}`}: {linkItem.url}
+                        </a>
+                      ))}
+                    </div>
                   )}
                   {skill.notes && <p style={{ fontSize: 12, color: "#a6a6a6" }}>{skill.notes}</p>}
                 </div>
@@ -494,10 +572,6 @@ export default function JobPrep() {
               ))}
             </select>
           </div>
-          <div style={{ flex: 2, minWidth: 180 }}>
-            <label style={labelStyle}>Link</label>
-            <input value={resourceLink} onChange={(event) => setResourceLink(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
-          </div>
         </div>
         <div>
           <label style={labelStyle}>Notes</label>
@@ -508,6 +582,35 @@ export default function JobPrep() {
             style={{ width: "100%", minHeight: 84 }}
           />
         </div>
+        <div style={{ marginTop: 12 }}>
+          <label style={labelStyle}>Links</label>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {resourceLinks.map((linkItem, index) => (
+              <div key={`resource-link-${index}`} style={{ display: "grid", gridTemplateColumns: "minmax(140px, 0.8fr) minmax(220px, 1.8fr) auto", gap: 8, alignItems: "center" }}>
+                <input
+                  value={linkItem.label}
+                  onChange={(event) => updateLinkItem(setResourceLinks, index, "label", event.target.value)}
+                  placeholder="Label"
+                  style={{ width: "100%" }}
+                />
+                <input
+                  value={linkItem.url}
+                  onChange={(event) => updateLinkItem(setResourceLinks, index, "url", event.target.value)}
+                  placeholder="https://..."
+                  style={{ width: "100%" }}
+                />
+                <button type="button" onClick={() => removeLinkItem(setResourceLinks, index)} style={smallGhostButton}>
+                  Remove
+                </button>
+              </div>
+            ))}
+            <div>
+              <button type="button" onClick={() => addLinkItem(setResourceLinks)} style={smallGhostButton}>
+                Add Link
+              </button>
+            </div>
+          </div>
+        </div>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
           <button onClick={addResource} style={buttonStyle}>
             Add
@@ -517,57 +620,64 @@ export default function JobPrep() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {resources.length === 0 && <p style={{ fontSize: 13, color: "#9a9a9a", padding: "12px 0" }}>No resources added yet.</p>}
-        {resources.map((resource) => (
-          <div
-            key={resource.id}
-            className="card"
-            style={{
-              padding: "10px 14px",
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 10,
-              opacity: resource.done ? 0.55 : 1,
-            }}
-          >
+        {resources.map((resource) => {
+          const resourceLinksList = resource.links?.filter((linkItem) => linkItem?.url) || (resource.link ? [{ label: "Link", url: resource.link }] : []);
+          return (
             <div
-              onClick={() => toggleResource(resource.id)}
+              key={resource.id}
+              className="card"
               style={{
-                width: 18,
-                height: 18,
-                borderRadius: 5,
-                flexShrink: 0,
-                cursor: "pointer",
-                border: resource.done ? "1px solid #888" : "2px solid #5c5c5c",
-                background: resource.done ? "#efefef" : "transparent",
-                color: "#111111",
+                padding: "10px 14px",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 10,
-                marginTop: 2,
+                alignItems: "flex-start",
+                gap: 10,
+                opacity: resource.done ? 0.55 : 1,
               }}
             >
-              {resource.done ? "OK" : ""}
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 4 }}>
-                <p style={{ fontWeight: 500, fontSize: 13, textDecoration: resource.done ? "line-through" : "none" }}>{resource.title}</p>
-                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "#1f1f1f", color: "#efefef", border: "1px solid #555" }}>
-                  {resource.type}
-                </span>
+              <div
+                onClick={() => toggleResource(resource.id)}
+                style={{
+                  width: 18,
+                  height: 18,
+                  borderRadius: 5,
+                  flexShrink: 0,
+                  cursor: "pointer",
+                  border: resource.done ? "1px solid #888" : "2px solid #5c5c5c",
+                  background: resource.done ? "#efefef" : "transparent",
+                  color: "#111111",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 10,
+                  marginTop: 2,
+                }}
+              >
+                {resource.done ? "OK" : ""}
               </div>
-              {resource.link && (
-                <a href={normalizeUrl(resource.link)} target="_blank" rel="noreferrer" style={{ display: "block", fontSize: 12, color: "#d8d8d8", marginBottom: 4 }}>
-                  {resource.link}
-                </a>
-              )}
-              {resource.notes && <p style={{ fontSize: 12, color: "#a6a6a6" }}>{resource.notes}</p>}
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 4 }}>
+                  <p style={{ fontWeight: 500, fontSize: 13, textDecoration: resource.done ? "line-through" : "none" }}>{resource.title}</p>
+                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "#1f1f1f", color: "#efefef", border: "1px solid #555" }}>
+                    {resource.type}
+                  </span>
+                </div>
+                {resourceLinksList.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: resource.notes ? 4 : 0 }}>
+                    {resourceLinksList.map((linkItem, index) => (
+                      <a key={`${resource.id}-link-${index}`} href={normalizeUrl(linkItem.url)} target="_blank" rel="noreferrer" style={{ display: "block", fontSize: 12, color: "#d8d8d8" }}>
+                        {linkItem.label || `Link ${index + 1}`}: {linkItem.url}
+                      </a>
+                    ))}
+                  </div>
+                )}
+                {resource.notes && <p style={{ fontSize: 12, color: "#a6a6a6" }}>{resource.notes}</p>}
+              </div>
+              <button onClick={() => removeResource(resource.id)} style={ghostDangerButton}>
+                Remove
+              </button>
             </div>
-            <button onClick={() => removeResource(resource.id)} style={ghostDangerButton}>
-              Remove
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -575,6 +685,7 @@ export default function JobPrep() {
 
 function ApplicationCard({ item, statusMeta, onDelete, onChangeStatus }) {
   const isDeadlinePast = item.deadline && item.deadline < today && item.status === "ongoing";
+  const appLinksList = item.links?.filter((linkItem) => linkItem?.url) || (item.link ? [{ label: "Job Link", url: item.link }] : []);
 
   return (
     <div className="card" style={{ marginBottom: 0, borderLeft: `3px solid ${statusMeta.border}` }}>
@@ -605,15 +716,20 @@ function ApplicationCard({ item, statusMeta, onDelete, onChangeStatus }) {
           </div>
           {item.notes && <p style={{ fontSize: 12, color: "#aaaaaa", marginTop: 5, fontStyle: "italic" }}>{item.notes}</p>}
           {item.usage && <p style={{ fontSize: 12, color: "#cfcfcf", marginTop: 4 }}>Use: {item.usage}</p>}
-          {item.link && (
-            <a
-              href={item.link.startsWith("http") ? item.link : `https://${item.link}`}
-              target="_blank"
-              rel="noreferrer"
-              style={{ fontSize: 12, color: "#dfdfdf", marginTop: 4, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
-            >
-              {item.link}
-            </a>
+          {appLinksList.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 4 }}>
+              {appLinksList.map((linkItem, index) => (
+                <a
+                  key={`${item.id}-link-${index}`}
+                  href={normalizeUrl(linkItem.url)}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ fontSize: 12, color: "#dfdfdf", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                >
+                  {linkItem.label || `Link ${index + 1}`}: {linkItem.url}
+                </a>
+              ))}
+            </div>
           )}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
@@ -687,4 +803,15 @@ const ghostDangerButton = {
   borderRadius: 8,
   padding: "7px 11px",
   fontSize: 13,
+};
+
+const smallGhostButton = {
+  background: "transparent",
+  border: "1px solid #555555",
+  cursor: "pointer",
+  color: "#d8d8d8",
+  borderRadius: 8,
+  padding: "8px 11px",
+  fontSize: 12,
+  whiteSpace: "nowrap",
 };
