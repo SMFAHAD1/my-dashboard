@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "../supabase";
 
 export function useSupabase(tableName, initialValue) {
-  const [state, setState] = useState(initialValue);
+  const initialValueRef = useRef(initialValue);
+  const [state, setState] = useState(initialValueRef.current);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
+    setLoading(true);
 
     async function loadData() {
       const { data } = await supabase
@@ -21,7 +23,7 @@ export function useSupabase(tableName, initialValue) {
       if (data?.data != null) {
         setState(data.data);
       } else {
-        setState(initialValue);
+        setState(initialValueRef.current);
       }
 
       setLoading(false);
@@ -32,7 +34,7 @@ export function useSupabase(tableName, initialValue) {
     return () => {
       isMounted = false;
     };
-  }, [initialValue, tableName]);
+  }, [tableName]);
 
   async function setAndSave(valueOrUpdater) {
     let nextValue;
