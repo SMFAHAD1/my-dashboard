@@ -201,7 +201,7 @@ function YearAnalysis({ movies }) {
 }
 
 export default function Movies() {
-  const [movies, setMovies, dataLoading] = useSupabase("Movies", []);
+  const [movies, setMovies] = useSupabase("Movies", []);
   const [watchForm, setWatchForm] = useState({ ...watchFormDefaults });
   const [futureForm, setFutureForm] = useState({ ...futureFormDefaults });
   const [editId, setEditId] = useState(null);
@@ -369,8 +369,6 @@ export default function Movies() {
   const inProgressCount = watchedMovies.filter((m) => m.startDate && !m.endDate).length;
   const avgRating = watchedMovies.map((m) => normalizeRating(m.rating)).filter((rating) => rating !== "");
   const avgRatingValue = avgRating.length ? (avgRating.reduce((s, rating) => s + rating, 0) / avgRating.length).toFixed(1) : null;
-
-  if (dataLoading) return <div style={{ padding: "32px" }}>Loading...</div>;
 
   return (
     <div>

@@ -12,11 +12,9 @@ export function useSupabase(tableName, initialValue) {
       return initialValueRef.current;
     }
   });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
 
     async function loadData() {
       let cachedValue = null;
@@ -30,7 +28,6 @@ export function useSupabase(tableName, initialValue) {
 
       if (cachedValue != null && isMounted) {
         setState(cachedValue);
-        setLoading(false);
       }
 
       const { data } = await supabase
@@ -54,8 +51,6 @@ export function useSupabase(tableName, initialValue) {
       } else {
         setState(initialValueRef.current);
       }
-
-      setLoading(false);
     }
 
     loadData();
@@ -84,5 +79,5 @@ export function useSupabase(tableName, initialValue) {
     }
   }
 
-  return [state, setAndSave, loading];
+  return [state, setAndSave];
 }

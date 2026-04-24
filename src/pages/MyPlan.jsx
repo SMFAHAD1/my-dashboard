@@ -198,7 +198,7 @@ function AnalysisPanel({ plans, period }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────
 export default function MyPlan() {
-  const [plans, setPlans, loading] = useSupabase("plans", []);
+  const [plans, setPlans] = useSupabase("plans", []);
   const [analysisPeriod, setAnalysisPeriod] = useState("weekly");
   const [filter, setFilter]   = useState("all");
 
@@ -230,8 +230,6 @@ export default function MyPlan() {
   }, {});
 
   const filtered = filter === "all" ? plans : plans.filter(p => p.status === filter);
-
-  if (loading) return <div style={{ padding: "32px" }}>Loading...</div>;
 
   return (
     <div>

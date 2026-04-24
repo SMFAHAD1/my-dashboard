@@ -31,7 +31,7 @@ const APP_STATUS = {
 const JOB_TYPES = ["Full-time", "Part-time", "Internship", "Remote", "Contract", "Freelance"];
 
 export default function JobPrep() {
-  const [jobPrepData, setJobPrepData, loading] = useSupabase("Job Preparation", {
+  const [jobPrepData, setJobPrepData] = useSupabase("Job Preparation", {
     applications: [],
     skills: [],
     resources: [],
@@ -245,7 +245,6 @@ export default function JobPrep() {
 
   const filtered = filter === "all" ? applications : applications.filter((a) => a.status === filter);
   const requirementDone = requirements.filter((r) => r.done).length;
-  if (loading) return <div style={{ padding: "32px" }}>Loading...</div>;
 
   return (
     <div>
