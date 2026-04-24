@@ -1,5 +1,4 @@
 import { BrowserRouter, NavLink, Navigate, Route, Routes } from "react-router-dom";
-import Planner from "./pages/Planner.jsx";
 import MyPlan from "./pages/MyPlan.jsx";
 import University from "./pages/University.jsx";
 import Books from "./pages/Books.jsx";
@@ -8,8 +7,7 @@ import Academic from "./pages/Academic.jsx";
 import JobPrep from "./pages/JobPrep.jsx";
 
 const NAV_ITEMS = [
-  { to: "/", label: "Planner", icon: "PL" },
-  { to: "/my-plan", label: "My Plan", icon: "MP" },
+  { to: "/", label: "My Plan", icon: "MP" },
   { to: "/university", label: "University", icon: "UN" },
   { to: "/books", label: "Books", icon: "BK" },
   { to: "/movies", label: "Movies", icon: "MV" },
@@ -46,8 +44,8 @@ export default function App() {
 
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<Planner />} />
-            <Route path="/my-plan" element={<MyPlan />} />
+            <Route path="/" element={<MyPlan />} />
+            <Route path="/my-plan" element={<Navigate to="/" replace />} />
             <Route path="/university" element={<University />} />
             <Route path="/books" element={<Books />} />
             <Route path="/movies" element={<Movies />} />

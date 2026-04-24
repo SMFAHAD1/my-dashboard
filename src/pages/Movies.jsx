@@ -1,62 +1,69 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const APIKEY = "trilogy";
 const today = new Date().toISOString().split("T")[0];
 
-function formatDate(d) {
-  if (!d) return "";
-  const [y, m, day] = d.split("-");
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  return `${parseInt(day)} ${months[parseInt(m) - 1]} ${y}`;
+function formatDate(value) {
+  if (!value) return "";
+  const [year, month, day] = value.split("-");
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${parseInt(day, 10)} ${months[parseInt(month, 10) - 1]} ${year}`;
 }
 
-function Stars({ rating, max = 10 }) {
-  return (
-    <span style={{ color: "#f0a500", fontSize: 12, letterSpacing: 1 }}>
-      {"★".repeat(rating)}{"☆".repeat(max - rating)}
-      <span style={{ fontSize: 10, color: "#888", marginLeft: 5 }}>{rating}/10</span>
-    </span>
-  );
+function formatDecimal(value, digits = 1) {
+  return Number(value || 0).toFixed(digits);
 }
 
 const TYPE_OPTIONS = [
-  { value: "movie",       label: "🎬 Movie" },
-  { value: "series",      label: "📺 TV Series" },
-  { value: "documentary", label: "🎥 Documentary" },
-  { value: "anime",       label: "🌸 Anime" },
+  { value: "movie", label: "Movie" },
+  { value: "series", label: "TV Series" },
+  { value: "documentary", label: "Documentary" },
+  { value: "anime", label: "Anime" },
 ];
 
 const TYPE_META = {
-  movie:       { label: "Movie",       color: "#185FA5", bg: "#E6F1FB" },
-  series:      { label: "Series",      color: "#3B6D11", bg: "#EAF3DE" },
-  documentary: { label: "Documentary", color: "#854F0B", bg: "#FAEEDA" },
-  anime:       { label: "Anime",       color: "#993556", bg: "#FBEAF0" },
+  movie: { label: "Movie" },
+  series: { label: "Series" },
+  documentary: { label: "Documentary" },
+  anime: { label: "Anime" },
 };
 
-const formDefaults = {
-  title: "", type: "movie", rating: 7, country: "",
-  startDate: "", endDate: "", addedDate: today,
+const watchedDefaults = {
+  title: "",
+  type: "movie",
+  rating: 7.0,
+  country: "",
+  startDate: "",
+  endDate: "",
+  addedDate: today,
 };
 
-// ── Year-by-Year Analysis ──────────────────────────────────────────────
+const watchlistDefaults = {
+  name: "",
+  type: "movie",
+  country: "",
+  addedDate: today,
+};
+
 function YearAnalysis({ movies }) {
   const [expandedYear, setExpandedYear] = useState(null);
-
   if (movies.length === 0) return null;
 
-  // Build per-year stats grouped by START WATCHING year
   const yearMap = {};
-  movies.forEach(m => {
-    const yr = m.startDate ? m.startDate.split("-")[0] : "Not set";
-    if (!yearMap[yr]) {
-      yearMap[yr] = { year: yr, total: 0, movie: 0, series: 0, documentary: 0, anime: 0, imdbSum: 0, imdbCount: 0, items: [] };
+  movies.forEach((movie) => {
+    const year = movie.startDate ? movie.startDate.split("-")[0] : "Not set";
+    if (!yearMap[year]) {
+      yearMap[year] = { year, total: 0, movie: 0, series: 0, documentary: 0, anime: 0, imdbSum: 0, imdbCount: 0, ratingSum: 0, items: [] };
     }
-    const y = yearMap[yr];
-    y.total++;
-    if (y[m.type] !== undefined) y[m.type]++;
-    if (m.imdbRating) { y.imdbSum += parseFloat(m.imdbRating); y.imdbCount++; }
-    y.items.push(m);
+    yearMap[year].total += 1;
+    if (yearMap[year][movie.type] !== undefined) yearMap[year][movie.type] += 1;
+    if (movie.imdbRating) {
+      yearMap[year].imdbSum += parseFloat(movie.imdbRating);
+      yearMap[year].imdbCount += 1;
+    }
+    yearMap[year].ratingSum += Number(movie.rating || 0);
+    yearMap[year].items.push(movie);
   });
 
   const years = Object.values(yearMap).sort((a, b) => {
@@ -65,127 +72,59 @@ function YearAnalysis({ movies }) {
     return b.year.localeCompare(a.year);
   });
 
-  const maxTotal = Math.max(...years.map(y => y.total));
-
-  const typeColors = { movie: "#185FA5", series: "#3B6D11", documentary: "#854F0B", anime: "#993556" };
-  const typeBgs   = { movie: "#E6F1FB", series: "#EAF3DE", documentary: "#FAEEDA", anime: "#FBEAF0" };
+  const maxTotal = Math.max(...years.map((entry) => entry.total));
 
   return (
     <div style={{ marginTop: 36 }}>
-      {/* Section header */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-        <div style={{ flex: 1, height: 1, background: "#eee" }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#555", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
-          📅 YEAR-BY-YEAR WATCHED ANALYSIS
+        <div style={{ flex: 1, height: 1, background: "#2f2f2f" }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#bdbdbd", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+          YEAR-BY-YEAR WATCHED ANALYSIS
         </span>
-        <div style={{ flex: 1, height: 1, background: "#eee" }} />
+        <div style={{ flex: 1, height: 1, background: "#2f2f2f" }} />
       </div>
-      <p style={{ fontSize: 11, color: "#aaa", textAlign: "center", marginBottom: 18 }}>Grouped by start watching year</p>
+      <p style={{ fontSize: 11, color: "#888", textAlign: "center", marginBottom: 18 }}>Grouped by start watching year</p>
 
-      {/* Summary pills */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
-        {Object.entries(typeColors).map(([type, color]) => {
-          const count = movies.filter(m => m.type === type).length;
-          if (!count) return null;
-          return (
-            <span key={type} style={{
-              fontSize: 12, fontWeight: 500,
-              padding: "4px 12px", borderRadius: 99,
-              background: typeBgs[type], color,
-            }}>
-              {TYPE_META[type]?.label}: {count}
-            </span>
-          );
-        })}
-        <span style={{ fontSize: 12, fontWeight: 500, padding: "4px 12px", borderRadius: 99, background: "#f0f0f0", color: "#555" }}>
-          Total: {movies.length}
-        </span>
-        {(() => {
-          const rated = movies.filter(m => m.imdbRating);
-          if (!rated.length) return null;
-          const avg = (rated.reduce((s, m) => s + parseFloat(m.imdbRating), 0) / rated.length).toFixed(1);
-          return (
-            <span style={{ fontSize: 12, fontWeight: 500, padding: "4px 12px", borderRadius: 99, background: "#fffbe6", color: "#b45309" }}>
-              ⭐ Avg IMDb: {avg}
-            </span>
-          );
-        })()}
-      </div>
-
-      {/* Year rows */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {years.map(y => {
-          const barPct = maxTotal > 0 ? (y.total / maxTotal) * 100 : 0;
-          const avgImdb = y.imdbCount > 0 ? (y.imdbSum / y.imdbCount).toFixed(1) : null;
-          const isOpen = expandedYear === y.year;
+        {years.map((entry) => {
+          const barPercent = maxTotal > 0 ? (entry.total / maxTotal) * 100 : 0;
+          const avgImdb = entry.imdbCount > 0 ? (entry.imdbSum / entry.imdbCount).toFixed(1) : null;
+          const avgRating = entry.total > 0 ? (entry.ratingSum / entry.total).toFixed(1) : null;
+          const isOpen = expandedYear === entry.year;
 
           return (
-            <div key={y.year} style={{ border: "1px solid #eee", borderRadius: 10, overflow: "hidden", background: "#fafafa" }}>
-              {/* Row header — clickable */}
+            <div key={entry.year} style={{ border: "1px solid #333", borderRadius: 10, overflow: "hidden", background: "#121212" }}>
               <div
-                onClick={() => setExpandedYear(isOpen ? null : y.year)}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", cursor: "pointer", userSelect: "none" }}
+                onClick={() => setExpandedYear(isOpen ? null : entry.year)}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", cursor: "pointer", userSelect: "none", flexWrap: "wrap" }}
               >
-                {/* Year label */}
-                <span style={{ fontWeight: 600, fontSize: 15, minWidth: 52, color: y.year === "Not set" ? "#aaa" : "#222" }}>{y.year}</span>
-
-                {/* Bar track */}
-                <div style={{ flex: 1, height: 8, background: "#eee", borderRadius: 99, overflow: "hidden" }}>
-                  <div style={{ width: `${barPct}%`, height: "100%", background: "#185FA5", borderRadius: 99, transition: "width 0.4s" }} />
+                <span style={{ fontWeight: 600, fontSize: 15, minWidth: 52, color: entry.year === "Not set" ? "#8e8e8e" : "#f1f1f1" }}>{entry.year}</span>
+                <div style={{ flex: 1, height: 8, background: "#2d2d2d", borderRadius: 99, overflow: "hidden", minWidth: 120 }}>
+                  <div style={{ width: `${barPercent}%`, height: "100%", background: "#f1f1f1", borderRadius: 99, transition: "width 0.4s" }} />
                 </div>
-
-                {/* Count */}
-                <span style={{ fontSize: 13, fontWeight: 500, color: "#555", minWidth: 24, textAlign: "right" }}>{y.total}</span>
-
-                {/* Type breakdown badges */}
-                <div style={{ display: "flex", gap: 4, flexWrap: "wrap", minWidth: 160, justifyContent: "flex-end" }}>
-                  {Object.entries(typeColors).map(([type, color]) => {
-                    const cnt = y[type];
-                    if (!cnt) return null;
-                    return (
-                      <span key={type} style={{
-                        fontSize: 10, fontWeight: 500,
-                        padding: "2px 7px", borderRadius: 99,
-                        background: typeBgs[type], color,
-                      }}>
-                        {TYPE_META[type]?.label} {cnt}
-                      </span>
-                    );
-                  })}
-                </div>
-
-                {/* IMDb avg */}
-                {avgImdb && (
-                  <span style={{ fontSize: 12, color: "#b45309", background: "#fffbe6", padding: "2px 8px", borderRadius: 99, whiteSpace: "nowrap" }}>
-                    ⭐ {avgImdb}
-                  </span>
-                )}
-
-                {/* Expand chevron */}
-                <span style={{ fontSize: 12, color: "#aaa", transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: "#c8c8c8", minWidth: 24, textAlign: "right" }}>{entry.total}</span>
+                {avgImdb && <span style={pillStyle}>IMDb {avgImdb}</span>}
+                {avgRating && <span style={pillStyle}>Your rating {avgRating}</span>}
+                <span style={{ fontSize: 11, color: "#999", transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>v</span>
               </div>
 
-              {/* Expanded: mini cards for that year */}
               {isOpen && (
-                <div style={{ padding: "0 16px 16px", borderTop: "1px solid #eee" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginTop: 12 }}>
-                    {y.items.map(m => (
-                      <div key={m.id} style={{ background: "#fff", border: "1px solid #eee", borderRadius: 8, overflow: "hidden", display: "flex", gap: 8, padding: 8 }}>
-                        {m.poster
-                          ? <img src={m.poster} style={{ width: 36, height: 54, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} />
-                          : <div style={{ width: 36, height: 54, background: "#f0f0f0", borderRadius: 4, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🎬</div>
-                        }
+                <div style={{ padding: "0 16px 16px", borderTop: "1px solid #2a2a2a" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10, marginTop: 12 }}>
+                    {entry.items.map((movie) => (
+                      <div key={movie.id} style={{ background: "#181818", border: "1px solid #2f2f2f", borderRadius: 8, overflow: "hidden", display: "flex", gap: 8, padding: 8 }}>
+                        {movie.poster ? (
+                          <img src={movie.poster} alt={movie.title} style={{ width: 38, height: 56, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} />
+                        ) : (
+                          <div style={{ width: 38, height: 56, background: "#262626", borderRadius: 4, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#aaa" }}>
+                            No image
+                          </div>
+                        )}
                         <div style={{ overflow: "hidden" }}>
-                          <p style={{ fontWeight: 500, fontSize: 12, lineHeight: 1.3, marginBottom: 3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{m.title}</p>
-                          <span style={{
-                            fontSize: 9, fontWeight: 500,
-                            padding: "1px 6px", borderRadius: 99,
-                            background: typeBgs[m.type] || "#eee",
-                            color: typeColors[m.type] || "#555",
-                            display: "inline-block", marginBottom: 3,
-                          }}>{TYPE_META[m.type]?.label || m.type}</span>
-                          {m.imdbRating && <p style={{ fontSize: 10, color: "#b45309" }}>⭐ {m.imdbRating}</p>}
-                          <p style={{ fontSize: 10, color: "#f0a500" }}>{"★".repeat(m.rating)}</p>
+                          <p style={{ fontWeight: 500, fontSize: 12, lineHeight: 1.3, marginBottom: 4 }}>{movie.title}</p>
+                          <p style={{ fontSize: 10, color: "#b9b9b9", marginBottom: 3 }}>{TYPE_META[movie.type]?.label}</p>
+                          {movie.imdbRating && <p style={{ fontSize: 10, color: "#d7d7d7" }}>IMDb {movie.imdbRating}</p>}
+                          <p style={{ fontSize: 10, color: "#d7d7d7" }}>Your rating {formatDecimal(movie.rating)}</p>
                         </div>
                       </div>
                     ))}
@@ -200,10 +139,11 @@ function YearAnalysis({ movies }) {
   );
 }
 
-// ── Main Component ─────────────────────────────────────────────────────
 export default function Movies() {
-  const [movies, setMovies] = useLocalStorage("dashboard-movies", []);
-  const [form, setForm] = useState({ ...formDefaults });
+  const [movies, setMovies] = useLocalStorage("dashboard-movies", [], 1);
+  const [watchlist, setWatchlist] = useLocalStorage("dashboard-movies-watchlist", [], 1);
+  const [form, setForm] = useState({ ...watchedDefaults });
+  const [watchlistForm, setWatchlistForm] = useState({ ...watchlistDefaults });
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
@@ -212,49 +152,59 @@ export default function Movies() {
   const formRef = useRef(null);
 
   useEffect(() => {
-    const hide = (e) => {
-      if (!inputWrapRef.current?.contains(e.target)) setSuggestions([]);
+    const hide = (event) => {
+      if (!inputWrapRef.current?.contains(event.target)) setSuggestions([]);
     };
     document.addEventListener("click", hide);
     return () => document.removeEventListener("click", hide);
   }, []);
 
   function setField(key, value) {
-    setForm(prev => ({ ...prev, [key]: value }));
+    setForm((current) => ({ ...current, [key]: value }));
   }
 
-  async function fetchSuggestions(q) {
-    if (q.length < 2) { setSuggestions([]); return; }
+  function setWatchlistField(key, value) {
+    setWatchlistForm((current) => ({ ...current, [key]: value }));
+  }
+
+  async function fetchSuggestions(query) {
+    if (query.length < 2) {
+      setSuggestions([]);
+      return;
+    }
     try {
-      const res = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(q)}&apikey=${APIKEY}`);
-      const data = await res.json();
+      const response = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${APIKEY}`);
+      const data = await response.json();
       setSuggestions(data.Search ? data.Search.slice(0, 5) : []);
-    } catch { setSuggestions([]); }
+    } catch {
+      setSuggestions([]);
+    }
   }
 
-  function onTitleChange(e) {
-    setField("title", e.target.value);
+  function onTitleChange(event) {
+    setField("title", event.target.value);
     clearTimeout(suggestTimeout.current);
-    suggestTimeout.current = setTimeout(() => fetchSuggestions(e.target.value.trim()), 300);
+    suggestTimeout.current = setTimeout(() => fetchSuggestions(event.target.value.trim()), 300);
   }
 
   async function addOrUpdate() {
-    const t = form.title.trim();
-    if (!t) return;
+    const title = form.title.trim();
+    if (!title) return;
     setSuggestions([]);
     setLoading(true);
+
     try {
-      const res = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(t)}&apikey=${APIKEY}`);
-      const data = await res.json();
+      const response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${APIKEY}`);
+      const data = await response.json();
       const entry = {
         id: editId || Date.now(),
-        title: data.Title || t,
+        title: data.Title || title,
         year: data.Year || "",
         poster: data.Poster !== "N/A" ? data.Poster : null,
-        rating: form.rating,
+        rating: Number(form.rating),
         type: form.type,
         country: form.country,
-        genre: data.Genre ? data.Genre.split(",").slice(0, 2).map(g => g.trim()) : [],
+        genre: data.Genre ? data.Genre.split(",").slice(0, 2).map((item) => item.trim()) : [],
         director: data.Director !== "N/A" ? data.Director : "",
         imdbRating: data.imdbRating !== "N/A" ? data.imdbRating : null,
         runtime: data.Runtime !== "N/A" ? data.Runtime : "",
@@ -262,89 +212,108 @@ export default function Movies() {
         endDate: form.endDate,
         addedDate: form.addedDate || today,
       };
+
       if (editId) {
-        setMovies(prev => prev.map(m => m.id === editId ? entry : m));
+        setMovies((current) => current.map((item) => (item.id === editId ? entry : item)));
         setEditId(null);
       } else {
-        setMovies(prev => [...prev, entry]);
+        setMovies((current) => [...current, entry]);
       }
-      setForm({ ...formDefaults });
-    } catch {}
+
+      setForm({ ...watchedDefaults });
+    } catch {
+      // Keep silent to match current page behavior.
+    }
+
     setLoading(false);
   }
 
   function startEdit(id) {
-    const m = movies.find(x => x.id === id);
-    if (!m) return;
+    const movie = movies.find((item) => item.id === id);
+    if (!movie) return;
     setEditId(id);
     setForm({
-      title: m.title, type: m.type, rating: m.rating, country: m.country || "",
-      startDate: m.startDate || "", endDate: m.endDate || "", addedDate: m.addedDate || today,
+      title: movie.title,
+      type: movie.type,
+      rating: movie.rating,
+      country: movie.country || "",
+      startDate: movie.startDate || "",
+      endDate: movie.endDate || "",
+      addedDate: movie.addedDate || today,
     });
     formRef.current?.scrollIntoView({ behavior: "smooth" });
   }
 
   function cancelEdit() {
     setEditId(null);
-    setForm({ ...formDefaults });
+    setForm({ ...watchedDefaults });
     setSuggestions([]);
   }
 
   function deleteMovie(id) {
-    setMovies(prev => prev.filter(m => m.id !== id));
+    setMovies((current) => current.filter((item) => item.id !== id));
     if (editId === id) cancelEdit();
   }
 
-  const counts = TYPE_OPTIONS.reduce((acc, { value }) => {
-    acc[value] = movies.filter(m => m.type === value).length;
-    return acc;
+  function addToWatchlist() {
+    if (!watchlistForm.name.trim()) return;
+    setWatchlist((current) => [...current, { id: Date.now(), ...watchlistForm, name: watchlistForm.name.trim() }]);
+    setWatchlistForm({ ...watchlistDefaults });
+  }
+
+  function deleteWatchlistItem(id) {
+    setWatchlist((current) => current.filter((item) => item.id !== id));
+  }
+
+  const counts = TYPE_OPTIONS.reduce((accumulator, { value }) => {
+    accumulator[value] = movies.filter((movie) => movie.type === value).length;
+    return accumulator;
   }, {});
 
   return (
     <div>
       <h2 style={{ marginBottom: 20 }}>Movies & Series</h2>
 
-      {/* ── FORM ── */}
       <div ref={formRef} className="card" style={{ marginBottom: 20 }}>
-        <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 12 }}>
-          {editId ? "Edit entry" : "Add movie or series"}
+        <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>
+          {editId ? "Edit entry" : "Add watched movie or series"}
         </p>
 
-        {/* Row 1: title, type, country */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 10 }}>
           <div ref={inputWrapRef} style={{ flex: 2, minWidth: 180, position: "relative" }}>
             <label style={labelStyle}>Title</label>
             <input
               value={form.title}
               onChange={onTitleChange}
-              onKeyDown={e => {
-                if (e.key === "Enter") addOrUpdate();
-                if (e.key === "Escape") setSuggestions([]);
+              onKeyDown={(event) => {
+                if (event.key === "Enter") addOrUpdate();
+                if (event.key === "Escape") setSuggestions([]);
               }}
               placeholder="Search title..."
               style={{ width: "100%" }}
             />
             {suggestions.length > 0 && (
               <div style={suggestBoxStyle}>
-                {suggestions.map(s => (
-                  <div key={s.imdbID}
+                {suggestions.map((suggestion) => (
+                  <div
+                    key={suggestion.imdbID}
                     onClick={() => {
-                      setField("title", s.Title);
-                      if (s.Type === "series") setField("type", "series");
-                      else if (s.Type === "movie") setField("type", "movie");
+                      setField("title", suggestion.Title);
+                      if (suggestion.Type === "series") setField("type", "series");
+                      if (suggestion.Type === "movie") setField("type", "movie");
                       setSuggestions([]);
                       setTimeout(() => addOrUpdate(), 0);
                     }}
                     style={suggestItemStyle}
-                    onMouseEnter={e => e.currentTarget.style.background = "#f9f9f9"}
-                    onMouseLeave={e => e.currentTarget.style.background = "#fff"}
                   >
-                    {s.Poster && s.Poster !== "N/A"
-                      ? <img src={s.Poster} style={{ width: 28, height: 40, borderRadius: 3, objectFit: "cover", flexShrink: 0 }} />
-                      : <div style={{ width: 28, height: 40, borderRadius: 3, background: "#eee", flexShrink: 0 }} />}
+                    {suggestion.Poster && suggestion.Poster !== "N/A" ? (
+                      <img src={suggestion.Poster} alt={suggestion.Title} style={{ width: 28, height: 40, borderRadius: 3, objectFit: "cover", flexShrink: 0 }} />
+                    ) : (
+                      <div style={{ width: 28, height: 40, borderRadius: 3, background: "#232323", flexShrink: 0 }} />
+                    )}
                     <div>
-                      <div style={{ fontWeight: 500, fontSize: 13 }}>{s.Title}</div>
-                      <div style={{ fontSize: 11, color: "#888" }}>{s.Year} · {s.Type}</div>
+                      <div style={{ fontWeight: 500, fontSize: 13 }}>{suggestion.Title}</div>
+                      <div style={{ fontSize: 11, color: "#9f9f9f" }}>{suggestion.Year} - {suggestion.Type}</div>
                     </div>
                   </div>
                 ))}
@@ -354,161 +323,245 @@ export default function Movies() {
 
           <div style={{ minWidth: 150 }}>
             <label style={labelStyle}>Type</label>
-            <select value={form.type} onChange={e => setField("type", e.target.value)} style={{ width: "100%" }}>
-              {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            <select value={form.type} onChange={(event) => setField("type", event.target.value)} style={{ width: "100%" }}>
+              {TYPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
 
           <div style={{ flex: 1, minWidth: 130 }}>
             <label style={labelStyle}>Country</label>
+            <input value={form.country} onChange={(event) => setField("country", event.target.value)} placeholder="e.g. Japan" style={{ width: "100%" }} />
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 10 }}>
+          <div style={{ minWidth: 150 }}>
+            <label style={labelStyle}>Your Rating</label>
             <input
-              value={form.country}
-              onChange={e => setField("country", e.target.value)}
-              placeholder="e.g. Bangladesh"
+              type="number"
+              min="0"
+              max="10"
+              step="0.1"
+              value={form.rating}
+              onChange={(event) => setField("rating", Math.min(10, Math.max(0, Number(event.target.value) || 0)))}
               style={{ width: "100%" }}
             />
           </div>
-        </div>
-
-        {/* Row 2: rating slider */}
-        <div style={{ marginBottom: 10 }}>
-          <label style={labelStyle}>Your rating: <strong style={{ color: "#333" }}>{form.rating} / 10</strong></label>
-          <input
-            type="range" min={1} max={10} step={1} value={form.rating}
-            onChange={e => setField("rating", Number(e.target.value))}
-            style={{ width: "100%", cursor: "pointer" }}
-          />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#aaa", marginTop: 2 }}>
-            {[1,2,3,4,5,6,7,8,9,10].map(n => <span key={n}>{n}</span>)}
+          <div style={{ flex: 1, minWidth: 130 }}>
+            <label style={labelStyle}>Start Watching</label>
+            <input type="date" value={form.startDate} onChange={(event) => setField("startDate", event.target.value)} />
           </div>
-        </div>
-
-        {/* Row 3: dates + buttons */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 3, flex: 1, minWidth: 130 }}>
-            <label style={labelStyle}>Start watching</label>
-            <input type="date" value={form.startDate} onChange={e => setField("startDate", e.target.value)} />
+          <div style={{ flex: 1, minWidth: 130 }}>
+            <label style={labelStyle}>Finish Date</label>
+            <input type="date" value={form.endDate} onChange={(event) => setField("endDate", event.target.value)} />
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 3, flex: 1, minWidth: 130 }}>
-            <label style={labelStyle}>Finish date</label>
-            <input type="date" value={form.endDate} onChange={e => setField("endDate", e.target.value)} />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 3, flex: 1, minWidth: 130 }}>
-            <label style={labelStyle}>Added on</label>
-            <input type="date" value={form.addedDate} onChange={e => setField("addedDate", e.target.value)} />
+          <div style={{ flex: 1, minWidth: 130 }}>
+            <label style={labelStyle}>Added On</label>
+            <input type="date" value={form.addedDate} onChange={(event) => setField("addedDate", event.target.value)} />
           </div>
           <div style={{ display: "flex", gap: 8, alignSelf: "flex-end" }}>
-            <button onClick={addOrUpdate} disabled={loading} style={btnPrimary}>
-              {loading ? "Searching..." : editId ? "Save changes" : "Add"}
+            <button onClick={addOrUpdate} disabled={loading} style={buttonStyle}>
+              {loading ? "Searching..." : editId ? "Save Changes" : "Add"}
             </button>
-            {editId && <button onClick={cancelEdit} style={btnSecondary}>Cancel</button>}
+            {editId && (
+              <button onClick={cancelEdit} style={secondaryButtonStyle}>
+                Cancel
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* ── STATS ── */}
+      <div className="card" style={{ marginBottom: 20 }}>
+        <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Want to Watch</p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
+          <div style={{ flex: 2, minWidth: 180 }}>
+            <label style={labelStyle}>Name</label>
+            <input value={watchlistForm.name} onChange={(event) => setWatchlistField("name", event.target.value)} placeholder="Title to watch later" style={{ width: "100%" }} />
+          </div>
+          <div style={{ minWidth: 150 }}>
+            <label style={labelStyle}>Type</label>
+            <select value={watchlistForm.type} onChange={(event) => setWatchlistField("type", event.target.value)} style={{ width: "100%" }}>
+              {TYPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ flex: 1, minWidth: 130 }}>
+            <label style={labelStyle}>Country</label>
+            <input value={watchlistForm.country} onChange={(event) => setWatchlistField("country", event.target.value)} placeholder="Country" style={{ width: "100%" }} />
+          </div>
+          <div style={{ flex: 1, minWidth: 130 }}>
+            <label style={labelStyle}>Added Date</label>
+            <input type="date" value={watchlistForm.addedDate} onChange={(event) => setWatchlistField("addedDate", event.target.value)} />
+          </div>
+          <button onClick={addToWatchlist} style={buttonStyle}>
+            Add to Box
+          </button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
+          {watchlist.length === 0 && <p style={{ fontSize: 13, color: "#909090" }}>No watchlist items yet.</p>}
+          {watchlist.map((item) => (
+            <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderRadius: 10, background: "#151515", border: "1px solid #2f2f2f", flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontWeight: 600 }}>{item.name}</div>
+                <div style={{ fontSize: 12, color: "#b1b1b1", marginTop: 2 }}>
+                  {[TYPE_META[item.type]?.label, item.country || "-", item.addedDate ? formatDate(item.addedDate) : "-"].join(" - ")}
+                </div>
+              </div>
+              <button onClick={() => deleteWatchlistItem(item.id)} style={ghostButtonStyle}>
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {movies.length > 0 && (
-        <p style={{ fontSize: 13, color: "#888", marginBottom: 12 }}>
+        <p style={{ fontSize: 13, color: "#9a9a9a", marginBottom: 12 }}>
           {movies.length} total
-          {counts.movie     > 0 ? ` · ${counts.movie} movie${counts.movie !== 1 ? "s" : ""}` : ""}
-          {counts.series    > 0 ? ` · ${counts.series} series` : ""}
-          {counts.documentary > 0 ? ` · ${counts.documentary} doc${counts.documentary !== 1 ? "s" : ""}` : ""}
-          {counts.anime     > 0 ? ` · ${counts.anime} anime` : ""}
+          {counts.movie > 0 ? ` - ${counts.movie} movies` : ""}
+          {counts.series > 0 ? ` - ${counts.series} series` : ""}
+          {counts.documentary > 0 ? ` - ${counts.documentary} documentaries` : ""}
+          {counts.anime > 0 ? ` - ${counts.anime} anime` : ""}
         </p>
       )}
 
-      {/* ── GRID ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(165px, 1fr))", gap: 14 }}>
-        {movies.map(m => {
-          const tm = TYPE_META[m.type] || { label: m.type, color: "#555", bg: "#eee" };
-          return (
-            <div key={m.id} className="card"
-              style={{ padding: 0, overflow: "hidden", position: "relative", outline: editId === m.id ? "2px solid #185FA5" : "none" }}
-              onMouseEnter={e => e.currentTarget.querySelector(".action-btns").style.opacity = 1}
-              onMouseLeave={e => e.currentTarget.querySelector(".action-btns").style.opacity = 0}
-            >
-              {/* Poster */}
-              <div style={{ position: "relative", aspectRatio: "2/3", background: "#f0f0f0" }}>
-                {m.poster
-                  ? <img src={m.poster} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, color: "#ccc" }}>🎬</div>}
-
-                {/* Type badge */}
-                <span style={{
-                  position: "absolute", top: 7, left: 7, fontSize: 10, fontWeight: 500,
-                  padding: "2px 8px", borderRadius: 99,
-                  background: tm.bg, color: tm.color,
-                }}>{tm.label}</span>
-
-                {/* Edit + Delete */}
-                <div className="action-btns" style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: 4, opacity: 0, transition: "opacity 0.15s" }}>
-                  <button onClick={() => startEdit(m.id)}
-                    style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(59,109,17,0.85)", border: "none", color: "#fff", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                    title="Edit">✎</button>
-                  <button onClick={() => deleteMovie(m.id)}
-                    style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(163,45,45,0.85)", border: "none", color: "#fff", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                    title="Delete">✕</button>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 14 }}>
+        {movies.map((movie) => (
+          <div key={movie.id} className="card" style={{ padding: 0, overflow: "hidden", position: "relative", outline: editId === movie.id ? "2px solid #f2f2f2" : "none" }}>
+            <div style={{ position: "relative", aspectRatio: "2/3", background: "#171717" }}>
+              {movie.poster ? (
+                <img src={movie.poster} alt={movie.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              ) : (
+                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#9b9b9b" }}>
+                  No poster
                 </div>
-              </div>
+              )}
 
-              {/* Card body */}
-              <div style={{ padding: "10px 10px 12px" }}>
-                <p style={{ fontWeight: 500, fontSize: 13, lineHeight: 1.35, marginBottom: 3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                  {m.title}
-                </p>
-                <p style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>
-                  {[m.year, m.runtime, m.imdbRating ? `⭐ ${m.imdbRating}` : null].filter(Boolean).join(" · ")}
-                </p>
-                {m.country && <p style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>🌍 {m.country}</p>}
-                <Stars rating={m.rating} />
-                <div style={{ marginTop: 4 }}>
-                  {m.genre.map(g => (
-                    <span key={g} style={{ display: "inline-block", fontSize: 10, background: "#e8f0fe", color: "#1a56db", padding: "2px 7px", borderRadius: 99, marginRight: 3, marginTop: 3 }}>{g}</span>
-                  ))}
-                </div>
-                {m.director && (
-                  <p style={{ fontSize: 11, color: "#888", marginTop: 5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Dir. {m.director}</p>
-                )}
-                {(m.startDate || m.endDate || m.addedDate) && (
-                  <div style={{ marginTop: 7, paddingTop: 7, borderTop: "0.5px solid #eee" }}>
-                    {m.startDate && <p style={{ fontSize: 11, color: "#888", marginBottom: 2 }}>▶ Started <strong style={{ fontWeight: 500 }}>{formatDate(m.startDate)}</strong></p>}
-                    {m.endDate   && <p style={{ fontSize: 11, color: "#888", marginBottom: 2 }}>✓ Finished <strong style={{ fontWeight: 500 }}>{formatDate(m.endDate)}</strong></p>}
-                    {m.addedDate && <p style={{ fontSize: 11, color: "#888" }}>+ Added <strong style={{ fontWeight: 500 }}>{formatDate(m.addedDate)}</strong></p>}
-                  </div>
-                )}
+              <span style={{ position: "absolute", top: 7, left: 7, fontSize: 10, fontWeight: 500, padding: "2px 8px", borderRadius: 99, background: "#101010", color: "#f1f1f1", border: "1px solid #555" }}>
+                {TYPE_META[movie.type]?.label || movie.type}
+              </span>
+
+              <div style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: 4 }}>
+                <button onClick={() => startEdit(movie.id)} style={iconButtonStyle}>
+                  Edit
+                </button>
+                <button onClick={() => deleteMovie(movie.id)} style={iconButtonStyle}>
+                  Del
+                </button>
               </div>
             </div>
-          );
-        })}
+
+            <div style={{ padding: "10px 10px 12px" }}>
+              <p style={{ fontWeight: 500, fontSize: 13, lineHeight: 1.35, marginBottom: 3 }}>{movie.title}</p>
+              <p style={{ fontSize: 11, color: "#b5b5b5", marginBottom: 4 }}>
+                {[movie.year, movie.runtime, movie.imdbRating ? `IMDb ${movie.imdbRating}` : null].filter(Boolean).join(" - ")}
+              </p>
+              {movie.country && <p style={{ fontSize: 11, color: "#b5b5b5", marginBottom: 4 }}>{movie.country}</p>}
+              <p style={{ fontSize: 12, color: "#efefef", marginBottom: 4 }}>Your rating {formatDecimal(movie.rating)}</p>
+              <div style={{ marginTop: 4 }}>
+                {movie.genre.map((genre) => (
+                  <span key={genre} style={{ display: "inline-block", fontSize: 10, background: "#1c1c1c", color: "#e0e0e0", padding: "2px 7px", borderRadius: 99, marginRight: 3, marginTop: 3, border: "1px solid #444" }}>
+                    {genre}
+                  </span>
+                ))}
+              </div>
+              {movie.director && <p style={{ fontSize: 11, color: "#9e9e9e", marginTop: 5 }}>Dir. {movie.director}</p>}
+              {(movie.startDate || movie.endDate || movie.addedDate) && (
+                <div style={{ marginTop: 7, paddingTop: 7, borderTop: "0.5px solid #2c2c2c" }}>
+                  {movie.startDate && <p style={{ fontSize: 11, color: "#a7a7a7", marginBottom: 2 }}>Started {formatDate(movie.startDate)}</p>}
+                  {movie.endDate && <p style={{ fontSize: 11, color: "#a7a7a7", marginBottom: 2 }}>Finished {formatDate(movie.endDate)}</p>}
+                  {movie.addedDate && <p style={{ fontSize: 11, color: "#a7a7a7" }}>Added {formatDate(movie.addedDate)}</p>}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* ── YEAR-BY-YEAR ANALYSIS ── */}
       <YearAnalysis movies={movies} />
     </div>
   );
 }
 
-// ── Styles ──────────────────────────────────────────────────────────────
-const labelStyle = { fontSize: 11, color: "#888", display: "block", marginBottom: 3 };
+const labelStyle = { fontSize: 11, color: "#9a9a9a", display: "block", marginBottom: 3 };
 
-const btnPrimary = {
-  padding: "7px 16px", background: "#185FA5", color: "#E6F1FB",
-  border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13,
+const buttonStyle = {
+  padding: "9px 16px",
+  background: "#f2f2f2",
+  color: "#111111",
+  border: "1px solid #676767",
+  borderRadius: 8,
+  cursor: "pointer",
 };
 
-const btnSecondary = {
-  padding: "7px 14px", background: "#fff", color: "#333",
-  border: "1px solid #e0e0e0", borderRadius: 8, cursor: "pointer", fontSize: 13,
+const secondaryButtonStyle = {
+  padding: "9px 14px",
+  background: "#141414",
+  color: "#f2f2f2",
+  border: "1px solid #4f4f4f",
+  borderRadius: 8,
+  cursor: "pointer",
+};
+
+const ghostButtonStyle = {
+  background: "transparent",
+  color: "#d4d4d4",
+  border: "1px solid #565656",
+  borderRadius: 8,
+  padding: "6px 10px",
+  cursor: "pointer",
+};
+
+const iconButtonStyle = {
+  minWidth: 38,
+  height: 24,
+  borderRadius: 999,
+  background: "rgba(0,0,0,0.75)",
+  border: "1px solid rgba(255,255,255,0.24)",
+  color: "#fff",
+  fontSize: 10,
+  cursor: "pointer",
 };
 
 const suggestBoxStyle = {
-  position: "absolute", top: "100%", left: 0, right: 0, zIndex: 20,
-  background: "#fff", border: "1px solid #e5e5e5", borderRadius: 8,
-  marginTop: 4, boxShadow: "0 4px 12px rgba(0,0,0,0.08)", overflow: "hidden",
+  position: "absolute",
+  top: "100%",
+  left: 0,
+  right: 0,
+  zIndex: 20,
+  background: "#111111",
+  border: "1px solid #3e3e3e",
+  borderRadius: 8,
+  marginTop: 4,
+  boxShadow: "0 4px 12px rgba(0,0,0,0.22)",
+  overflow: "hidden",
 };
 
 const suggestItemStyle = {
-  display: "flex", alignItems: "center", gap: 10,
-  padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #f0f0f0",
-  background: "#fff",
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  padding: "8px 12px",
+  cursor: "pointer",
+  borderBottom: "1px solid #252525",
+  background: "#111111",
+};
+
+const pillStyle = {
+  fontSize: 11,
+  padding: "2px 8px",
+  borderRadius: 99,
+  background: "#191919",
+  color: "#efefef",
+  border: "1px solid #525252",
+  whiteSpace: "nowrap",
 };

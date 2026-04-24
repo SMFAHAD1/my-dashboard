@@ -1,54 +1,43 @@
-// src/pages/Books.jsx
 import { useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const today = new Date().toISOString().split("T")[0];
 
-function formatDate(d) {
-  if (!d) return "";
-  const [y, m, day] = d.split("-");
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  return `${parseInt(day)} ${months[parseInt(m) - 1]} ${y}`;
+function formatDate(value) {
+  if (!value) return "";
+  const [year, month, day] = value.split("-");
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${parseInt(day, 10)} ${months[parseInt(month, 10) - 1]} ${year}`;
 }
 
-function StarRating({ rating, max = 5, onChange }) {
-  return (
-    <div style={{ display: "flex", gap: 2 }}>
-      {Array.from({ length: max }).map((_, i) => (
-        <span
-          key={i}
-          onClick={() => onChange && onChange(i + 1)}
-          style={{ fontSize: 18, cursor: onChange ? "pointer" : "default",
-            color: i < rating ? "#f0a500" : "#e0e0e0", lineHeight: 1 }}>
-          ★
-        </span>
-      ))}
-    </div>
-  );
+function formatRating(value) {
+  return Number(value || 0).toFixed(1);
 }
 
 function Divider({ label }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "28px 0 16px" }}>
-      <div style={{ flex: 1, height: 1, background: "#eee" }} />
-      <span style={{ fontSize: 12, fontWeight: 600, color: "#888", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{label}</span>
-      <div style={{ flex: 1, height: 1, background: "#eee" }} />
+      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
+      <span style={{ fontSize: 12, fontWeight: 600, color: "#9a9a9a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{label}</span>
+      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
     </div>
   );
 }
 
-// ── Year-by-Year Analysis ─────────────────────────────────────────────────
 function YearAnalysis({ books }) {
   const [expandedYear, setExpandedYear] = useState(null);
-  const reading = books.filter(b => b.section === "reading");
+  const reading = books.filter((book) => book.section === "reading");
   if (!reading.length) return null;
 
   const yearMap = {};
-  reading.forEach(b => {
-    const yr = b.startDate ? b.startDate.split("-")[0] : "Not set";
-    if (!yearMap[yr]) yearMap[yr] = { year: yr, items: [], ratingSum: 0, ratingCount: 0 };
-    yearMap[yr].items.push(b);
-    if (b.rating) { yearMap[yr].ratingSum += b.rating; yearMap[yr].ratingCount++; }
+  reading.forEach((book) => {
+    const year = book.startDate ? book.startDate.split("-")[0] : "Not set";
+    if (!yearMap[year]) yearMap[year] = { year, items: [], ratingSum: 0, ratingCount: 0 };
+    yearMap[year].items.push(book);
+    if (book.rating) {
+      yearMap[year].ratingSum += Number(book.rating);
+      yearMap[year].ratingCount += 1;
+    }
   });
 
   const years = Object.values(yearMap).sort((a, b) => {
@@ -57,69 +46,62 @@ function YearAnalysis({ books }) {
     return b.year.localeCompare(a.year);
   });
 
-  const maxCount = Math.max(...years.map(y => y.items.length));
+  const maxCount = Math.max(...years.map((entry) => entry.items.length));
 
   return (
     <div style={{ marginTop: 32 }}>
       <Divider label="YEAR-BY-YEAR READING ANALYSIS" />
-      <p style={{ fontSize: 11, color: "#aaa", textAlign: "center", marginBottom: 16, marginTop: -8 }}>Grouped by start reading year</p>
+      <p style={{ fontSize: 11, color: "#888", textAlign: "center", marginBottom: 16, marginTop: -8 }}>Grouped by start reading year</p>
 
-      {/* Summary pills */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-        <span style={{ fontSize: 12, padding: "4px 12px", borderRadius: 99, background: "#e8f0fe", color: "#185FA5", fontWeight: 500 }}>
-          {reading.length} book{reading.length !== 1 ? "s" : ""} total
-        </span>
-        {(() => {
-          const rated = reading.filter(b => b.rating);
-          if (!rated.length) return null;
-          const avg = (rated.reduce((s, b) => s + b.rating, 0) / rated.length).toFixed(1);
-          return (
-            <span style={{ fontSize: 12, padding: "4px 12px", borderRadius: 99, background: "#fff8e1", color: "#854F0B", fontWeight: 500 }}>
-              ★ Avg rating: {avg}/5
-            </span>
-          );
-        })()}
-        <span style={{ fontSize: 12, padding: "4px 12px", borderRadius: 99, background: "#e8f5e9", color: "#3B6D11", fontWeight: 500 }}>
-          {reading.filter(b => b.finishDate).length} finished
-        </span>
+        <span style={summaryPillStyle}>{reading.length} books total</span>
+        {reading.filter((book) => book.rating).length > 0 && (
+          <span style={summaryPillStyle}>
+            Avg rating{" "}
+            {(
+              reading.filter((book) => book.rating).reduce((sum, book) => sum + Number(book.rating), 0) /
+              reading.filter((book) => book.rating).length
+            ).toFixed(1)}
+            /10
+          </span>
+        )}
+        <span style={summaryPillStyle}>{reading.filter((book) => book.finishDate).length} finished</span>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {years.map(y => {
-          const barPct = maxCount > 0 ? (y.items.length / maxCount) * 100 : 0;
-          const avgRating = y.ratingCount > 0 ? (y.ratingSum / y.ratingCount).toFixed(1) : null;
-          const isOpen = expandedYear === y.year;
+        {years.map((entry) => {
+          const barPercent = maxCount > 0 ? (entry.items.length / maxCount) * 100 : 0;
+          const avgRating = entry.ratingCount > 0 ? (entry.ratingSum / entry.ratingCount).toFixed(1) : null;
+          const isOpen = expandedYear === entry.year;
 
           return (
-            <div key={y.year} style={{ border: "1px solid #eee", borderRadius: 10, overflow: "hidden", background: "#fafafa" }}>
-              <div onClick={() => setExpandedYear(isOpen ? null : y.year)}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", cursor: "pointer", userSelect: "none" }}>
-                <span style={{ fontWeight: 600, fontSize: 15, minWidth: 52, color: y.year === "Not set" ? "#aaa" : "#222" }}>{y.year}</span>
-                <div style={{ flex: 1, height: 8, background: "#eee", borderRadius: 99, overflow: "hidden" }}>
-                  <div style={{ width: `${barPct}%`, height: "100%", background: "#185FA5", borderRadius: 99 }} />
+            <div key={entry.year} style={{ border: "1px solid #303030", borderRadius: 10, overflow: "hidden", background: "#121212" }}>
+              <div
+                onClick={() => setExpandedYear(isOpen ? null : entry.year)}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", cursor: "pointer", userSelect: "none" }}
+              >
+                <span style={{ fontWeight: 600, fontSize: 15, minWidth: 52, color: entry.year === "Not set" ? "#8e8e8e" : "#f0f0f0" }}>{entry.year}</span>
+                <div style={{ flex: 1, height: 8, background: "#2c2c2c", borderRadius: 99, overflow: "hidden" }}>
+                  <div style={{ width: `${barPercent}%`, height: "100%", background: "#f2f2f2", borderRadius: 99 }} />
                 </div>
-                <span style={{ fontSize: 13, fontWeight: 500, color: "#555", minWidth: 20, textAlign: "right" }}>{y.items.length}</span>
-                {avgRating && (
-                  <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 99, background: "#fff8e1", color: "#854F0B", whiteSpace: "nowrap" }}>★ {avgRating}</span>
-                )}
-                <span style={{ fontSize: 11, color: "#aaa", transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: "#c6c6c6", minWidth: 20, textAlign: "right" }}>{entry.items.length}</span>
+                {avgRating && <span style={summaryPillStyle}>{avgRating}</span>}
+                <span style={{ fontSize: 11, color: "#888", transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>v</span>
               </div>
 
               {isOpen && (
-                <div style={{ padding: "0 16px 16px", borderTop: "1px solid #eee" }}>
+                <div style={{ padding: "0 16px 16px", borderTop: "1px solid #292929" }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 12 }}>
-                    {y.items.map(b => (
-                      <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "#fff", borderRadius: 8, border: "1px solid #eee" }}>
+                    {entry.items.map((book) => (
+                      <div key={book.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "#181818", borderRadius: 8, border: "1px solid #2f2f2f" }}>
                         <div style={{ flex: 1 }}>
-                          <p style={{ fontWeight: 500, fontSize: 13 }}>{b.title}</p>
-                          {b.author && <p style={{ fontSize: 11, color: "#888" }}>{b.author}</p>}
+                          <p style={{ fontWeight: 500, fontSize: 13 }}>{book.title}</p>
+                          {book.author && <p style={{ fontSize: 11, color: "#9f9f9f" }}>{book.author}</p>}
                         </div>
-                        {b.rating ? (
-                          <span style={{ fontSize: 12, color: "#f0a500" }}>{"★".repeat(b.rating)}{"☆".repeat(5 - b.rating)}</span>
-                        ) : null}
-                        <div style={{ fontSize: 10, color: "#aaa", textAlign: "right" }}>
-                          {b.startDate && <div>Started {formatDate(b.startDate)}</div>}
-                          {b.finishDate && <div>Finished {formatDate(b.finishDate)}</div>}
+                        {book.rating ? <span style={{ fontSize: 12, color: "#e2e2e2" }}>{formatRating(book.rating)}/10</span> : null}
+                        <div style={{ fontSize: 10, color: "#8e8e8e", textAlign: "right" }}>
+                          {book.startDate && <div>Started {formatDate(book.startDate)}</div>}
+                          {book.finishDate && <div>Finished {formatDate(book.finishDate)}</div>}
                         </div>
                       </div>
                     ))}
@@ -134,176 +116,194 @@ function YearAnalysis({ books }) {
   );
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────
 export default function Books() {
-  const [books, setBooks] = useLocalStorage("dashboard-books", []);
+  const [books, setBooks] = useLocalStorage("dashboard-books", [], 1);
 
-  // Reading form
-  const [rTitle, setRTitle]         = useState("");
-  const [rAuthor, setRAuthor]       = useState("");
-  const [rRating, setRRating]       = useState(0);
-  const [rAdded, setRAdded]         = useState(today);
-  const [rStart, setRStart]         = useState("");
-  const [rFinish, setRFinish]       = useState("");
+  const [readingTitle, setReadingTitle] = useState("");
+  const [readingAuthor, setReadingAuthor] = useState("");
+  const [readingRating, setReadingRating] = useState("0");
+  const [readingAdded, setReadingAdded] = useState(today);
+  const [readingStart, setReadingStart] = useState("");
+  const [readingFinish, setReadingFinish] = useState("");
 
-  // Buy list form
-  const [bTitle, setBTitle]         = useState("");
-  const [bAuthor, setBAuthor]       = useState("");
-  const [bPrice, setBPrice]         = useState("");
-  const [bCurrency, setBCurrency]   = useState("BDT");
-  const [bNotes, setBNotes]         = useState("");
+  const [buyTitle, setBuyTitle] = useState("");
+  const [buyAuthor, setBuyAuthor] = useState("");
+  const [buyPrice, setBuyPrice] = useState("");
+  const [buyCurrency, setBuyCurrency] = useState("BDT");
+  const [buyNotes, setBuyNotes] = useState("");
 
   function addReadingBook() {
-    if (!rTitle.trim()) return;
-    setBooks(prev => [...prev, {
-      id: Date.now(), section: "reading",
-      title: rTitle.trim(), author: rAuthor.trim(),
-      rating: rRating, addedDate: rAdded,
-      startDate: rStart, finishDate: rFinish,
-    }]);
-    setRTitle(""); setRAuthor(""); setRRating(0); setRAdded(today); setRStart(""); setRFinish("");
+    if (!readingTitle.trim()) return;
+    setBooks((current) => [
+      ...current,
+      {
+        id: Date.now(),
+        section: "reading",
+        title: readingTitle.trim(),
+        author: readingAuthor.trim(),
+        rating: readingRating !== "" ? Number(readingRating) : 0,
+        addedDate: readingAdded,
+        startDate: readingStart,
+        finishDate: readingFinish,
+      },
+    ]);
+    setReadingTitle("");
+    setReadingAuthor("");
+    setReadingRating("0");
+    setReadingAdded(today);
+    setReadingStart("");
+    setReadingFinish("");
   }
 
   function addBuyBook() {
-    if (!bTitle.trim()) return;
-    setBooks(prev => [...prev, {
-      id: Date.now(), section: "buy",
-      title: bTitle.trim(), author: bAuthor.trim(),
-      price: bPrice !== "" ? parseFloat(bPrice) : null, currency: bCurrency,
-      notes: bNotes.trim(), addedDate: today,
-    }]);
-    setBTitle(""); setBAuthor(""); setBPrice(""); setBNotes("");
+    if (!buyTitle.trim()) return;
+    setBooks((current) => [
+      ...current,
+      {
+        id: Date.now(),
+        section: "buy",
+        title: buyTitle.trim(),
+        author: buyAuthor.trim(),
+        price: buyPrice !== "" ? parseFloat(buyPrice) : null,
+        currency: buyCurrency,
+        notes: buyNotes.trim(),
+        addedDate: today,
+      },
+    ]);
+    setBuyTitle("");
+    setBuyAuthor("");
+    setBuyPrice("");
+    setBuyNotes("");
   }
 
-  function deleteBook(id) { setBooks(prev => prev.filter(b => b.id !== id)); }
-  function toggleBought(id) { setBooks(prev => prev.map(b => b.id === id ? { ...b, bought: !b.bought } : b)); }
+  function deleteBook(id) {
+    setBooks((current) => current.filter((book) => book.id !== id));
+  }
 
-  const readingBooks = books.filter(b => b.section === "reading");
-  const buyBooks     = books.filter(b => b.section === "buy");
-  const finished     = readingBooks.filter(b => b.finishDate).length;
-  const totalBuyPrice = buyBooks.filter(b => !b.bought).reduce((s, b) => s + (b.price || 0), 0);
+  function toggleBought(id) {
+    setBooks((current) => current.map((book) => (book.id === id ? { ...book, bought: !book.bought } : book)));
+  }
+
+  const readingBooks = books.filter((book) => book.section === "reading");
+  const buyBooks = books.filter((book) => book.section === "buy");
+  const finished = readingBooks.filter((book) => book.finishDate).length;
+  const totalBuyPrice = buyBooks.filter((book) => !book.bought).reduce((sum, book) => sum + (book.price || 0), 0);
 
   return (
     <div>
       <h2 style={{ marginBottom: 20 }}>Books</h2>
 
-      {/* Stats */}
       {books.length > 0 && (
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
           {[
-            { label: "Reading List", value: readingBooks.length, bg: "#e8f0fe", color: "#185FA5" },
-            { label: "Finished",     value: finished,            bg: "#e8f5e9", color: "#3B6D11" },
-            { label: "Buy List",     value: buyBooks.length,     bg: "#fff8e1", color: "#854F0B" },
-            { label: "To Buy",       value: buyBooks.filter(b => !b.bought).length, bg: "#fce8e8", color: "#A32D2D" },
-          ].map(s => (
-            <div key={s.label} style={{ flex: 1, minWidth: 90, padding: "12px 14px", borderRadius: 10, background: s.bg, color: s.color, textAlign: "center" }}>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{s.value}</div>
-              <div style={{ fontSize: 10, marginTop: 2 }}>{s.label}</div>
+            { label: "Reading List", value: readingBooks.length },
+            { label: "Finished", value: finished },
+            { label: "Buy List", value: buyBooks.length },
+            { label: "To Buy", value: buyBooks.filter((book) => !book.bought).length },
+          ].map((stat) => (
+            <div key={stat.label} style={statCardStyle}>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>{stat.value}</div>
+              <div style={{ fontSize: 10, marginTop: 2, color: "#9e9e9e" }}>{stat.label}</div>
             </div>
           ))}
           {totalBuyPrice > 0 && (
-            <div style={{ flex: 1, minWidth: 90, padding: "12px 14px", borderRadius: 10, background: "#f3e8ff", color: "#6B21A8", textAlign: "center" }}>
+            <div style={statCardStyle}>
               <div style={{ fontSize: 16, fontWeight: 700 }}>{totalBuyPrice.toLocaleString()}</div>
-              <div style={{ fontSize: 10, marginTop: 2 }}>Est. Cost ({buyBooks[0]?.currency || "BDT"})</div>
+              <div style={{ fontSize: 10, marginTop: 2, color: "#9e9e9e" }}>Est. Cost ({buyBooks[0]?.currency || "BDT"})</div>
             </div>
           )}
         </div>
       )}
 
-      {/* ── Reading List ── */}
       <Divider label="READING LIST" />
 
       <div className="card" style={{ marginBottom: 16 }}>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 2, minWidth: 160 }}>
-            <label style={labelSt}>Book title</label>
-            <input value={rTitle} onChange={e => setRTitle(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && addReadingBook()}
-              placeholder="Book title..." style={{ width: "100%" }} />
+            <label style={labelStyle}>Book Title</label>
+            <input value={readingTitle} onChange={(event) => setReadingTitle(event.target.value)} onKeyDown={(event) => event.key === "Enter" && addReadingBook()} placeholder="Book title..." style={{ width: "100%" }} />
           </div>
           <div style={{ flex: 1, minWidth: 130 }}>
-            <label style={labelSt}>Author</label>
-            <input value={rAuthor} onChange={e => setRAuthor(e.target.value)}
-              placeholder="Author name" style={{ width: "100%" }} />
+            <label style={labelStyle}>Author</label>
+            <input value={readingAuthor} onChange={(event) => setReadingAuthor(event.target.value)} placeholder="Author name" style={{ width: "100%" }} />
           </div>
-          <div>
-            <label style={labelSt}>Rating (1–5)</label>
-            <StarRating rating={rRating} onChange={setRRating} />
+          <div style={{ minWidth: 130 }}>
+            <label style={labelStyle}>Rating (0-10)</label>
+            <input
+              type="number"
+              min="0"
+              max="10"
+              step="0.1"
+              value={readingRating}
+              onChange={(event) => setReadingRating(event.target.value)}
+              style={{ width: "100%" }}
+            />
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginTop: 10 }}>
           <div style={{ flex: 1, minWidth: 130 }}>
-            <label style={labelSt}>Added date</label>
-            <input type="date" value={rAdded} onChange={e => setRAdded(e.target.value)} />
+            <label style={labelStyle}>Added Date</label>
+            <input type="date" value={readingAdded} onChange={(event) => setReadingAdded(event.target.value)} />
           </div>
           <div style={{ flex: 1, minWidth: 130 }}>
-            <label style={labelSt}>Start reading</label>
-            <input type="date" value={rStart} onChange={e => setRStart(e.target.value)} />
+            <label style={labelStyle}>Start Reading</label>
+            <input type="date" value={readingStart} onChange={(event) => setReadingStart(event.target.value)} />
           </div>
           <div style={{ flex: 1, minWidth: 130 }}>
-            <label style={labelSt}>Finish date</label>
-            <input type="date" value={rFinish} onChange={e => setRFinish(e.target.value)} />
+            <label style={labelStyle}>Finish Date</label>
+            <input type="date" value={readingFinish} onChange={(event) => setReadingFinish(event.target.value)} />
           </div>
-          <button onClick={addReadingBook} style={{ alignSelf: "flex-end" }}>Add Book</button>
+          <button onClick={addReadingBook} style={buttonStyle}>
+            Add Book
+          </button>
         </div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 8 }}>
         {readingBooks.length === 0 && (
-          <p style={{ fontSize: 13, color: "#bbb", textAlign: "center", padding: "20px 0" }}>No books yet.</p>
+          <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: "20px 0" }}>No books yet.</p>
         )}
-        {readingBooks.map(b => (
-          <div key={b.id} className="card" style={{ padding: "12px 16px", display: "flex", gap: 12, alignItems: "flex-start" }}>
+        {readingBooks.map((book) => (
+          <div key={book.id} className="card" style={{ padding: "12px 16px", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 0 }}>
             <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>{b.title}</p>
-              {b.author && <p style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>{b.author}</p>}
-              {b.rating > 0 && (
-                <div style={{ marginBottom: 4 }}>
-                  <StarRating rating={b.rating} />
-                </div>
-              )}
+              <p style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>{book.title}</p>
+              {book.author && <p style={{ fontSize: 12, color: "#a4a4a4", marginBottom: 4 }}>{book.author}</p>}
+              {book.rating > 0 && <div style={{ marginBottom: 4, fontSize: 12, color: "#efefef" }}>Rating {formatRating(book.rating)}/10</div>}
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                {b.addedDate  && <span style={{ fontSize: 11, color: "#aaa" }}>Added {formatDate(b.addedDate)}</span>}
-                {b.startDate  && <span style={{ fontSize: 11, color: "#888" }}>▶ Started {formatDate(b.startDate)}</span>}
-                {b.finishDate && <span style={{ fontSize: 11, color: "#3B6D11", fontWeight: 500 }}>✓ Finished {formatDate(b.finishDate)}</span>}
+                {book.addedDate && <span style={{ fontSize: 11, color: "#8f8f8f" }}>Added {formatDate(book.addedDate)}</span>}
+                {book.startDate && <span style={{ fontSize: 11, color: "#a8a8a8" }}>Started {formatDate(book.startDate)}</span>}
+                {book.finishDate && <span style={{ fontSize: 11, color: "#f1f1f1", fontWeight: 500 }}>Finished {formatDate(book.finishDate)}</span>}
               </div>
             </div>
-            {b.finishDate && (
-              <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "#e8f5e9", color: "#3B6D11", fontWeight: 500, whiteSpace: "nowrap" }}>Done</span>
-            )}
-            <button onClick={() => deleteBook(b.id)}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 14 }}>✕</button>
+            {book.finishDate && <span style={summaryPillStyle}>Done</span>}
+            <button onClick={() => deleteBook(book.id)} style={ghostButtonStyle}>
+              Remove
+            </button>
           </div>
         ))}
       </div>
 
-      {/* Year analysis */}
       <YearAnalysis books={books} />
 
-      {/* ── Buy List ── */}
       <Divider label="BOOKS TO BUY" />
 
       <div className="card" style={{ marginBottom: 16 }}>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 2, minWidth: 160 }}>
-            <label style={labelSt}>Book title</label>
-            <input value={bTitle} onChange={e => setBTitle(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && addBuyBook()}
-              placeholder="Book to buy..." style={{ width: "100%" }} />
+            <label style={labelStyle}>Book Title</label>
+            <input value={buyTitle} onChange={(event) => setBuyTitle(event.target.value)} onKeyDown={(event) => event.key === "Enter" && addBuyBook()} placeholder="Book to buy..." style={{ width: "100%" }} />
           </div>
           <div style={{ flex: 1, minWidth: 130 }}>
-            <label style={labelSt}>Author</label>
-            <input value={bAuthor} onChange={e => setBAuthor(e.target.value)}
-              placeholder="Author" style={{ width: "100%" }} />
+            <label style={labelStyle}>Author</label>
+            <input value={buyAuthor} onChange={(event) => setBuyAuthor(event.target.value)} placeholder="Author" style={{ width: "100%" }} />
           </div>
           <div style={{ minWidth: 100 }}>
-            <label style={labelSt}>Price</label>
-            <input type="number" min="0" value={bPrice} onChange={e => setBPrice(e.target.value)}
-              placeholder="0" style={{ width: "100%" }} />
+            <label style={labelStyle}>Price</label>
+            <input type="number" min="0" value={buyPrice} onChange={(event) => setBuyPrice(event.target.value)} placeholder="0" style={{ width: "100%" }} />
           </div>
           <div style={{ minWidth: 80 }}>
-            <label style={labelSt}>Currency</label>
-            <select value={bCurrency} onChange={e => setBCurrency(e.target.value)} style={{ width: "100%" }}>
+            <label style={labelStyle}>Currency</label>
+            <select value={buyCurrency} onChange={(event) => setBuyCurrency(event.target.value)} style={{ width: "100%" }}>
               <option value="BDT">BDT</option>
               <option value="USD">USD</option>
               <option value="INR">INR</option>
@@ -312,42 +312,50 @@ export default function Books() {
             </select>
           </div>
           <div style={{ flex: 1, minWidth: 130 }}>
-            <label style={labelSt}>Notes</label>
-            <input value={bNotes} onChange={e => setBNotes(e.target.value)}
-              placeholder="Where to buy, edition..." style={{ width: "100%" }} />
+            <label style={labelStyle}>Notes</label>
+            <input value={buyNotes} onChange={(event) => setBuyNotes(event.target.value)} placeholder="Where to buy, edition..." style={{ width: "100%" }} />
           </div>
-          <button onClick={addBuyBook} style={{ alignSelf: "flex-end" }}>Add</button>
+          <button onClick={addBuyBook} style={buttonStyle}>
+            Add
+          </button>
         </div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {buyBooks.length === 0 && (
-          <p style={{ fontSize: 13, color: "#bbb", textAlign: "center", padding: "20px 0" }}>No books on the buy list yet.</p>
-        )}
-        {buyBooks.map(b => (
-          <div key={b.id} className="card"
-            style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, opacity: b.bought ? 0.55 : 1 }}>
-            <div onClick={() => toggleBought(b.id)}
-              style={{ width: 20, height: 20, borderRadius: 6, flexShrink: 0, cursor: "pointer",
-                border: b.bought ? "none" : "2px solid #ddd", background: b.bought ? "#3B6D11" : "transparent",
-                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#fff" }}>
-              {b.bought ? "✓" : ""}
+        {buyBooks.length === 0 && <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: "20px 0" }}>No books on the buy list yet.</p>}
+        {buyBooks.map((book) => (
+          <div key={book.id} className="card" style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, opacity: book.bought ? 0.55 : 1, marginBottom: 0 }}>
+            <div
+              onClick={() => toggleBought(book.id)}
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: 6,
+                flexShrink: 0,
+                cursor: "pointer",
+                border: book.bought ? "1px solid #888" : "2px solid #5d5d5d",
+                background: book.bought ? "#f1f1f1" : "transparent",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 10,
+                color: "#111",
+              }}
+            >
+              {book.bought ? "OK" : ""}
             </div>
             <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 500, fontSize: 14, textDecoration: b.bought ? "line-through" : "none", color: b.bought ? "#aaa" : "inherit" }}>{b.title}</p>
+              <p style={{ fontWeight: 500, fontSize: 14, textDecoration: book.bought ? "line-through" : "none", color: book.bought ? "#8f8f8f" : "inherit" }}>{book.title}</p>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 2 }}>
-                {b.author && <span style={{ fontSize: 12, color: "#888" }}>{b.author}</span>}
-                {b.notes   && <span style={{ fontSize: 11, color: "#aaa" }}>{b.notes}</span>}
+                {book.author && <span style={{ fontSize: 12, color: "#9f9f9f" }}>{book.author}</span>}
+                {book.notes && <span style={{ fontSize: 11, color: "#8a8a8a" }}>{book.notes}</span>}
               </div>
             </div>
-            {b.price != null && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#6B21A8", whiteSpace: "nowrap" }}>
-                {b.currency} {b.price.toLocaleString()}
-              </span>
-            )}
-            {b.bought && <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "#e8f5e9", color: "#3B6D11" }}>Bought</span>}
-            <button onClick={() => deleteBook(b.id)}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 14 }}>✕</button>
+            {book.price != null && <span style={{ fontSize: 13, fontWeight: 700, color: "#f2f2f2", whiteSpace: "nowrap" }}>{book.currency} {book.price.toLocaleString()}</span>}
+            {book.bought && <span style={summaryPillStyle}>Bought</span>}
+            <button onClick={() => deleteBook(book.id)} style={ghostButtonStyle}>
+              Remove
+            </button>
           </div>
         ))}
       </div>
@@ -355,4 +363,45 @@ export default function Books() {
   );
 }
 
-const labelSt = { fontSize: 11, color: "#888", display: "block", marginBottom: 3 };
+const labelStyle = { fontSize: 11, color: "#9a9a9a", display: "block", marginBottom: 3 };
+
+const statCardStyle = {
+  flex: 1,
+  minWidth: 90,
+  padding: "12px 14px",
+  borderRadius: 10,
+  background: "#121212",
+  color: "#f0f0f0",
+  textAlign: "center",
+  border: "1px solid #363636",
+};
+
+const buttonStyle = {
+  alignSelf: "flex-end",
+  background: "#f2f2f2",
+  color: "#111111",
+  border: "1px solid #676767",
+  borderRadius: 8,
+  padding: "9px 16px",
+  cursor: "pointer",
+};
+
+const ghostButtonStyle = {
+  background: "transparent",
+  border: "1px solid #616161",
+  cursor: "pointer",
+  color: "#d3d3d3",
+  borderRadius: 8,
+  padding: "6px 10px",
+  fontSize: 12,
+};
+
+const summaryPillStyle = {
+  fontSize: 12,
+  padding: "4px 12px",
+  borderRadius: 99,
+  background: "#171717",
+  color: "#f1f1f1",
+  fontWeight: 500,
+  border: "1px solid #4a4a4a",
+};

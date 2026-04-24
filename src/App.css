@@ -1,17 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap");
 
 :root {
-  --bg: #0f1117;
-  --surface: #1a1d27;
-  --surface2: #22263a;
-  --border: #2e3248;
-  --accent: #6c8fff;
-  --accent2: #a78bfa;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --text: #e8eaf6;
-  --muted: #7b83a6;
+  --bg: #080808;
+  --surface: #121212;
+  --surface2: #1a1a1a;
+  --border: #313131;
+  --accent: #f1f1f1;
+  --accent2: #cfcfcf;
+  --success: #f1f1f1;
+  --warning: #d9d9d9;
+  --danger: #bbbbbb;
+  --text: #f5f5f5;
+  --muted: #9b9b9b;
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
@@ -59,7 +59,7 @@ textarea {
 
 .sidebar {
   width: 240px;
-  background: linear-gradient(180deg, #171b25 0%, #12151d 100%);
+  background: linear-gradient(180deg, #111111 0%, #090909 100%);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -120,7 +120,7 @@ textarea {
 }
 
 .nav-link.active {
-  background: rgba(108, 143, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--accent);
 }
 
@@ -133,7 +133,7 @@ textarea {
   justify-content: center;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -276,7 +276,8 @@ select option {
 }
 
 .btn-primary:hover {
-  background: #5a7aff;
+  background: #d9d9d9;
+  color: #111111;
   transform: translateY(-1px);
 }
 
@@ -289,7 +290,7 @@ select option {
 }
 
 .btn-danger:hover {
-  background: rgba(248, 113, 113, 0.1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .btn-ghost {
@@ -299,8 +300,8 @@ select option {
 }
 
 .btn-ghost:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: #d7d7d7;
+  color: #f1f1f1;
 }
 
 .table-wrap {
@@ -346,27 +347,27 @@ tr:hover td {
 }
 
 .badge-green {
-  background: rgba(52, 211, 153, 0.15);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--success);
 }
 
 .badge-yellow {
-  background: rgba(251, 191, 36, 0.15);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--warning);
 }
 
 .badge-red {
-  background: rgba(248, 113, 113, 0.15);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--danger);
 }
 
 .badge-blue {
-  background: rgba(108, 143, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--accent);
 }
 
 .badge-purple {
-  background: rgba(167, 139, 250, 0.15);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--accent2);
 }
 
