@@ -231,6 +231,8 @@ export default function MyPlan() {
 
   const filtered = filter === "all" ? plans : plans.filter(p => p.status === filter);
 
+  if (loading) return <div style={{ padding: "32px" }}>Loading...</div>;
+
   return (
     <div>
       <h2 style={{ marginBottom: 20 }}>My Plan</h2>
