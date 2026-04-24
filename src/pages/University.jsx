@@ -26,12 +26,12 @@ function useLocalStorage(key, initialValue, version = 1) {
 const DEGREE_TYPES = ["Masters", "PhD"];
 const STATUS_OPTIONS = ["Interested", "Researching", "Applied", "Accepted", "Rejected", "Enrolled"];
 const STATUS_COLORS = {
-  Interested:  { bg: "#e8f0fe", text: "#185FA5" },
-  Researching: { bg: "#fff8e1", text: "#9a6700" },
-  Applied:     { bg: "#e0f2fe", text: "#0369a1" },
-  Accepted:    { bg: "#e8f5e9", text: "#2e7d32" },
-  Rejected:    { bg: "#fce8e8", text: "#b42318" },
-  Enrolled:    { bg: "#ede9fe", text: "#6d28d9" },
+  Interested:  { bg: "#e0ecff", text: "#1d4ed8" },
+  Researching: { bg: "#fff1cc", text: "#b45309" },
+  Applied:     { bg: "#dff7f4", text: "#0f766e" },
+  Accepted:    { bg: "#dcfce7", text: "#15803d" },
+  Rejected:    { bg: "#ffe0e0", text: "#dc2626" },
+  Enrolled:    { bg: "#efe3ff", text: "#7c3aed" },
 };
 
 const EMPTY_FORM = {
@@ -168,18 +168,21 @@ export default function University() {
     @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
 
     .uni-page {
-      --uni-bg: #ffffff;
-      --uni-surface: #ffffff;
-      --uni-surface-soft: #f8fafc;
+      --uni-bg: #fffdf8;
+      --uni-surface: rgba(255, 255, 255, 0.92);
+      --uni-surface-soft: #f9fbff;
       --uni-surface-strong: #eef4ff;
-      --uni-border: #dbe5f0;
-      --uni-border-strong: #b9c9df;
+      --uni-border: #d9e3f2;
+      --uni-border-strong: #a9bfe3;
       --uni-text: #1f2937;
-      --uni-text-soft: #4b5563;
+      --uni-text-soft: #475569;
       --uni-text-muted: #64748b;
       --uni-text-faint: #94a3b8;
       font-family: 'DM Sans', sans-serif;
-      background: #ffffff;
+      background:
+        radial-gradient(circle at top left, rgba(255, 220, 180, 0.55), transparent 28%),
+        radial-gradient(circle at top right, rgba(188, 224, 255, 0.6), transparent 30%),
+        linear-gradient(180deg, #fffaf1 0%, #ffffff 38%, #f7fbff 100%);
       min-height: 100vh;
       color: var(--uni-text);
       padding: 28px 20px 60px;
@@ -198,7 +201,7 @@ export default function University() {
     .uni-title {
       font-family: 'DM Serif Display', serif;
       font-size: 2rem;
-      color: #111827;
+      color: #17325c;
       margin: 0 0 4px;
       letter-spacing: -0.5px;
     }
@@ -223,13 +226,13 @@ export default function University() {
       transition: all 0.2s;
     }
     .uni-tab.active {
-      background: var(--uni-surface-strong);
-      border-color: #9fb6d5;
-      color: #185FA5;
+      background: linear-gradient(135deg, #edf4ff, #fff3da);
+      border-color: #86a9db;
+      color: #17325c;
     }
     .uni-tab-count {
       display: inline-block;
-      background: #eef4ff;
+      background: rgba(255,255,255,0.75);
       border-radius: 50px;
       padding: 0 7px;
       font-size: 0.75rem;
@@ -252,7 +255,7 @@ export default function University() {
       border: 1.5px solid var(--uni-border);
       transition: all 0.18s;
     }
-    .uni-stat-chip.selected { outline: 2px solid #185FA5; outline-offset: 1px; }
+    .uni-stat-chip.selected { outline: 2px solid #2563eb; outline-offset: 1px; }
 
     /* search + filter */
     .uni-controls {
@@ -274,7 +277,7 @@ export default function University() {
       outline: none;
       transition: border-color 0.2s;
     }
-    .uni-search:focus { border-color: #7aa2d6; }
+    .uni-search:focus { border-color: #6b9cff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
     .uni-search::placeholder { color: var(--uni-text-faint); }
 
     .uni-filter-select {
@@ -294,7 +297,7 @@ export default function University() {
       padding: 9px 20px;
       border-radius: 9px;
       border: none;
-      background: #185FA5;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
       color: #ffffff;
       font-family: 'DM Sans', sans-serif;
       font-size: 0.87rem;
@@ -310,11 +313,12 @@ export default function University() {
       border-radius: 14px;
       border: 1.5px solid var(--uni-border);
       background: var(--uni-surface);
+      backdrop-filter: blur(8px);
       margin-bottom: 12px;
       overflow: hidden;
       transition: border-color 0.2s;
     }
-    .uni-card:hover { border-color: var(--uni-border-strong); box-shadow: 0 10px 24px rgba(24, 95, 165, 0.08); }
+    .uni-card:hover { border-color: var(--uni-border-strong); box-shadow: 0 14px 32px rgba(59, 130, 246, 0.12); }
 
     .uni-card-header {
       display: flex;
@@ -324,8 +328,8 @@ export default function University() {
       cursor: pointer;
     }
     .uni-rank-badge {
-      background: #f5f9ff;
-      border: 1.5px solid #d9e5f4;
+      background: linear-gradient(135deg, #eef4ff, #fff2de);
+      border: 1.5px solid #d7e3f6;
       border-radius: 8px;
       padding: 4px 10px;
       font-size: 0.75rem;
@@ -365,7 +369,7 @@ export default function University() {
       font-size: 0.82rem;
       transition: all 0.18s;
     }
-    .uni-icon-btn:hover { border-color: #8fb0d8; color: #185FA5; }
+    .uni-icon-btn:hover { border-color: #8fb0d8; color: #2563eb; }
     .uni-icon-btn.del:hover { border-color: #e4a6a6; color: #b42318; }
 
     .uni-expand-icon { color: var(--uni-text-faint); font-size: 0.8rem; }
@@ -385,6 +389,7 @@ export default function University() {
       background: var(--uni-surface-soft);
       border-radius: 10px;
       padding: 14px;
+      border: 1px solid #edf2fb;
     }
     .uni-detail-section-title {
       font-size: 0.72rem;
@@ -428,7 +433,7 @@ export default function University() {
       font-size: 0.83rem;
       color: var(--uni-text-soft);
       line-height: 1.6;
-      border-left: 3px solid #d1d5db;
+      border-left: 3px solid #7c3aed;
     }
 
     /* empty state */
@@ -459,6 +464,7 @@ export default function University() {
       width: 100%;
       max-width: 680px;
       padding: 28px;
+      box-shadow: 0 24px 60px rgba(37, 99, 235, 0.18);
     }
     .uni-modal-title {
       font-family: 'DM Serif Display', serif;
@@ -503,7 +509,7 @@ export default function University() {
       transition: border-color 0.2s;
       width: 100%;
     }
-    .uni-input:focus, .uni-select:focus, .uni-textarea:focus { border-color: #9ca3af; }
+    .uni-input:focus, .uni-select:focus, .uni-textarea:focus { border-color: #7aa2d6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
     .uni-input::placeholder, .uni-textarea::placeholder { color: var(--uni-text-faint); }
     .uni-textarea { resize: vertical; min-height: 80px; }
 
@@ -515,7 +521,7 @@ export default function University() {
       color: var(--uni-text-soft);
       cursor: pointer;
     }
-    .uni-check-row input[type="checkbox"] { cursor: pointer; accent-color: #6b7280; width: 15px; height: 15px; }
+    .uni-check-row input[type="checkbox"] { cursor: pointer; accent-color: #2563eb; width: 15px; height: 15px; }
 
     .uni-deg-toggle {
       display: flex;
@@ -535,7 +541,7 @@ export default function University() {
       cursor: pointer;
       transition: all 0.2s;
     }
-    .uni-deg-btn.active { background: #f3f4f6; border-color: #c7cdd4; color: #111827; }
+    .uni-deg-btn.active { background: linear-gradient(135deg, #edf4ff, #fff3da); border-color: #86a9db; color: #17325c; }
 
     /* links */
     .uni-link-row {
@@ -592,7 +598,7 @@ export default function University() {
       padding: 9px 24px;
       border-radius: 8px;
       border: none;
-      background: #185FA5;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
       color: #ffffff;
       font-family: 'DM Sans', sans-serif;
       font-size: 0.87rem;
@@ -619,7 +625,7 @@ export default function University() {
       padding: 7px 18px;
       border-radius: 7px;
       border: none;
-      background: #185FA5;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
       color: #ffffff;
       font-family: 'DM Sans', sans-serif;
       font-size: 0.84rem;
@@ -676,7 +682,7 @@ export default function University() {
         <div className="uni-stats">
           <span
             className={`uni-stat-chip ${filterStatus === "All" ? "selected" : ""}`}
-            style={{ background: "#f8fafc", color: "#475569", borderColor: "#dbe5f0" }}
+            style={{ background: "#eef4ff", color: "#1e3a8a", borderColor: "#c8d7ee" }}
             onClick={() => setFilterStatus("All")}
           >All {(grouped[activeTab] || []).length}</span>
           {STATUS_OPTIONS.map((s) => stats[s] > 0 && (
@@ -800,7 +806,7 @@ export default function University() {
 
                   {uni.notes && (
                     <div className="uni-notes-box">
-                      <strong style={{color:"#5b6f8d",fontSize:"0.75rem",textTransform:"uppercase",letterSpacing:"0.8px"}}>Notes</strong>
+                      <strong style={{color:"#6d28d9",fontSize:"0.75rem",textTransform:"uppercase",letterSpacing:"0.8px"}}>Notes</strong>
                       <div style={{marginTop:6}}>{uni.notes}</div>
                     </div>
                   )}
