@@ -53,11 +53,11 @@ export default function JobPrep() {
 
   const [skillName, setSkillName] = useState("");
   const [skillLevel, setSkillLevel] = useState("learning");
-  const [skillLink, setSkillLink] = useState("");
+  const [skillLinks, setSkillLinks] = useState([""]);
 
   const [resTitle, setResTitle] = useState("");
   const [resType, setResType] = useState("Course");
-  const [resLink, setResLink] = useState("");
+  const [resLinks, setResLinks] = useState([""]);
 
   const SKILL_LEVELS = {
     learning: { label: "Learning", bg: "#fff8e1", color: "#854F0B" },
@@ -151,26 +151,61 @@ export default function JobPrep() {
     if (!skillName.trim()) return;
     setSkills((prev) => [
       ...prev,
-      { id: Date.now(), name: skillName.trim(), level: skillLevel, link: skillLink.trim() },
+      {
+        id: Date.now(),
+        name: skillName.trim(),
+        level: skillLevel,
+        links: skillLinks.map((link) => link.trim()).filter(Boolean),
+      },
     ]);
     setSkillName("");
     setSkillLevel("learning");
-    setSkillLink("");
+    setSkillLinks([""]);
   }
 
   function addResource() {
     if (!resTitle.trim()) return;
     setResources((prev) => [
       ...prev,
-      { id: Date.now(), title: resTitle.trim(), type: resType, link: resLink.trim(), done: false },
+      {
+        id: Date.now(),
+        title: resTitle.trim(),
+        type: resType,
+        links: resLinks.map((link) => link.trim()).filter(Boolean),
+        done: false,
+      },
     ]);
     setResTitle("");
     setResType("Course");
-    setResLink("");
+    setResLinks([""]);
   }
 
   function toggleResource(id) {
     setResources((prev) => prev.map((r) => (r.id === id ? { ...r, done: !r.done } : r)));
+  }
+
+  function updateSkillLink(index, value) {
+    setSkillLinks((prev) => prev.map((link, i) => (i === index ? value : link)));
+  }
+
+  function addSkillLinkField() {
+    setSkillLinks((prev) => [...prev, ""]);
+  }
+
+  function removeSkillLinkField(index) {
+    setSkillLinks((prev) => (prev.length === 1 ? [""] : prev.filter((_, i) => i !== index)));
+  }
+
+  function updateResLink(index, value) {
+    setResLinks((prev) => prev.map((link, i) => (i === index ? value : link)));
+  }
+
+  function addResLinkField() {
+    setResLinks((prev) => [...prev, ""]);
+  }
+
+  function removeResLinkField(index) {
+    setResLinks((prev) => (prev.length === 1 ? [""] : prev.filter((_, i) => i !== index)));
   }
 
   const counts = Object.keys(APP_STATUS).reduce((acc, key) => {
@@ -418,11 +453,24 @@ export default function JobPrep() {
             {Object.entries(SKILL_LEVELS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
           </select>
         </div>
-        <div style={{ flex: 2, minWidth: 160 }}>
-          <label style={labelSt}>Link</label>
-          <input value={skillLink} onChange={(e) => setSkillLink(e.target.value)} placeholder="https://..." style={{ width: "100%" }} />
-        </div>
         <button onClick={addSkill} style={{ alignSelf: "flex-end" }}>Add Skill</button>
+      </div>
+      <div className="card" style={{ marginBottom: 12 }}>
+        <label style={labelSt}>Skill Links</label>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {skillLinks.map((link, index) => (
+            <div key={index} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input
+                value={link}
+                onChange={(e) => updateSkillLink(index, e.target.value)}
+                placeholder={`https://... (${index + 1})`}
+                style={{ width: "100%" }}
+              />
+              <button onClick={() => removeSkillLinkField(index)} style={smallBtn} type="button">Remove</button>
+            </div>
+          ))}
+          <button onClick={addSkillLinkField} style={{ ...smallBtn, width: "fit-content" }} type="button">Add Link</button>
+        </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {skills.length === 0 && <p style={{ fontSize: 13, color: "#bbb", padding: "12px 0" }}>No skills added yet.</p>}
@@ -436,12 +484,16 @@ export default function JobPrep() {
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 500, padding: "4px 10px", borderRadius: 99, background: lv.bg, color: lv.color }}>
                     {lv.label}
                   </span>
-                  {s.link && (
-                    <a href={normalizeUrl(s.link)} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: "#185FA5" }}>
-                      {s.link}
-                    </a>
-                  )}
                 </div>
+                {((Array.isArray(s.links) && s.links.length > 0) || s.link) && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 4 }}>
+                    {(Array.isArray(s.links) && s.links.length > 0 ? s.links : [s.link]).map((link, index) => (
+                      <a key={`${s.id}-${index}`} href={normalizeUrl(link)} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: "#185FA5" }}>
+                        {link}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
               <button onClick={() => setSkills((prev) => prev.filter((x) => x.id !== s.id))} style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 12 }}>
                 Remove
@@ -463,11 +515,24 @@ export default function JobPrep() {
             {["Course", "Book", "Platform", "YouTube", "Article", "Practice"].map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
-        <div style={{ flex: 2, minWidth: 160 }}>
-          <label style={labelSt}>Link</label>
-          <input value={resLink} onChange={(e) => setResLink(e.target.value)} placeholder="https://..." style={{ width: "100%" }} />
-        </div>
         <button onClick={addResource} style={{ alignSelf: "flex-end" }}>Add</button>
+      </div>
+      <div className="card" style={{ marginBottom: 12 }}>
+        <label style={labelSt}>Resource Links</label>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {resLinks.map((link, index) => (
+            <div key={index} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input
+                value={link}
+                onChange={(e) => updateResLink(index, e.target.value)}
+                placeholder={`https://... (${index + 1})`}
+                style={{ width: "100%" }}
+              />
+              <button onClick={() => removeResLinkField(index)} style={smallBtn} type="button">Remove</button>
+            </div>
+          ))}
+          <button onClick={addResLinkField} style={{ ...smallBtn, width: "fit-content" }} type="button">Add Link</button>
+        </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {resources.length === 0 && <p style={{ fontSize: 13, color: "#bbb", padding: "12px 0" }}>No resources added yet.</p>}
@@ -480,12 +545,16 @@ export default function JobPrep() {
               <p style={{ fontWeight: 500, fontSize: 13, textDecoration: r.done ? "line-through" : "none", color: r.done ? "#aaa" : "inherit" }}>{r.title}</p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 4 }}>
                 <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "#e8f0fe", color: "#185FA5" }}>{r.type}</span>
-                {r.link && (
-                  <a href={normalizeUrl(r.link)} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: "#185FA5" }}>
-                    {r.link}
-                  </a>
-                )}
               </div>
+              {((Array.isArray(r.links) && r.links.length > 0) || r.link) && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 4 }}>
+                  {(Array.isArray(r.links) && r.links.length > 0 ? r.links : [r.link]).map((link, index) => (
+                    <a key={`${r.id}-${index}`} href={normalizeUrl(link)} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: "#185FA5" }}>
+                      {link}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
             <button onClick={() => setResources((prev) => prev.filter((x) => x.id !== r.id))} style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 13 }}>
               Remove

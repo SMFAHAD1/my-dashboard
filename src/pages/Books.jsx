@@ -4,6 +4,22 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const today = new Date().toISOString().split("T")[0];
 
+async function fetchBookCover(title, author = "") {
+  try {
+    const query = new URLSearchParams({
+      title,
+      ...(author ? { author } : {}),
+      limit: "1",
+    });
+    const res = await fetch(`https://openlibrary.org/search.json?${query.toString()}`);
+    const data = await res.json();
+    const doc = data?.docs?.[0];
+    if (doc?.cover_i) return `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`;
+    if (doc?.isbn?.[0]) return `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-M.jpg`;
+  } catch {}
+  return null;
+}
+
 function normalizeRating(value) {
   if (value === "" || value == null) return "";
   const parsed = Number.parseFloat(value);
@@ -29,6 +45,17 @@ function Divider({ label }) {
       <div style={{ flex: 1, height: 1, background: "#eee" }} />
       <span style={{ fontSize: 12, fontWeight: 600, color: "#888", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{label}</span>
       <div style={{ flex: 1, height: 1, background: "#eee" }} />
+    </div>
+  );
+}
+
+function CoverThumb({ src, alt, kind = "book" }) {
+  if (src) {
+    return <img src={src} alt={alt} style={{ width: 40, height: 56, objectFit: "cover", borderRadius: 6, border: "1px solid #e5e7eb", background: "#f8fafc" }} />;
+  }
+  return (
+    <div style={{ width: 40, height: 56, borderRadius: 6, border: "1px solid #e5e7eb", background: "#f8fafc", color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600 }}>
+      {kind === "book" ? "BOOK" : "POSTER"}
     </div>
   );
 }
@@ -114,6 +141,7 @@ function YearAnalysis({ books }) {
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 12 }}>
                     {y.items.map((b) => (
                       <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "#fff", borderRadius: 8, border: "1px solid #eee" }}>
+                        <CoverThumb src={b.cover} alt={b.title} />
                         <div style={{ flex: 1 }}>
                           <p style={{ fontWeight: 500, fontSize: 13 }}>{b.title}</p>
                           {b.author && <p style={{ fontSize: 11, color: "#888" }}>{b.author}</p>}
@@ -154,8 +182,9 @@ export default function Books() {
   const [bCurrency, setBCurrency] = useState("BDT");
   const [bNotes, setBNotes] = useState("");
 
-  function addReadingBook() {
+  async function addReadingBook() {
     if (!rTitle.trim()) return;
+    const cover = await fetchBookCover(rTitle.trim(), rAuthor.trim());
     setBooks((prev) => [
       ...prev,
       {
@@ -163,6 +192,7 @@ export default function Books() {
         section: "reading",
         title: rTitle.trim(),
         author: rAuthor.trim(),
+        cover,
         rating: normalizeRating(rRating),
         addedDate: rAdded,
         startDate: rStart,
@@ -177,8 +207,9 @@ export default function Books() {
     setRFinish("");
   }
 
-  function addBuyBook() {
+  async function addBuyBook() {
     if (!bTitle.trim()) return;
+    const cover = await fetchBookCover(bTitle.trim(), bAuthor.trim());
     setBooks((prev) => [
       ...prev,
       {
@@ -186,6 +217,7 @@ export default function Books() {
         section: "buy",
         title: bTitle.trim(),
         author: bAuthor.trim(),
+        cover,
         price: bPrice !== "" ? parseFloat(bPrice) : null,
         currency: bCurrency,
         notes: bNotes.trim(),
@@ -296,7 +328,7 @@ export default function Books() {
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760 }}>
                 <thead>
                   <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
-                    {["SL", "Title", "Author", "Rating", "Added", "Start", "Finish", "Status", "Action"].map((head) => (
+                    {["SL", "Cover", "Title", "Author", "Rating", "Added", "Start", "Finish", "Status", "Action"].map((head) => (
                       <th key={head} style={tableHead}>
                         {head}
                       </th>
@@ -313,6 +345,7 @@ export default function Books() {
                       }}
                     >
                       <td style={tableCell}>{index + 1}</td>
+                      <td style={tableCell}><CoverThumb src={b.cover} alt={b.title} /></td>
                       <td style={tableCellTitle}>{b.title}</td>
                       <td style={tableCell}>{b.author || "-"}</td>
                       <td style={tableCell}>{formatRating(b.rating) ? `${formatRating(b.rating)}/5` : "-"}</td>
@@ -408,6 +441,7 @@ export default function Books() {
             className="card"
             style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, opacity: b.bought ? 0.55 : 1 }}
           >
+            <CoverThumb src={b.cover} alt={b.title} />
             <div
               onClick={() => toggleBought(b.id)}
               style={{

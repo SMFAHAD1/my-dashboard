@@ -64,6 +64,17 @@ function Divider({ label }) {
   );
 }
 
+function PosterThumb({ src, alt }) {
+  if (src) {
+    return <img src={src} alt={alt} style={{ width: 40, height: 56, objectFit: "cover", borderRadius: 6, border: "1px solid #e5e7eb", background: "#f8fafc" }} />;
+  }
+  return (
+    <div style={{ width: 40, height: 56, borderRadius: 6, border: "1px solid #e5e7eb", background: "#f8fafc", color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 600 }}>
+      POSTER
+    </div>
+  );
+}
+
 function YearAnalysis({ movies }) {
   const [expandedYear, setExpandedYear] = useState(null);
   if (movies.length === 0) return null;
@@ -163,7 +174,9 @@ function YearAnalysis({ movies }) {
                 <div style={{ padding: "0 16px 16px", borderTop: "1px solid #eee" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 10, marginTop: 12 }}>
                     {y.items.map((m) => (
-                      <div key={m.id} style={{ background: "#fff", border: "1px solid #eee", borderRadius: 8, padding: 10 }}>
+                      <div key={m.id} style={{ background: "#fff", border: "1px solid #eee", borderRadius: 8, padding: 10, display: "flex", gap: 10, alignItems: "flex-start" }}>
+                        <PosterThumb src={m.poster} alt={m.title} />
+                        <div>
                         <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 4 }}>{m.title}</p>
                         <span style={{ fontSize: 10, fontWeight: 500, padding: "2px 7px", borderRadius: 99, background: TYPE_META[m.type]?.bg || "#eee", color: TYPE_META[m.type]?.color || "#555" }}>
                           {TYPE_META[m.type]?.label || m.type}
@@ -172,6 +185,7 @@ function YearAnalysis({ movies }) {
                         <div style={{ fontSize: 10, color: "#888", marginTop: 6 }}>
                           {m.startDate && <div>Started {formatDate(m.startDate)}</div>}
                           {m.endDate && <div>Finished {formatDate(m.endDate)}</div>}
+                        </div>
                         </div>
                       </div>
                     ))}
@@ -492,7 +506,7 @@ export default function Movies() {
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 980 }}>
                 <thead>
                   <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
-                    {["SL", "Title", "Type", "Rating", "Country", "IMDb", "Added", "Start", "Finish", "Action"].map((head) => (
+                    {["SL", "Poster", "Title", "Type", "Rating", "Country", "IMDb", "Added", "Start", "Finish", "Action"].map((head) => (
                       <th key={head} style={tableHead}>{head}</th>
                     ))}
                   </tr>
@@ -501,6 +515,7 @@ export default function Movies() {
                   {watchedMovies.map((m, index) => (
                     <tr key={m.id} style={{ borderBottom: index === watchedMovies.length - 1 ? "none" : "1px solid #eef2f7", background: index % 2 === 0 ? "#ffffff" : "#fcfcfd" }}>
                       <td style={tableCell}>{index + 1}</td>
+                      <td style={tableCell}><PosterThumb src={m.poster} alt={m.title} /></td>
                       <td style={tableCellTitle}>{m.title}</td>
                       <td style={tableCell}>
                         <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 8px", borderRadius: 99, background: TYPE_META[m.type]?.bg || "#eee", color: TYPE_META[m.type]?.color || "#555", whiteSpace: "nowrap" }}>
@@ -612,7 +627,7 @@ export default function Movies() {
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760 }}>
                 <thead>
                   <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
-                    {["SL", "Title", "Type", "Country", "IMDb", "Added", "Action"].map((head) => (
+                    {["SL", "Poster", "Title", "Type", "Country", "IMDb", "Added", "Action"].map((head) => (
                       <th key={head} style={tableHead}>{head}</th>
                     ))}
                   </tr>
@@ -621,6 +636,7 @@ export default function Movies() {
                   {futureMovies.map((m, index) => (
                     <tr key={m.id} style={{ borderBottom: index === futureMovies.length - 1 ? "none" : "1px solid #eef2f7", background: index % 2 === 0 ? "#ffffff" : "#fcfcfd" }}>
                       <td style={tableCell}>{index + 1}</td>
+                      <td style={tableCell}><PosterThumb src={m.poster} alt={m.title} /></td>
                       <td style={tableCellTitle}>{m.title}</td>
                       <td style={tableCell}>
                         <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 8px", borderRadius: 99, background: TYPE_META[m.type]?.bg || "#eee", color: TYPE_META[m.type]?.color || "#555", whiteSpace: "nowrap" }}>
