@@ -19,6 +19,20 @@ export function useSupabase(tableName, initialValue) {
     setLoading(true);
 
     async function loadData() {
+      let cachedValue = null;
+
+      try {
+        const rawCachedValue = localStorage.getItem(storageKey);
+        cachedValue = rawCachedValue ? JSON.parse(rawCachedValue) : null;
+      } catch {
+        cachedValue = null;
+      }
+
+      if (cachedValue != null && isMounted) {
+        setState(cachedValue);
+        setLoading(false);
+      }
+
       const { data } = await supabase
         .from(tableName)
         .select("data")
@@ -28,18 +42,17 @@ export function useSupabase(tableName, initialValue) {
 
       if (!isMounted) return;
 
-      if (data?.data != null) {
+      // Prefer local cached data when present because remote writes are
+      // currently blocked by RLS and older remote rows can overwrite new input.
+      if (cachedValue != null) {
+        setState(cachedValue);
+      } else if (data?.data != null) {
         setState(data.data);
         try {
           localStorage.setItem(storageKey, JSON.stringify(data.data));
         } catch {}
       } else {
-        try {
-          const cachedValue = localStorage.getItem(storageKey);
-          setState(cachedValue ? JSON.parse(cachedValue) : initialValueRef.current);
-        } catch {
-          setState(initialValueRef.current);
-        }
+        setState(initialValueRef.current);
       }
 
       setLoading(false);
