@@ -413,9 +413,9 @@ export default function Movies() {
                     <td>{index + 1}</td>
                     <td>
                       {movie.poster ? (
-                        <img src={movie.poster} alt={movie.title} style={{ width: 34, height: 50, objectFit: "cover", borderRadius: 4 }} />
+                        <img src={movie.poster} alt={movie.title} style={{ width: 60, height: 88, objectFit: "cover", borderRadius: 6 }} />
                       ) : (
-                        <div style={{ width: 34, height: 50, background: "#242424", borderRadius: 4 }} />
+                        <div style={{ width: 60, height: 88, background: "#242424", borderRadius: 6 }} />
                       )}
                     </td>
                     <td>{movie.title}</td>
@@ -495,9 +495,11 @@ export default function Movies() {
         ))}
       </div>
 
-      <div className="card" style={{ marginBottom: 20 }}>
+      <YearAnalysis movies={movies} />
+
+      <div className="card" style={{ marginTop: 24, marginBottom: 20 }}>
         <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Want to Watch</p>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 2, minWidth: 180 }}>
             <label style={labelStyle}>Name</label>
             <input value={watchlistForm.name} onChange={(event) => setWatchlistField("name", event.target.value)} placeholder="Title to watch later" style={{ width: "100%" }} />
@@ -562,8 +564,6 @@ export default function Movies() {
           )}
         </div>
       </div>
-
-      <YearAnalysis movies={movies} />
     </div>
   );
 }

@@ -203,7 +203,7 @@ export default function JobPrep() {
       <Divider label="APPLICATION TRACKER" />
 
       <div className="card" style={{ marginBottom: 16 }}>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12, marginBottom: 12 }}>
           <div style={{ flex: 2, minWidth: 150 }}>
             <label style={labelStyle}>Company</label>
             <input value={company} onChange={(event) => setCompany(event.target.value)} placeholder="Company name" style={{ width: "100%" }} />
@@ -244,35 +244,37 @@ export default function JobPrep() {
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
-          <div style={{ flex: 1, minWidth: 130 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12, alignItems: "end" }}>
+          <div>
             <label style={labelStyle}>Applied Date</label>
-            <input type="date" value={appDate} onChange={(event) => setAppDate(event.target.value)} />
+            <input type="date" value={appDate} onChange={(event) => setAppDate(event.target.value)} style={{ width: "100%" }} />
           </div>
-          <div style={{ flex: 1, minWidth: 130 }}>
+          <div>
             <label style={labelStyle}>Deadline</label>
-            <input type="date" value={deadline} onChange={(event) => setDeadline(event.target.value)} />
+            <input type="date" value={deadline} onChange={(event) => setDeadline(event.target.value)} style={{ width: "100%" }} />
           </div>
-          <div style={{ flex: 1, minWidth: 130 }}>
+          <div>
             <label style={labelStyle}>Expected Salary</label>
             <input value={salary} onChange={(event) => setSalary(event.target.value)} placeholder="e.g. 50000" style={{ width: "100%" }} />
           </div>
-          <div style={{ flex: 2, minWidth: 160 }}>
+          <div>
             <label style={labelStyle}>Job Link</label>
             <input value={link} onChange={(event) => setLink(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
           </div>
-          <div style={{ flex: 2, minWidth: 220 }}>
+          <div style={{ gridColumn: "1 / -1" }}>
             <label style={labelStyle}>Notes</label>
-            <input
+            <textarea
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
               placeholder="Interview notes, contact person, follow-ups..."
-              style={{ width: "100%" }}
+              style={{ width: "100%", minHeight: 82, resize: "vertical" }}
             />
           </div>
-          <button onClick={addApplication} style={buttonStyle}>
-            Add
-          </button>
+          <div style={{ display: "flex", justifyContent: "flex-end", gridColumn: "1 / -1", marginTop: 4 }}>
+            <button onClick={addApplication} style={buttonStyle}>
+              Add
+            </button>
+          </div>
         </div>
       </div>
 

@@ -11,26 +11,26 @@ function formatDate(d) {
 }
 
 const SUBJECT_COLORS = [
-  { bg: "#e8f0fe", color: "#185FA5" },
-  { bg: "#e8f5e9", color: "#3B6D11" },
-  { bg: "#fff8e1", color: "#854F0B" },
-  { bg: "#fce8e8", color: "#A32D2D" },
-  { bg: "#f3e8ff", color: "#6B21A8" },
-  { bg: "#e0f7fa", color: "#0B6E74" },
+  { bg: "#1a2330", color: "#8fc4ff" },
+  { bg: "#1c2a20", color: "#9ed8a6" },
+  { bg: "#2d2417", color: "#f5c46b" },
+  { bg: "#2c1d20", color: "#ff9e9e" },
+  { bg: "#241d31", color: "#caa7ff" },
+  { bg: "#16292b", color: "#82d7de" },
 ];
 
 const STATUS_OPTIONS = ["ongoing", "completed", "upcoming", "dropped"];
 const STATUS_STYLES = {
-  ongoing:   { bg: "#e8f0fe", color: "#185FA5" },
-  completed: { bg: "#e8f5e9", color: "#3B6D11" },
-  upcoming:  { bg: "#fff8e1", color: "#854F0B" },
-  dropped:   { bg: "#fce8e8", color: "#A32D2D" },
+  ongoing:   { bg: "#1a2330", color: "#8fc4ff" },
+  completed: { bg: "#1c2a20", color: "#9ed8a6" },
+  upcoming:  { bg: "#2d2417", color: "#f5c46b" },
+  dropped:   { bg: "#2c1d20", color: "#ff9e9e" },
 };
 const TERM_STATUS_OPTIONS = ["ongoing", "completed", "upcoming"];
 const TERM_STATUS_STYLES = {
-  ongoing:   { bg: "#e8f0fe", color: "#185FA5" },
-  completed: { bg: "#e8f5e9", color: "#3B6D11" },
-  upcoming:  { bg: "#fff8e1", color: "#854F0B" },
+  ongoing:   { bg: "#1a2330", color: "#8fc4ff" },
+  completed: { bg: "#1c2a20", color: "#9ed8a6" },
+  upcoming:  { bg: "#2d2417", color: "#f5c46b" },
 };
 
 // ── CGPA helpers ──────────────────────────────────────────────────────────
@@ -63,10 +63,10 @@ function gradeLabel(p) {
 }
 
 function cgpaColor(v) {
-  if (v >= 3.5) return { color: "#3B6D11", bg: "#e8f5e9" };
-  if (v >= 3.0) return { color: "#185FA5", bg: "#e8f0fe" };
-  if (v >= 2.5) return { color: "#854F0B", bg: "#fff8e1" };
-  return { color: "#A32D2D", bg: "#fce8e8" };
+  if (v >= 3.5) return { color: "#9ed8a6", bg: "#1c2a20" };
+  if (v >= 3.0) return { color: "#8fc4ff", bg: "#1a2330" };
+  if (v >= 2.5) return { color: "#f5c46b", bg: "#2d2417" };
+  return { color: "#ff9e9e", bg: "#2c1d20" };
 }
 
 function getEligibleCourses(courses) {
@@ -107,14 +107,14 @@ function calcFinalCGPA(terms) {
 }
 
 // ── Shared style helpers ──────────────────────────────────────────────────
-const labelStyle = { fontSize: 11, color: "#888", display: "block", marginBottom: 3 };
+const labelStyle = { fontSize: 11, color: "#9ca3af", display: "block", marginBottom: 3 };
 
 function pill(bg, color) {
-  return { fontSize: 11, padding: "3px 10px", borderRadius: 99, background: bg, color, fontWeight: 500 };
+  return { fontSize: 11, padding: "3px 10px", borderRadius: 99, background: bg, color, fontWeight: 500, border: "1px solid rgba(255,255,255,0.08)" };
 }
 
 function statBox(bg, color) {
-  return { padding: "10px 16px", borderRadius: 10, background: bg, color, textAlign: "center", minWidth: 80 };
+  return { padding: "10px 16px", borderRadius: 10, background: bg, color, textAlign: "center", minWidth: 80, border: "1px solid rgba(255,255,255,0.08)" };
 }
 
 // ── Overall CGPA Summary ──────────────────────────────────────────────────
@@ -133,7 +133,7 @@ function CGPASummary({ terms }) {
 
   return (
     <div style={{ marginBottom: 20, padding: "16px 20px", borderRadius: 12,
-      border: "1px solid #e0e0e0", background: "#fafafa" }}>
+      border: "1px solid #26303d", background: "#131a22" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
         flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: "#555", letterSpacing: 0.4 }}>📊 OVERALL CGPA</span>
@@ -163,9 +163,9 @@ function CGPASummary({ terms }) {
               return (
                 <div key={t.id}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "#444", minWidth: 120,
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "#d4d9e1", minWidth: 120,
                       overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.name}</span>
-                    <div style={{ flex: 1, height: 8, background: "#eee", borderRadius: 99, overflow: "hidden" }}>
+                    <div style={{ flex: 1, height: 8, background: "#243040", borderRadius: 99, overflow: "hidden" }}>
                       <div style={{ width: `${(gpa / 4) * 100}%`, height: "100%",
                         background: col.color, borderRadius: 99, transition: "width 0.4s" }} />
                     </div>
@@ -187,8 +187,8 @@ function CGPASummary({ terms }) {
               );
             })}
             <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 8,
-              borderTop: "1px dashed #eee", gap: 10 }}>
-              <span style={{ fontSize: 11, color: "#888" }}>
+              borderTop: "1px dashed #243040", gap: 10 }}>
+              <span style={{ fontSize: 11, color: "#9ca3af" }}>
                 Sum: {completedTermsWithGPA.reduce((s, t) => s + calcTermGPA(t.courses), 0).toFixed(2)}
               </span>
               <span style={{ fontSize: 11, color: "#888" }}>÷ {completedTermsWithGPA.length} terms</span>
@@ -248,18 +248,18 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
   const tStyle = TERM_STATUS_STYLES[term.status] || TERM_STATUS_STYLES.ongoing;
 
   return (
-    <div style={{ border: "1px solid #e0e0e0", borderRadius: 12, overflow: "hidden",
-      marginBottom: 16, background: "#fff" }}>
+    <div style={{ border: "1px solid #26303d", borderRadius: 12, overflow: "hidden",
+      marginBottom: 16, background: "#121821" }}>
 
       {/* Term header */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px",
-        background: "#fafafa", borderBottom: collapsed ? "none" : "1px solid #eee", flexWrap: "wrap" }}>
+        background: "#19222d", borderBottom: collapsed ? "none" : "1px solid #26303d", flexWrap: "wrap" }}>
         <button onClick={() => setCollapsed(p => !p)}
           style={{ background: "none", border: "none", cursor: "pointer",
-            fontSize: 13, color: "#888", padding: 0 }}>
+            fontSize: 13, color: "#9ca3af", padding: 0 }}>
           {collapsed ? "▶" : "▼"}
         </button>
-        <span style={{ fontWeight: 700, fontSize: 15, color: "#222", flex: 1, minWidth: 120 }}>{term.name}</span>
+        <span style={{ fontWeight: 700, fontSize: 15, color: "#e5e7eb", flex: 1, minWidth: 120 }}>{term.name}</span>
         <select value={term.status} onChange={e => onUpdateTerm(term.id, { status: e.target.value })}
           style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 99, border: "none",
             background: tStyle.bg, color: tStyle.color, cursor: "pointer" }}>
@@ -281,9 +281,9 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
         <div style={{ padding: "14px 16px" }}>
 
           {/* Add course form */}
-          <div style={{ background: "#fafafa", borderRadius: 10, padding: "12px 14px",
-            marginBottom: 14, border: "1px solid #f0f0f0" }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: "#888", marginBottom: 10 }}>Add course to {term.name}</p>
+          <div style={{ background: "#19222d", borderRadius: 10, padding: "12px 14px",
+            marginBottom: 14, border: "1px solid #26303d" }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: "#cbd5e1", marginBottom: 10 }}>Add course to {term.name}</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
               <div style={{ flex: 2, minWidth: 150 }}>
                 <label style={labelStyle}>Course name</label>
@@ -322,7 +322,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
                 <label style={labelStyle}>End date</label>
                 <input type="date" value={courseEnd} onChange={e => setCourseEnd(e.target.value)} />
               </div>
-              <div style={{ fontSize: 10, color: "#bbb", alignSelf: "flex-end", paddingBottom: 6, flex: 2 }}>
+              <div style={{ fontSize: 10, color: "#94a3b8", alignSelf: "flex-end", paddingBottom: 6, flex: 2 }}>
                 Use letter grades or GPA values from 0.0 to 4.0 only
               </div>
               <button onClick={addCourse} style={{ alignSelf: "flex-end" }}>Add Course</button>
@@ -331,7 +331,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
 
           {/* Course cards grid */}
           {term.courses.length === 0 && (
-            <p style={{ fontSize: 12, color: "#ccc", textAlign: "center", padding: "12px 0" }}>No courses yet.</p>
+            <p style={{ fontSize: 12, color: "#94a3b8", textAlign: "center", padding: "12px 0" }}>No courses yet.</p>
           )}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(185px, 1fr))", gap: 10, marginBottom: 12 }}>
             {term.courses.map(c => {
