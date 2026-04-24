@@ -451,10 +451,10 @@ export default function Movies() {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))", gap: 14, marginBottom: 24 }}>
         {sortedMovies.map((movie, index) => (
           <div key={movie.id} className="card" style={{ padding: 0, overflow: "hidden", position: "relative", outline: editId === movie.id ? "2px solid #f2f2f2" : "none" }}>
-            <div style={{ position: "relative", aspectRatio: "2/3", background: "#171717" }}>
+            <div style={{ position: "relative", aspectRatio: "4/5", background: "#171717" }}>
               {movie.poster ? (
                 <img src={movie.poster} alt={movie.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               ) : (

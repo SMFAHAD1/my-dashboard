@@ -498,9 +498,6 @@ export default function JobPrep() {
             <label style={labelStyle}>Link</label>
             <input value={resourceLink} onChange={(event) => setResourceLink(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
           </div>
-          <button onClick={addResource} style={buttonStyle}>
-            Add
-          </button>
         </div>
         <div>
           <label style={labelStyle}>Notes</label>
@@ -510,6 +507,11 @@ export default function JobPrep() {
             placeholder="Why it matters, target chapters, checkpoints..."
             style={{ width: "100%", minHeight: 84 }}
           />
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+          <button onClick={addResource} style={buttonStyle}>
+            Add
+          </button>
         </div>
       </div>
 

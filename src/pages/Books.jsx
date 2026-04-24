@@ -122,7 +122,6 @@ export default function Books() {
   const [readingTitle, setReadingTitle] = useState("");
   const [readingAuthor, setReadingAuthor] = useState("");
   const [readingRating, setReadingRating] = useState("0");
-  const [readingCover, setReadingCover] = useState("");
   const [readingAdded, setReadingAdded] = useState(today);
   const [readingStart, setReadingStart] = useState("");
   const [readingFinish, setReadingFinish] = useState("");
@@ -151,15 +150,23 @@ export default function Books() {
 
   function addReadingBook() {
     if (!readingTitle.trim()) return;
+    addReadingBookWithCover();
+  }
+
+  async function addReadingBookWithCover() {
+    const title = readingTitle.trim();
+    if (!title) return;
+    const author = readingAuthor.trim();
+    const coverUrl = await fetchBookCover(title, author);
     setBooks((current) => [
       ...current,
       {
         id: Date.now(),
         section: "reading",
-        title: readingTitle.trim(),
-        author: readingAuthor.trim(),
+        title,
+        author,
         rating: readingRating !== "" ? Number(readingRating) : 0,
-        coverUrl: readingCover.trim(),
+        coverUrl,
         addedDate: readingAdded,
         startDate: readingStart,
         finishDate: readingFinish,
@@ -168,7 +175,6 @@ export default function Books() {
     setReadingTitle("");
     setReadingAuthor("");
     setReadingRating("0");
-    setReadingCover("");
     setReadingAdded(today);
     setReadingStart("");
     setReadingFinish("");
@@ -264,10 +270,6 @@ export default function Books() {
               style={{ width: "100%" }}
             />
           </div>
-          <div style={{ flex: 2, minWidth: 180 }}>
-            <label style={labelStyle}>Poster / Cover URL</label>
-            <input value={readingCover} onChange={(event) => setReadingCover(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
-          </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginTop: 10 }}>
           <div style={{ flex: 1, minWidth: 130 }}>
@@ -282,7 +284,7 @@ export default function Books() {
             <label style={labelStyle}>Finish Date</label>
             <input type="date" value={readingFinish} onChange={(event) => setReadingFinish(event.target.value)} />
           </div>
-          <button onClick={addReadingBook} style={buttonStyle}>
+          <button onClick={addReadingBookWithCover} style={buttonStyle}>
             Add Book
           </button>
         </div>
