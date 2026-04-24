@@ -71,7 +71,7 @@ export default function JobPrep() {
   }
 
   function addApplication() {
-    if (!company.trim() && !role.trim()) return;
+    if (!company.trim() && !role.trim()) return false;
     setApplications((prev) => [
       ...prev,
       {
@@ -96,6 +96,7 @@ export default function JobPrep() {
     setLink("");
     setSalary("");
     setNotes("");
+    return true;
   }
 
   function updateStatus(id, val) {
@@ -107,7 +108,7 @@ export default function JobPrep() {
   }
 
   function addRequirement() {
-    if (!reqTitle.trim()) return;
+    if (!reqTitle.trim()) return false;
     setRequirements((prev) => [
       ...prev,
       {
@@ -121,6 +122,13 @@ export default function JobPrep() {
     setReqTitle("");
     setReqNotes("");
     setReqLinks([""]);
+    return true;
+  }
+
+  function addOverallProcess() {
+    const addedApplication = addApplication();
+    const addedRequirement = addRequirement();
+    return addedApplication || addedRequirement;
   }
 
   function updateReqLink(index, value) {
@@ -228,7 +236,7 @@ export default function JobPrep() {
           </div>
           <div style={{ flex: 2, minWidth: 150 }}>
             <label style={labelSt}>Role / Position</label>
-            <input value={role} onChange={(e) => setRole(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addApplication()} placeholder="Job title" style={{ width: "100%" }} />
+            <input value={role} onChange={(e) => setRole(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addOverallProcess()} placeholder="Job title" style={{ width: "100%" }} />
           </div>
           <div style={{ minWidth: 110 }}>
             <label style={labelSt}>Type</label>
@@ -260,7 +268,6 @@ export default function JobPrep() {
             <label style={labelSt}>Job link</label>
             <input value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://..." style={{ width: "100%" }} />
           </div>
-          <button onClick={addApplication} style={{ alignSelf: "flex-end" }}>Add</button>
         </div>
         <div style={{ marginTop: 8 }}>
           <label style={labelSt}>Notes</label>
@@ -276,13 +283,12 @@ export default function JobPrep() {
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 10 }}>
             <div style={{ flex: 2, minWidth: 180 }}>
               <label style={labelSt}>Requirement</label>
-              <input value={reqTitle} onChange={(e) => setReqTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addRequirement()} placeholder="e.g. Resume, Cover letter, Portfolio" style={{ width: "100%" }} />
+              <input value={reqTitle} onChange={(e) => setReqTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addOverallProcess()} placeholder="e.g. Resume, Cover letter, Portfolio" style={{ width: "100%" }} />
             </div>
             <div style={{ flex: 2, minWidth: 180 }}>
               <label style={labelSt}>Notes</label>
               <input value={reqNotes} onChange={(e) => setReqNotes(e.target.value)} placeholder="Optional note" style={{ width: "100%" }} />
             </div>
-            <button onClick={addRequirement} style={{ alignSelf: "flex-end" }}>Add Requirement</button>
           </div>
           <div style={{ marginBottom: 10 }}>
             <label style={labelSt}>Links</label>
@@ -327,6 +333,9 @@ export default function JobPrep() {
               </button>
             </div>
           ))}
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
+          <button onClick={addOverallProcess}>Add To Tracker</button>
         </div>
       </div>
 
