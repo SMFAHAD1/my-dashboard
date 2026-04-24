@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const today = new Date().toISOString().split("T")[0];
@@ -219,6 +219,30 @@ export default function Books() {
   const sortedBuyBooks = [...buyBooks].sort((a, b) => (b.addedDate || "").localeCompare(a.addedDate || ""));
   const finished = readingBooks.filter((book) => book.finishDate).length;
   const totalBuyPrice = buyBooks.filter((book) => !book.bought).reduce((sum, book) => sum + (book.price || 0), 0);
+
+  useEffect(() => {
+    const booksNeedingCovers = buyBooks.filter((book) => !book.coverUrl && book.title);
+    if (!booksNeedingCovers.length) return;
+
+    let cancelled = false;
+
+    async function hydrateBuyCovers() {
+      for (const book of booksNeedingCovers) {
+        const coverUrl = await fetchBookCover(book.title, book.author || "");
+        if (cancelled || !coverUrl) continue;
+
+        setBooks((current) =>
+          current.map((item) => (item.id === book.id && !item.coverUrl ? { ...item, coverUrl } : item))
+        );
+      }
+    }
+
+    hydrateBuyCovers();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [books, setBooks]);
 
   return (
     <div>
