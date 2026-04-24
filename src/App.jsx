@@ -1,53 +1,61 @@
-import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
-import Planner   from "./pages/Planner";
-import Books     from "./pages/Books";
-import Movies    from "./pages/Movies";
-import Academic  from "./pages/Academic";
-import JobPrep   from "./pages/JobPrep";
+import { BrowserRouter, NavLink, Navigate, Route, Routes } from "react-router-dom";
+import Planner from "./pages/Planner.jsx";
+import MyPlan from "./pages/MyPlan.jsx";
+import University from "./pages/University.jsx";
+import Books from "./pages/Books.jsx";
+import Movies from "./pages/Movies.jsx";
+import Academic from "./pages/Academic.jsx";
+import JobPrep from "./pages/JobPrep.jsx";
 
-const NAV = [
-  { to: "/",         label: "Planner",  icon: "📋" },
-  { to: "/books",    label: "Books",    icon: "📚" },
-  { to: "/movies",   label: "Movies",   icon: "🎬" },
-  { to: "/academic", label: "Academic", icon: "🎓" },
-  { to: "/jobprep",  label: "Job Prep", icon: "💼" },
+const NAV_ITEMS = [
+  { to: "/", label: "Planner", icon: "PL" },
+  { to: "/my-plan", label: "My Plan", icon: "MP" },
+  { to: "/university", label: "University", icon: "UN" },
+  { to: "/books", label: "Books", icon: "BK" },
+  { to: "/movies", label: "Movies", icon: "MV" },
+  { to: "/academic", label: "Academic", icon: "AC" },
+  { to: "/jobprep", label: "Job Prep", icon: "JP" },
 ];
 
 export default function App() {
   return (
     <BrowserRouter>
       <div className="app-layout">
-
-        {/* ── Sidebar ── */}
         <nav className="sidebar">
           <div className="sidebar-brand">
             My Dashboard
             <span>Personal Hub</span>
           </div>
-          {NAV.map(({ to, label, icon }) => (
+
+          <div className="sidebar-section">Pages</div>
+
+          {NAV_ITEMS.map(({ to, label, icon }) => (
             <NavLink
               key={to}
               to={to}
               end={to === "/"}
-              className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+              className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
             >
-              <span className="nav-icon">{icon}</span>
+              <span className="nav-icon" aria-hidden="true">
+                {icon}
+              </span>
               <span>{label}</span>
             </NavLink>
           ))}
         </nav>
 
-        {/* ── Pages ── */}
         <main className="main-content">
           <Routes>
-            <Route path="/"         element={<Planner />}  />
-            <Route path="/books"    element={<Books />}    />
-            <Route path="/movies"   element={<Movies />}   />
+            <Route path="/" element={<Planner />} />
+            <Route path="/my-plan" element={<MyPlan />} />
+            <Route path="/university" element={<University />} />
+            <Route path="/books" element={<Books />} />
+            <Route path="/movies" element={<Movies />} />
             <Route path="/academic" element={<Academic />} />
-            <Route path="/jobprep"  element={<JobPrep />}  />
+            <Route path="/jobprep" element={<JobPrep />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
-
       </div>
     </BrowserRouter>
   );
