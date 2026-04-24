@@ -296,7 +296,7 @@ export default function Books() {
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760 }}>
                 <thead>
                   <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
-                    {["Title", "Author", "Rating", "Added", "Start", "Finish", "Status", "Action"].map((head) => (
+                    {["SL", "Title", "Author", "Rating", "Added", "Start", "Finish", "Status", "Action"].map((head) => (
                       <th key={head} style={tableHead}>
                         {head}
                       </th>
@@ -312,6 +312,7 @@ export default function Books() {
                         background: index % 2 === 0 ? "#ffffff" : "#fcfcfd",
                       }}
                     >
+                      <td style={tableCell}>{index + 1}</td>
                       <td style={tableCellTitle}>{b.title}</td>
                       <td style={tableCell}>{b.author || "-"}</td>
                       <td style={tableCell}>{formatRating(b.rating) ? `${formatRating(b.rating)}/5` : "-"}</td>
