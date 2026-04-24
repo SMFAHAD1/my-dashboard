@@ -167,7 +167,7 @@ function YearAnalysis({ books }) {
 }
 
 export default function Books() {
-  const [books, setBooks, loading] = useSupabase("dashboard-books", []);
+  const [books, setBooks, loading] = useSupabase("Books", []);
 
   const [rTitle, setRTitle] = useState("");
   const [rAuthor, setRAuthor] = useState("");

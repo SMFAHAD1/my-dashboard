@@ -201,7 +201,7 @@ function YearAnalysis({ movies }) {
 }
 
 export default function Movies() {
-  const [movies, setMovies, dataLoading] = useSupabase("dashboard-movies", []);
+  const [movies, setMovies, dataLoading] = useSupabase("Movies", []);
   const [watchForm, setWatchForm] = useState({ ...watchFormDefaults });
   const [futureForm, setFutureForm] = useState({ ...futureFormDefaults });
   const [editId, setEditId] = useState(null);

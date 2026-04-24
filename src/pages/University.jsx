@@ -61,7 +61,7 @@ function groupByDegree(universities) {
 // ── main component ────────────────────────────────────────────────────────────
 export default function University() {
   const [universities, setUniversities, loading] = useSupabase(
-    "dashboard-universities",
+    "University",
     []
   );
   const [showForm, setShowForm] = useState(false);

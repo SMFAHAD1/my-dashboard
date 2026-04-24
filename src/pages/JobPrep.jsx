@@ -31,10 +31,16 @@ const APP_STATUS = {
 const JOB_TYPES = ["Full-time", "Part-time", "Internship", "Remote", "Contract", "Freelance"];
 
 export default function JobPrep() {
-  const [applications, setApplications, applicationsLoading] = useSupabase("dashboard-jobs-applications", []);
-  const [skills, setSkills, skillsLoading] = useSupabase("dashboard-jobs-skills", []);
-  const [resources, setResources, resourcesLoading] = useSupabase("dashboard-jobs-resources", []);
-  const [requirements, setRequirements, requirementsLoading] = useSupabase("dashboard-jobs-requirements", []);
+  const [jobPrepData, setJobPrepData, loading] = useSupabase("Job Preparation", {
+    applications: [],
+    skills: [],
+    resources: [],
+    requirements: [],
+  });
+  const applications = jobPrepData.applications ?? [];
+  const skills = jobPrepData.skills ?? [];
+  const resources = jobPrepData.resources ?? [];
+  const requirements = jobPrepData.requirements ?? [];
 
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
@@ -72,21 +78,24 @@ export default function JobPrep() {
 
   function addApplication() {
     if (!company.trim() && !role.trim()) return false;
-    setApplications((prev) => [
+    setJobPrepData((prev) => ({
       ...prev,
-      {
-        id: Date.now(),
-        company: company.trim(),
-        role: role.trim(),
-        jobType,
-        status,
-        appDate,
-        deadline,
-        link: link.trim(),
-        salary: salary.trim(),
-        notes: notes.trim(),
-      },
-    ]);
+      applications: [
+        ...(prev.applications ?? []),
+        {
+          id: Date.now(),
+          company: company.trim(),
+          role: role.trim(),
+          jobType,
+          status,
+          appDate,
+          deadline,
+          link: link.trim(),
+          salary: salary.trim(),
+          notes: notes.trim(),
+        },
+      ],
+    }));
     setCompany("");
     setRole("");
     setJobType("Full-time");
@@ -100,25 +109,34 @@ export default function JobPrep() {
   }
 
   function updateStatus(id, val) {
-    setApplications((prev) => prev.map((a) => (a.id === id ? { ...a, status: val } : a)));
+    setJobPrepData((prev) => ({
+      ...prev,
+      applications: (prev.applications ?? []).map((a) => (a.id === id ? { ...a, status: val } : a)),
+    }));
   }
 
   function deleteApp(id) {
-    setApplications((prev) => prev.filter((a) => a.id !== id));
+    setJobPrepData((prev) => ({
+      ...prev,
+      applications: (prev.applications ?? []).filter((a) => a.id !== id),
+    }));
   }
 
   function addRequirement() {
     if (!reqTitle.trim()) return false;
-    setRequirements((prev) => [
+    setJobPrepData((prev) => ({
       ...prev,
-      {
-        id: Date.now(),
-        title: reqTitle.trim(),
-        notes: reqNotes.trim(),
-        links: reqLinks.map((link) => link.trim()).filter(Boolean),
-        done: false,
-      },
-    ]);
+      requirements: [
+        ...(prev.requirements ?? []),
+        {
+          id: Date.now(),
+          title: reqTitle.trim(),
+          notes: reqNotes.trim(),
+          links: reqLinks.map((link) => link.trim()).filter(Boolean),
+          done: false,
+        },
+      ],
+    }));
     setReqTitle("");
     setReqNotes("");
     setReqLinks([""]);
@@ -144,20 +162,26 @@ export default function JobPrep() {
   }
 
   function toggleRequirement(id) {
-    setRequirements((prev) => prev.map((r) => (r.id === id ? { ...r, done: !r.done } : r)));
+    setJobPrepData((prev) => ({
+      ...prev,
+      requirements: (prev.requirements ?? []).map((r) => (r.id === id ? { ...r, done: !r.done } : r)),
+    }));
   }
 
   function addSkill() {
     if (!skillName.trim()) return;
-    setSkills((prev) => [
+    setJobPrepData((prev) => ({
       ...prev,
-      {
-        id: Date.now(),
-        name: skillName.trim(),
-        level: skillLevel,
-        links: skillLinks.map((link) => link.trim()).filter(Boolean),
-      },
-    ]);
+      skills: [
+        ...(prev.skills ?? []),
+        {
+          id: Date.now(),
+          name: skillName.trim(),
+          level: skillLevel,
+          links: skillLinks.map((link) => link.trim()).filter(Boolean),
+        },
+      ],
+    }));
     setSkillName("");
     setSkillLevel("learning");
     setSkillLinks([""]);
@@ -165,23 +189,29 @@ export default function JobPrep() {
 
   function addResource() {
     if (!resTitle.trim()) return;
-    setResources((prev) => [
+    setJobPrepData((prev) => ({
       ...prev,
-      {
-        id: Date.now(),
-        title: resTitle.trim(),
-        type: resType,
-        links: resLinks.map((link) => link.trim()).filter(Boolean),
-        done: false,
-      },
-    ]);
+      resources: [
+        ...(prev.resources ?? []),
+        {
+          id: Date.now(),
+          title: resTitle.trim(),
+          type: resType,
+          links: resLinks.map((link) => link.trim()).filter(Boolean),
+          done: false,
+        },
+      ],
+    }));
     setResTitle("");
     setResType("Course");
     setResLinks([""]);
   }
 
   function toggleResource(id) {
-    setResources((prev) => prev.map((r) => (r.id === id ? { ...r, done: !r.done } : r)));
+    setJobPrepData((prev) => ({
+      ...prev,
+      resources: (prev.resources ?? []).map((r) => (r.id === id ? { ...r, done: !r.done } : r)),
+    }));
   }
 
   function updateSkillLink(index, value) {
@@ -215,8 +245,6 @@ export default function JobPrep() {
 
   const filtered = filter === "all" ? applications : applications.filter((a) => a.status === filter);
   const requirementDone = requirements.filter((r) => r.done).length;
-  const loading = applicationsLoading || skillsLoading || resourcesLoading || requirementsLoading;
-
   if (loading) return <div style={{ padding: "32px" }}>Loading...</div>;
 
   return (
@@ -366,7 +394,7 @@ export default function JobPrep() {
                   </div>
                 ) : null}
               </div>
-              <button onClick={() => setRequirements((prev) => prev.filter((x) => x.id !== r.id))} style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 12 }}>
+              <button onClick={() => setJobPrepData((prev) => ({ ...prev, requirements: (prev.requirements ?? []).filter((x) => x.id !== r.id) }))} style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 12 }}>
                 Remove
               </button>
             </div>
@@ -498,7 +526,7 @@ export default function JobPrep() {
                   </div>
                 )}
               </div>
-              <button onClick={() => setSkills((prev) => prev.filter((x) => x.id !== s.id))} style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 12 }}>
+              <button onClick={() => setJobPrepData((prev) => ({ ...prev, skills: (prev.skills ?? []).filter((x) => x.id !== s.id) }))} style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 12 }}>
                 Remove
               </button>
             </div>
@@ -559,7 +587,7 @@ export default function JobPrep() {
                 </div>
               )}
             </div>
-            <button onClick={() => setResources((prev) => prev.filter((x) => x.id !== r.id))} style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 13 }}>
+            <button onClick={() => setJobPrepData((prev) => ({ ...prev, resources: (prev.resources ?? []).filter((x) => x.id !== r.id) }))} style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc", fontSize: 13 }}>
               Remove
             </button>
           </div>
