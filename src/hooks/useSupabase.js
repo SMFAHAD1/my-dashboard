@@ -2,8 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "../supabase";
 
 export function useSupabase(tableName, initialValue) {
+  const storageKey = `dashboard-cache:${tableName}`;
   const initialValueRef = useRef(initialValue);
-  const [state, setState] = useState(initialValueRef.current);
+  const [state, setState] = useState(() => {
+    try {
+      const cachedValue = localStorage.getItem(storageKey);
+      return cachedValue ? JSON.parse(cachedValue) : initialValueRef.current;
+    } catch {
+      return initialValueRef.current;
+    }
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,8 +30,16 @@ export function useSupabase(tableName, initialValue) {
 
       if (data?.data != null) {
         setState(data.data);
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(data.data));
+        } catch {}
       } else {
-        setState(initialValueRef.current);
+        try {
+          const cachedValue = localStorage.getItem(storageKey);
+          setState(cachedValue ? JSON.parse(cachedValue) : initialValueRef.current);
+        } catch {
+          setState(initialValueRef.current);
+        }
       }
 
       setLoading(false);
@@ -34,7 +50,7 @@ export function useSupabase(tableName, initialValue) {
     return () => {
       isMounted = false;
     };
-  }, [tableName]);
+  }, [storageKey, tableName]);
 
   async function setAndSave(valueOrUpdater) {
     let nextValue;
@@ -44,7 +60,15 @@ export function useSupabase(tableName, initialValue) {
       return nextValue;
     });
 
-    await supabase.from(tableName).insert({ data: nextValue });
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(nextValue));
+    } catch {}
+
+    const { error } = await supabase.from(tableName).insert({ data: nextValue });
+
+    if (error) {
+      console.warn(`Supabase save failed for ${tableName}; using local cache instead.`, error.message);
+    }
   }
 
   return [state, setAndSave, loading];
