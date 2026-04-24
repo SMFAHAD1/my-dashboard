@@ -43,6 +43,7 @@ const watchlistDefaults = {
   name: "",
   type: "movie",
   country: "",
+  poster: "",
   addedDate: today,
 };
 
@@ -438,7 +439,7 @@ export default function Movies() {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 14, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 14, marginBottom: 24 }}>
         {sortedMovies.map((movie, index) => (
           <div key={movie.id} className="card" style={{ padding: 0, overflow: "hidden", position: "relative", outline: editId === movie.id ? "2px solid #f2f2f2" : "none" }}>
             <div style={{ position: "relative", aspectRatio: "2/3", background: "#171717" }}>
@@ -468,8 +469,8 @@ export default function Movies() {
               </div>
             </div>
 
-            <div style={{ padding: "10px 10px 12px" }}>
-              <p style={{ fontWeight: 500, fontSize: 13, lineHeight: 1.35, marginBottom: 3 }}>{movie.title}</p>
+            <div style={{ padding: "9px 9px 11px" }}>
+              <p style={{ fontWeight: 500, fontSize: 12, lineHeight: 1.35, marginBottom: 3 }}>{movie.title}</p>
               <p style={{ fontSize: 11, color: "#b5b5b5", marginBottom: 4 }}>
                 {[movie.year, movie.runtime, movie.imdbRating ? `IMDb ${movie.imdbRating}` : null].filter(Boolean).join(" - ")}
               </p>
@@ -518,6 +519,10 @@ export default function Movies() {
             <label style={labelStyle}>Country</label>
             <input value={watchlistForm.country} onChange={(event) => setWatchlistField("country", event.target.value)} placeholder="Country" style={{ width: "100%" }} />
           </div>
+          <div style={{ flex: 2, minWidth: 180 }}>
+            <label style={labelStyle}>Poster URL</label>
+            <input value={watchlistForm.poster} onChange={(event) => setWatchlistField("poster", event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
+          </div>
           <div style={{ flex: 1, minWidth: 130 }}>
             <label style={labelStyle}>Added Date</label>
             <input type="date" value={watchlistForm.addedDate} onChange={(event) => setWatchlistField("addedDate", event.target.value)} />
@@ -536,6 +541,7 @@ export default function Movies() {
                 <thead>
                   <tr>
                     <th>S/N</th>
+                    <th>Poster</th>
                     <th>Title</th>
                     <th>Type</th>
                     <th>Country</th>
@@ -547,6 +553,13 @@ export default function Movies() {
                   {sortedWatchlist.map((item, index) => (
                     <tr key={item.id}>
                       <td>{index + 1}</td>
+                      <td>
+                        {item.poster ? (
+                          <img src={item.poster} alt={item.name} style={{ width: 48, height: 68, objectFit: "cover", borderRadius: 6 }} />
+                        ) : (
+                          <div style={{ width: 48, height: 68, background: "#242424", borderRadius: 6 }} />
+                        )}
+                      </td>
                       <td>{item.name}</td>
                       <td>{TYPE_META[item.type]?.label || item.type}</td>
                       <td>{item.country || "-"}</td>

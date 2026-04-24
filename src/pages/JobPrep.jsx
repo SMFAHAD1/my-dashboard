@@ -53,6 +53,7 @@ export default function JobPrep() {
   const [link, setLink] = useState("");
   const [salary, setSalary] = useState("");
   const [notes, setNotes] = useState("");
+  const [usage, setUsage] = useState("");
   const [filter, setFilter] = useState("all");
 
   const [skillName, setSkillName] = useState("");
@@ -87,6 +88,7 @@ export default function JobPrep() {
         link: link.trim(),
         salary: salary.trim(),
         notes: notes.trim(),
+        usage: usage.trim(),
       },
     ]);
 
@@ -100,6 +102,7 @@ export default function JobPrep() {
     setLink("");
     setSalary("");
     setNotes("");
+    setUsage("");
   }
 
   function updateApplicationStatus(id, value) {
@@ -268,6 +271,15 @@ export default function JobPrep() {
               onChange={(event) => setNotes(event.target.value)}
               placeholder="Interview notes, contact person, follow-ups..."
               style={{ width: "100%", minHeight: 82, resize: "vertical" }}
+            />
+          </div>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <label style={labelStyle}>Use</label>
+            <input
+              value={usage}
+              onChange={(event) => setUsage(event.target.value)}
+              placeholder="How you will use this application or next action"
+              style={{ width: "100%" }}
             />
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gridColumn: "1 / -1", marginTop: 4 }}>
@@ -588,6 +600,7 @@ function ApplicationCard({ item, statusMeta, onDelete, onChangeStatus }) {
             {item.salary && <span style={{ fontSize: 12, color: "#f0f0f0" }}>Salary {item.salary}</span>}
           </div>
           {item.notes && <p style={{ fontSize: 12, color: "#aaaaaa", marginTop: 5, fontStyle: "italic" }}>{item.notes}</p>}
+          {item.usage && <p style={{ fontSize: 12, color: "#cfcfcf", marginTop: 4 }}>Use: {item.usage}</p>}
           {item.link && (
             <a
               href={item.link.startsWith("http") ? item.link : `https://${item.link}`}

@@ -132,6 +132,7 @@ export default function Books() {
   const [buyPrice, setBuyPrice] = useState("");
   const [buyCurrency, setBuyCurrency] = useState("BDT");
   const [buyNotes, setBuyNotes] = useState("");
+  const [buyCover, setBuyCover] = useState("");
 
   function addReadingBook() {
     if (!readingTitle.trim()) return;
@@ -170,6 +171,7 @@ export default function Books() {
         price: buyPrice !== "" ? parseFloat(buyPrice) : null,
         currency: buyCurrency,
         notes: buyNotes.trim(),
+        coverUrl: buyCover.trim(),
         addedDate: today,
       },
     ]);
@@ -177,6 +179,7 @@ export default function Books() {
     setBuyAuthor("");
     setBuyPrice("");
     setBuyNotes("");
+    setBuyCover("");
   }
 
   function deleteBook(id) {
@@ -332,6 +335,10 @@ export default function Books() {
             <label style={labelStyle}>Notes</label>
             <input value={buyNotes} onChange={(event) => setBuyNotes(event.target.value)} placeholder="Where to buy, edition..." style={{ width: "100%" }} />
           </div>
+          <div style={{ flex: 2, minWidth: 180 }}>
+            <label style={labelStyle}>Poster / Cover URL</label>
+            <input value={buyCover} onChange={(event) => setBuyCover(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
+          </div>
           <button onClick={addBuyBook} style={buttonStyle}>
             Add
           </button>
@@ -345,6 +352,11 @@ export default function Books() {
             <div style={{ minWidth: 36, height: 36, borderRadius: 999, background: "#1d1d1d", border: "1px solid #373737", display: "flex", alignItems: "center", justifyContent: "center", color: "#f1f1f1", fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
               {index + 1}
             </div>
+            {book.coverUrl ? (
+              <img src={book.coverUrl} alt={book.title} style={{ width: 48, height: 68, objectFit: "cover", borderRadius: 6, flexShrink: 0 }} />
+            ) : (
+              <div style={{ width: 48, height: 68, borderRadius: 6, background: "#1f1f1f", flexShrink: 0 }} />
+            )}
             <div
               onClick={() => toggleBought(book.id)}
               style={{
