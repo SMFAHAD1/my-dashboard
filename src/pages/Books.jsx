@@ -167,7 +167,7 @@ function YearAnalysis({ books }) {
 }
 
 export default function Books() {
-  const [books, setBooks] = useSupabase("dashboard-books", []);
+  const [books, setBooks, loading] = useSupabase("dashboard-books", []);
 
   const [rTitle, setRTitle] = useState("");
   const [rAuthor, setRAuthor] = useState("");
@@ -242,6 +242,8 @@ export default function Books() {
   const buyBooks = books.filter((b) => b.section === "buy");
   const finished = readingBooks.filter((b) => b.finishDate).length;
   const totalBuyPrice = buyBooks.filter((b) => !b.bought).reduce((s, b) => s + (b.price || 0), 0);
+
+  if (loading) return <div style={{ padding: "32px" }}>Loading...</div>;
 
   return (
     <div>

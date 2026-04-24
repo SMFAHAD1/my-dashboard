@@ -31,10 +31,10 @@ const APP_STATUS = {
 const JOB_TYPES = ["Full-time", "Part-time", "Internship", "Remote", "Contract", "Freelance"];
 
 export default function JobPrep() {
-  const [applications, setApplications] = useSupabase("dashboard-jobs-applications", []);
-  const [skills, setSkills] = useSupabase("dashboard-jobs-skills", []);
-  const [resources, setResources] = useSupabase("dashboard-jobs-resources", []);
-  const [requirements, setRequirements] = useSupabase("dashboard-jobs-requirements", []);
+  const [applications, setApplications, applicationsLoading] = useSupabase("dashboard-jobs-applications", []);
+  const [skills, setSkills, skillsLoading] = useSupabase("dashboard-jobs-skills", []);
+  const [resources, setResources, resourcesLoading] = useSupabase("dashboard-jobs-resources", []);
+  const [requirements, setRequirements, requirementsLoading] = useSupabase("dashboard-jobs-requirements", []);
 
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
@@ -215,6 +215,9 @@ export default function JobPrep() {
 
   const filtered = filter === "all" ? applications : applications.filter((a) => a.status === filter);
   const requirementDone = requirements.filter((r) => r.done).length;
+  const loading = applicationsLoading || skillsLoading || resourcesLoading || requirementsLoading;
+
+  if (loading) return <div style={{ padding: "32px" }}>Loading...</div>;
 
   return (
     <div>

@@ -60,7 +60,7 @@ function groupByDegree(universities) {
 
 // ── main component ────────────────────────────────────────────────────────────
 export default function University() {
-  const [universities, setUniversities] = useSupabase(
+  const [universities, setUniversities, loading] = useSupabase(
     "dashboard-universities",
     []
   );
@@ -649,6 +649,8 @@ export default function University() {
       .uni-modal { padding: 18px; }
     }
   `;
+
+  if (loading) return <div style={{ padding: "32px" }}>Loading...</div>;
 
   return (
     <>

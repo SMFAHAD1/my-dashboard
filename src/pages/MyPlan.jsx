@@ -198,7 +198,7 @@ function AnalysisPanel({ plans, period }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────
 export default function MyPlan() {
-  const [plans, setPlans] = useSupabase("dashboard-plans", []);
+  const [plans, setPlans, loading] = useSupabase("dashboard-plans", []);
   const [analysisPeriod, setAnalysisPeriod] = useState("weekly");
   const [filter, setFilter]   = useState("all");
 
