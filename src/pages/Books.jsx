@@ -189,6 +189,8 @@ export default function Books() {
 
   const readingBooks = books.filter((book) => book.section === "reading");
   const buyBooks = books.filter((book) => book.section === "buy");
+  const sortedReadingBooks = [...readingBooks].sort((a, b) => (b.addedDate || "").localeCompare(a.addedDate || ""));
+  const sortedBuyBooks = [...buyBooks].sort((a, b) => (b.addedDate || "").localeCompare(a.addedDate || ""));
   const finished = readingBooks.filter((book) => book.finishDate).length;
   const totalBuyPrice = buyBooks.filter((book) => !book.bought).reduce((sum, book) => sum + (book.price || 0), 0);
 
@@ -270,8 +272,11 @@ export default function Books() {
         {readingBooks.length === 0 && (
           <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: "20px 0" }}>No books yet.</p>
         )}
-        {readingBooks.map((book) => (
+        {sortedReadingBooks.map((book, index) => (
           <div key={book.id} className="card" style={{ padding: "12px 16px", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 0 }}>
+            <div style={{ minWidth: 36, height: 36, borderRadius: 999, background: "#1d1d1d", border: "1px solid #373737", display: "flex", alignItems: "center", justifyContent: "center", color: "#f1f1f1", fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
+              {index + 1}
+            </div>
             {book.coverUrl ? (
               <img src={book.coverUrl} alt={book.title} style={{ width: 54, height: 76, objectFit: "cover", borderRadius: 6, flexShrink: 0 }} />
             ) : (
@@ -335,8 +340,11 @@ export default function Books() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {buyBooks.length === 0 && <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: "20px 0" }}>No books on the buy list yet.</p>}
-        {buyBooks.map((book) => (
+        {sortedBuyBooks.map((book, index) => (
           <div key={book.id} className="card" style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, opacity: book.bought ? 0.55 : 1, marginBottom: 0 }}>
+            <div style={{ minWidth: 36, height: 36, borderRadius: 999, background: "#1d1d1d", border: "1px solid #373737", display: "flex", alignItems: "center", justifyContent: "center", color: "#f1f1f1", fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
+              {index + 1}
+            </div>
             <div
               onClick={() => toggleBought(book.id)}
               style={{

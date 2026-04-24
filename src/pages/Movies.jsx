@@ -270,6 +270,9 @@ export default function Movies() {
     return accumulator;
   }, {});
 
+  const sortedMovies = [...movies].sort((a, b) => (b.addedDate || "").localeCompare(a.addedDate || ""));
+  const sortedWatchlist = [...watchlist].sort((a, b) => (b.addedDate || "").localeCompare(a.addedDate || ""));
+
   return (
     <div>
       <h2 style={{ marginBottom: 20 }}>Movies & Series</h2>
@@ -376,54 +379,6 @@ export default function Movies() {
         </div>
       </div>
 
-      <div className="card" style={{ marginBottom: 20 }}>
-        <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Want to Watch</p>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
-          <div style={{ flex: 2, minWidth: 180 }}>
-            <label style={labelStyle}>Name</label>
-            <input value={watchlistForm.name} onChange={(event) => setWatchlistField("name", event.target.value)} placeholder="Title to watch later" style={{ width: "100%" }} />
-          </div>
-          <div style={{ minWidth: 150 }}>
-            <label style={labelStyle}>Type</label>
-            <select value={watchlistForm.type} onChange={(event) => setWatchlistField("type", event.target.value)} style={{ width: "100%" }}>
-              {TYPE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={{ flex: 1, minWidth: 130 }}>
-            <label style={labelStyle}>Country</label>
-            <input value={watchlistForm.country} onChange={(event) => setWatchlistField("country", event.target.value)} placeholder="Country" style={{ width: "100%" }} />
-          </div>
-          <div style={{ flex: 1, minWidth: 130 }}>
-            <label style={labelStyle}>Added Date</label>
-            <input type="date" value={watchlistForm.addedDate} onChange={(event) => setWatchlistField("addedDate", event.target.value)} />
-          </div>
-          <button onClick={addToWatchlist} style={buttonStyle}>
-            Add to Box
-          </button>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
-          {watchlist.length === 0 && <p style={{ fontSize: 13, color: "#909090" }}>No watchlist items yet.</p>}
-          {watchlist.map((item) => (
-            <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderRadius: 10, background: "#151515", border: "1px solid #2f2f2f", flexWrap: "wrap" }}>
-              <div>
-                <div style={{ fontWeight: 600 }}>{item.name}</div>
-                <div style={{ fontSize: 12, color: "#b1b1b1", marginTop: 2 }}>
-                  {[TYPE_META[item.type]?.label, item.country || "-", item.addedDate ? formatDate(item.addedDate) : "-"].join(" - ")}
-                </div>
-              </div>
-              <button onClick={() => deleteWatchlistItem(item.id)} style={ghostButtonStyle}>
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {movies.length > 0 && (
         <p style={{ fontSize: 13, color: "#9a9a9a", marginBottom: 12 }}>
           {movies.length} total
@@ -436,11 +391,12 @@ export default function Movies() {
 
       {movies.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
-          <div className="card-title">Main List</div>
+          <div className="card-title">Watched List</div>
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
+                  <th>S/N</th>
                   <th>Poster</th>
                   <th>Title</th>
                   <th>Type</th>
@@ -452,8 +408,9 @@ export default function Movies() {
                 </tr>
               </thead>
               <tbody>
-                {movies.map((movie) => (
+                {sortedMovies.map((movie, index) => (
                   <tr key={movie.id}>
+                    <td>{index + 1}</td>
                     <td>
                       {movie.poster ? (
                         <img src={movie.poster} alt={movie.title} style={{ width: 34, height: 50, objectFit: "cover", borderRadius: 4 }} />
@@ -481,8 +438,8 @@ export default function Movies() {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 14 }}>
-        {movies.map((movie) => (
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 14, marginBottom: 24 }}>
+        {sortedMovies.map((movie, index) => (
           <div key={movie.id} className="card" style={{ padding: 0, overflow: "hidden", position: "relative", outline: editId === movie.id ? "2px solid #f2f2f2" : "none" }}>
             <div style={{ position: "relative", aspectRatio: "2/3", background: "#171717" }}>
               {movie.poster ? (
@@ -494,6 +451,10 @@ export default function Movies() {
               )}
 
               <span style={{ position: "absolute", top: 7, left: 7, fontSize: 10, fontWeight: 500, padding: "2px 8px", borderRadius: 99, background: "#101010", color: "#f1f1f1", border: "1px solid #555" }}>
+                #{index + 1}
+              </span>
+
+              <span style={{ position: "absolute", top: 7, left: 56, fontSize: 10, fontWeight: 500, padding: "2px 8px", borderRadius: 99, background: "#101010", color: "#f1f1f1", border: "1px solid #555" }}>
                 {TYPE_META[movie.type]?.label || movie.type}
               </span>
 
@@ -532,6 +493,74 @@ export default function Movies() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="card" style={{ marginBottom: 20 }}>
+        <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Want to Watch</p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
+          <div style={{ flex: 2, minWidth: 180 }}>
+            <label style={labelStyle}>Name</label>
+            <input value={watchlistForm.name} onChange={(event) => setWatchlistField("name", event.target.value)} placeholder="Title to watch later" style={{ width: "100%" }} />
+          </div>
+          <div style={{ minWidth: 150 }}>
+            <label style={labelStyle}>Type</label>
+            <select value={watchlistForm.type} onChange={(event) => setWatchlistField("type", event.target.value)} style={{ width: "100%" }}>
+              {TYPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ flex: 1, minWidth: 130 }}>
+            <label style={labelStyle}>Country</label>
+            <input value={watchlistForm.country} onChange={(event) => setWatchlistField("country", event.target.value)} placeholder="Country" style={{ width: "100%" }} />
+          </div>
+          <div style={{ flex: 1, minWidth: 130 }}>
+            <label style={labelStyle}>Added Date</label>
+            <input type="date" value={watchlistForm.addedDate} onChange={(event) => setWatchlistField("addedDate", event.target.value)} />
+          </div>
+          <button onClick={addToWatchlist} style={buttonStyle}>
+            Add to Box
+          </button>
+        </div>
+
+        <div style={{ marginTop: 14 }}>
+          {sortedWatchlist.length === 0 ? (
+            <p style={{ fontSize: 13, color: "#909090" }}>No watchlist items yet.</p>
+          ) : (
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>S/N</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Country</th>
+                    <th>Added Date</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedWatchlist.map((item, index) => (
+                    <tr key={item.id}>
+                      <td>{index + 1}</td>
+                      <td>{item.name}</td>
+                      <td>{TYPE_META[item.type]?.label || item.type}</td>
+                      <td>{item.country || "-"}</td>
+                      <td>{item.addedDate ? formatDate(item.addedDate) : "-"}</td>
+                      <td>
+                        <button onClick={() => deleteWatchlistItem(item.id)} style={ghostButtonStyle}>
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       <YearAnalysis movies={movies} />

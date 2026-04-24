@@ -261,19 +261,18 @@ export default function JobPrep() {
             <label style={labelStyle}>Job Link</label>
             <input value={link} onChange={(event) => setLink(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
           </div>
+          <div style={{ flex: 2, minWidth: 220 }}>
+            <label style={labelStyle}>Notes</label>
+            <input
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
+              placeholder="Interview notes, contact person, follow-ups..."
+              style={{ width: "100%" }}
+            />
+          </div>
           <button onClick={addApplication} style={buttonStyle}>
             Add
           </button>
-        </div>
-
-        <div style={{ marginTop: 8 }}>
-          <label style={labelStyle}>Notes</label>
-          <textarea
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-            placeholder="Interview notes, contact person, follow-ups..."
-            style={{ width: "100%", minHeight: 84 }}
-          />
         </div>
       </div>
 

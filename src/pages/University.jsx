@@ -74,6 +74,18 @@ function normalizeUrl(url) {
   return url.startsWith("http://") || url.startsWith("https://") ? url : `https://${url}`;
 }
 
+function Divider({ label }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "26px 0 14px" }}>
+      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
+      <span style={{ fontSize: 12, fontWeight: 600, color: "#9a9a9a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+        {label}
+      </span>
+      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
+    </div>
+  );
+}
+
 export default function University() {
   const [universities, setUniversities] = useLocalStorage("dashboard-universities", [], 1);
   const [showForm, setShowForm] = useState(false);
