@@ -266,48 +266,6 @@ export default function Books() {
         </div>
       </div>
 
-      {readingBooks.length > 0 && (
-        <div className="card" style={{ marginBottom: 16 }}>
-          <div className="card-title">Main List</div>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Cover</th>
-                  <th>Title</th>
-                  <th>Author</th>
-                  <th>Rating</th>
-                  <th>Added</th>
-                  <th>Start</th>
-                  <th>Finish</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {readingBooks.map((book) => (
-                  <tr key={book.id}>
-                    <td>
-                      {book.coverUrl ? (
-                        <img src={book.coverUrl} alt={book.title} style={{ width: 34, height: 48, objectFit: "cover", borderRadius: 4 }} />
-                      ) : (
-                        <div style={{ width: 34, height: 48, borderRadius: 4, background: "#242424" }} />
-                      )}
-                    </td>
-                    <td>{book.title}</td>
-                    <td>{book.author || "-"}</td>
-                    <td>{book.rating ? `${formatRating(book.rating)}/10` : "-"}</td>
-                    <td>{book.addedDate ? formatDate(book.addedDate) : "-"}</td>
-                    <td>{book.startDate ? formatDate(book.startDate) : "-"}</td>
-                    <td>{book.finishDate ? formatDate(book.finishDate) : "-"}</td>
-                    <td><button onClick={() => deleteBook(book.id)} style={ghostButtonStyle}>Remove</button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 8 }}>
         {readingBooks.length === 0 && (
           <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: "20px 0" }}>No books yet.</p>
@@ -320,13 +278,13 @@ export default function Books() {
               <div style={{ width: 54, height: 76, borderRadius: 6, background: "#1f1f1f", flexShrink: 0 }} />
             )}
             <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>{book.title}</p>
-              {book.author && <p style={{ fontSize: 12, color: "#a4a4a4", marginBottom: 4 }}>{book.author}</p>}
-              {book.rating > 0 && <div style={{ marginBottom: 4, fontSize: 12, color: "#efefef" }}>Rating {formatRating(book.rating)}/10</div>}
+              <p style={{ fontWeight: 600, fontSize: 16, marginBottom: 2 }}>{book.title}</p>
+              {book.author && <p style={{ fontSize: 13, color: "#a4a4a4", marginBottom: 4 }}>{book.author}</p>}
+              {book.rating > 0 && <div style={{ marginBottom: 4, fontSize: 13, color: "#efefef" }}>Rating {formatRating(book.rating)}/10</div>}
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                {book.addedDate && <span style={{ fontSize: 11, color: "#8f8f8f" }}>Added {formatDate(book.addedDate)}</span>}
-                {book.startDate && <span style={{ fontSize: 11, color: "#a8a8a8" }}>Started {formatDate(book.startDate)}</span>}
-                {book.finishDate && <span style={{ fontSize: 11, color: "#f1f1f1", fontWeight: 500 }}>Finished {formatDate(book.finishDate)}</span>}
+                {book.addedDate && <span style={{ fontSize: 12, color: "#8f8f8f" }}>Added {formatDate(book.addedDate)}</span>}
+                {book.startDate && <span style={{ fontSize: 12, color: "#a8a8a8" }}>Started {formatDate(book.startDate)}</span>}
+                {book.finishDate && <span style={{ fontSize: 12, color: "#f1f1f1", fontWeight: 500 }}>Finished {formatDate(book.finishDate)}</span>}
               </div>
             </div>
             {book.finishDate && <span style={summaryPillStyle}>Done</span>}
@@ -417,7 +375,7 @@ export default function Books() {
   );
 }
 
-const labelStyle = { fontSize: 11, color: "#9a9a9a", display: "block", marginBottom: 3 };
+const labelStyle = { fontSize: 12, color: "#9a9a9a", display: "block", marginBottom: 4 };
 
 const statCardStyle = {
   flex: 1,
@@ -436,8 +394,9 @@ const buttonStyle = {
   color: "#111111",
   border: "1px solid #676767",
   borderRadius: 8,
-  padding: "9px 16px",
+  padding: "10px 16px",
   cursor: "pointer",
+  fontSize: 13,
 };
 
 const ghostButtonStyle = {
@@ -446,8 +405,8 @@ const ghostButtonStyle = {
   cursor: "pointer",
   color: "#d3d3d3",
   borderRadius: 8,
-  padding: "6px 10px",
-  fontSize: 12,
+  padding: "7px 11px",
+  fontSize: 13,
 };
 
 const summaryPillStyle = {

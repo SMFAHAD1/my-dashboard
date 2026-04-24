@@ -23,13 +23,12 @@ function Divider({ label }) {
 }
 
 const APP_STATUS = {
-  requirement: { label: "Requirement", bg: "#171717", color: "#f5f5f5", border: "#4b4b4b" },
   ongoing: { label: "Ongoing", bg: "#202020", color: "#ededed", border: "#5a5a5a" },
   complete: { label: "Complete", bg: "#111111", color: "#ffffff", border: "#707070" },
   rejection: { label: "Rejected", bg: "#1b1b1b", color: "#d4d4d4", border: "#555555" },
 };
 
-const JOB_TYPES = ["Full-time", "Part-time", "Internship", "Remote", "Contract", "Freelance"];
+const JOB_TYPES = ["Full-time", "Part-time", "Internship", "Remote", "Contract", "Freelance", "Other"];
 
 const SKILL_LEVELS = {
   learning: { label: "Learning", bg: "#171717", color: "#f5f5f5", border: "#474747" },
@@ -37,7 +36,7 @@ const SKILL_LEVELS = {
   proficient: { label: "Proficient", bg: "#101010", color: "#ffffff", border: "#7c7c7c" },
 };
 
-const RESOURCE_TYPES = ["Course", "Book", "Platform", "YouTube", "Article", "Practice"];
+const RESOURCE_TYPES = ["Course", "Book", "Platform", "YouTube", "Article", "Practice", "Other"];
 
 export default function JobPrep() {
   const [applications, setApplications] = useLocalStorage("dashboard-jobs-applications", [], 1);
@@ -47,7 +46,8 @@ export default function JobPrep() {
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
   const [jobType, setJobType] = useState("Full-time");
-  const [status, setStatus] = useState("requirement");
+  const [status, setStatus] = useState("ongoing");
+  const [requirement, setRequirement] = useState("");
   const [appDate, setAppDate] = useState(today);
   const [deadline, setDeadline] = useState("");
   const [link, setLink] = useState("");
@@ -81,6 +81,7 @@ export default function JobPrep() {
         role: role.trim(),
         jobType,
         status,
+        requirement: requirement.trim(),
         appDate,
         deadline,
         link: link.trim(),
@@ -92,7 +93,8 @@ export default function JobPrep() {
     setCompany("");
     setRole("");
     setJobType("Full-time");
-    setStatus("requirement");
+    setStatus("ongoing");
+    setRequirement("");
     setAppDate(today);
     setDeadline("");
     setLink("");
@@ -161,22 +163,27 @@ export default function JobPrep() {
     setResources((current) => current.filter((item) => item.id !== id));
   }
 
+  const normalizedApplications = applications.map((item) => ({
+    ...item,
+    status: item.status === "requirement" ? "ongoing" : item.status,
+    requirement: item.requirement || (item.status === "requirement" ? "Requirement pending" : ""),
+  }));
   const counts = Object.keys(APP_STATUS).reduce((accumulator, key) => {
-    accumulator[key] = applications.filter((item) => item.status === key).length;
+    accumulator[key] = normalizedApplications.filter((item) => item.status === key).length;
     return accumulator;
   }, {});
 
-  const filteredApplications = filter === "all" ? applications : applications.filter((item) => item.status === filter);
-  const requirementItems = filteredApplications.filter((item) => item.status === "requirement");
-  const activeApplications = filteredApplications.filter((item) => item.status !== "requirement");
+  const filteredApplications = filter === "all" ? normalizedApplications : normalizedApplications.filter((item) => item.status === filter);
+  const applicationsWithRequirements = filteredApplications.filter((item) => item.requirement);
+  const applicationsWithoutRequirements = filteredApplications.filter((item) => !item.requirement);
 
   const successRate = counts.complete + counts.rejection > 0
     ? Math.round((counts.complete / (counts.complete + counts.rejection)) * 100)
     : null;
 
   const recent = useMemo(
-    () => [...applications].sort((a, b) => (b.appDate || "").localeCompare(a.appDate || "")).slice(0, 4),
-    [applications]
+    () => [...normalizedApplications].sort((a, b) => (b.appDate || "").localeCompare(a.appDate || "")).slice(0, 4),
+    [normalizedApplications]
   );
 
   return (
@@ -231,6 +238,10 @@ export default function JobPrep() {
               ))}
             </select>
           </div>
+          <div style={{ flex: 2, minWidth: 180 }}>
+            <label style={labelStyle}>Requirement</label>
+            <input value={requirement} onChange={(event) => setRequirement(event.target.value)} placeholder="e.g. Portfolio, visa support, final review" style={{ width: "100%" }} />
+          </div>
         </div>
 
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
@@ -260,7 +271,7 @@ export default function JobPrep() {
           <textarea
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
-            placeholder="Interview notes, contact person, requirements..."
+            placeholder="Interview notes, contact person, follow-ups..."
             style={{ width: "100%", minHeight: 84 }}
           />
         </div>
@@ -292,13 +303,13 @@ export default function JobPrep() {
         </div>
       )}
 
-      {requirementItems.length > 0 && (
+      {applicationsWithRequirements.length > 0 && (
         <div className="card" style={{ marginBottom: 16, border: "1px solid #4d4d4d", background: "#111111" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#f5f5f5", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#f5f5f5", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>
             Requirements
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {requirementItems.map((item) => (
+            {applicationsWithRequirements.map((item) => (
               <ApplicationCard
                 key={item.id}
                 item={item}
@@ -311,9 +322,9 @@ export default function JobPrep() {
         </div>
       )}
 
-      {activeApplications.length > 0 && (
+      {applicationsWithoutRequirements.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {activeApplications.map((item) => (
+          {applicationsWithoutRequirements.map((item) => (
             <ApplicationCard
               key={item.id}
               item={item}
@@ -546,36 +557,42 @@ export default function JobPrep() {
 }
 
 function ApplicationCard({ item, statusMeta, onDelete, onChangeStatus }) {
-  const isDeadlinePast = item.deadline && item.deadline < today && item.status === "requirement";
+  const isDeadlinePast = item.deadline && item.deadline < today && item.status === "ongoing";
 
   return (
     <div className="card" style={{ marginBottom: 0, borderLeft: `3px solid ${statusMeta.border}` }}>
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-start" }}>
         <div style={{ flex: 1, minWidth: 160 }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 3 }}>
-            <p style={{ fontWeight: 700, fontSize: 14 }}>{item.company || "-"}</p>
-            <span style={{ fontSize: 11, padding: "1px 8px", borderRadius: 99, background: "#1c1c1c", color: "#f1f1f1", border: "1px solid #4f4f4f" }}>
+            <p style={{ fontWeight: 700, fontSize: 15 }}>{item.company || "-"}</p>
+            <span style={{ fontSize: 12, padding: "2px 9px", borderRadius: 99, background: "#1c1c1c", color: "#f1f1f1", border: "1px solid #4f4f4f" }}>
               {item.jobType}
             </span>
           </div>
-          <p style={{ fontSize: 13, color: "#c9c9c9", marginBottom: 4 }}>{item.role}</p>
+          <p style={{ fontSize: 14, color: "#c9c9c9", marginBottom: 4 }}>{item.role}</p>
+          {item.requirement && (
+            <div style={{ marginBottom: 6 }}>
+              <span style={{ fontSize: 12, color: "#f0f0f0", fontWeight: 600 }}>Requirement:</span>
+              <span style={{ fontSize: 12, color: "#bcbcbc", marginLeft: 6 }}>{item.requirement}</span>
+            </div>
+          )}
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            {item.appDate && <span style={{ fontSize: 11, color: "#9f9f9f" }}>Applied {formatDate(item.appDate)}</span>}
+            {item.appDate && <span style={{ fontSize: 12, color: "#9f9f9f" }}>Applied {formatDate(item.appDate)}</span>}
             {item.deadline && (
-              <span style={{ fontSize: 11, color: isDeadlinePast ? "#ffffff" : "#9f9f9f", fontWeight: isDeadlinePast ? 600 : 400 }}>
+              <span style={{ fontSize: 12, color: isDeadlinePast ? "#ffffff" : "#9f9f9f", fontWeight: isDeadlinePast ? 600 : 400 }}>
                 {isDeadlinePast ? "Deadline past - " : "Deadline - "}
                 {formatDate(item.deadline)}
               </span>
             )}
-            {item.salary && <span style={{ fontSize: 11, color: "#f0f0f0" }}>Salary {item.salary}</span>}
+            {item.salary && <span style={{ fontSize: 12, color: "#f0f0f0" }}>Salary {item.salary}</span>}
           </div>
-          {item.notes && <p style={{ fontSize: 11, color: "#aaaaaa", marginTop: 5, fontStyle: "italic" }}>{item.notes}</p>}
+          {item.notes && <p style={{ fontSize: 12, color: "#aaaaaa", marginTop: 5, fontStyle: "italic" }}>{item.notes}</p>}
           {item.link && (
             <a
               href={item.link.startsWith("http") ? item.link : `https://${item.link}`}
               target="_blank"
               rel="noreferrer"
-              style={{ fontSize: 11, color: "#dfdfdf", marginTop: 4, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+              style={{ fontSize: 12, color: "#dfdfdf", marginTop: 4, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
             >
               {item.link}
             </a>
@@ -586,8 +603,8 @@ function ApplicationCard({ item, statusMeta, onDelete, onChangeStatus }) {
             value={item.status}
             onChange={(event) => onChangeStatus(event.target.value)}
             style={{
-              fontSize: 11,
-              padding: "4px 10px",
+              fontSize: 12,
+              padding: "5px 11px",
               borderRadius: 99,
               background: statusMeta.bg,
               color: statusMeta.color,
@@ -626,12 +643,12 @@ function StatCard({ label, value }) {
       }}
     >
       <div style={{ fontSize: 20, fontWeight: 700 }}>{value}</div>
-      <div style={{ fontSize: 10, marginTop: 2, color: "#aaaaaa" }}>{label}</div>
+      <div style={{ fontSize: 11, marginTop: 2, color: "#aaaaaa" }}>{label}</div>
     </div>
   );
 }
 
-const labelStyle = { fontSize: 11, color: "#9a9a9a", display: "block", marginBottom: 3 };
+const labelStyle = { fontSize: 12, color: "#9a9a9a", display: "block", marginBottom: 4 };
 
 const buttonStyle = {
   alignSelf: "flex-end",
@@ -639,8 +656,9 @@ const buttonStyle = {
   color: "#111111",
   border: "1px solid #6c6c6c",
   borderRadius: 8,
-  padding: "9px 16px",
+  padding: "10px 16px",
   cursor: "pointer",
+  fontSize: 13,
 };
 
 const ghostDangerButton = {
@@ -649,6 +667,6 @@ const ghostDangerButton = {
   cursor: "pointer",
   color: "#d0d0d0",
   borderRadius: 8,
-  padding: "6px 10px",
-  fontSize: 12,
+  padding: "7px 11px",
+  fontSize: 13,
 };

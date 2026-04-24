@@ -36,6 +36,7 @@ const EMPTY_FORM = {
   ranking: "",
   country: "",
   status: "Interested",
+  workPolicy: "Not set",
   requirements: {
     gpa: "",
     ielts: "",
@@ -280,17 +281,17 @@ export default function University() {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {visibleList.map((entry) => (
             <div key={entry.id} className="card" style={{ marginBottom: 0, borderLeft: "3px solid #666666" }}>
-              <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                <div style={{ minWidth: 56, textAlign: "center", padding: "6px 8px", borderRadius: 8, background: "#1a1a1a", border: "1px solid #373737", color: "#d9d9d9", fontSize: 12 }}>
+            <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                <div style={{ minWidth: 56, textAlign: "center", padding: "7px 9px", borderRadius: 8, background: "#1a1a1a", border: "1px solid #373737", color: "#d9d9d9", fontSize: 13 }}>
                   {entry.ranking ? `#${entry.ranking}` : "-"}
                 </div>
                 <div style={{ flex: 1, minWidth: 160 }}>
-                  <div style={{ fontWeight: 600, fontSize: 15 }}>{entry.universityName}</div>
-                  <div style={{ fontSize: 12, color: "#9d9d9d", marginTop: 2 }}>
-                    {[entry.country || "Country not set", entry.deadline ? `Deadline ${entry.deadline}` : null, entry.tuitionFee || null].filter(Boolean).join(" - ")}
+                  <div style={{ fontWeight: 600, fontSize: 16 }}>{entry.universityName}</div>
+                  <div style={{ fontSize: 13, color: "#9d9d9d", marginTop: 2 }}>
+                    {[entry.country || "Country not set", entry.deadline ? `Deadline ${entry.deadline}` : null, entry.tuitionFee || null, entry.workPolicy !== "Not set" ? entry.workPolicy : null].filter(Boolean).join(" - ")}
                   </div>
                 </div>
-                <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 999, background: STATUS_STYLES[entry.status]?.bg, color: STATUS_STYLES[entry.status]?.text, border: "1px solid #444" }}>
+                <span style={{ fontSize: 12, padding: "5px 11px", borderRadius: 999, background: STATUS_STYLES[entry.status]?.bg, color: STATUS_STYLES[entry.status]?.text, border: "1px solid #444" }}>
                   {entry.status}
                 </span>
                 <button onClick={() => openEdit(entry)} style={ghostButtonStyle}>Edit</button>
@@ -323,6 +324,7 @@ export default function University() {
                         ["GMAT", entry.requirements.gmat],
                         ["Work Experience", entry.requirements.workExp],
                         ["Research Experience", entry.requirements.researchExp],
+                        ["Student Work", entry.workPolicy !== "Not set" ? entry.workPolicy : ""],
                         ["LOR", entry.requirements.lor ? `${entry.requirements.lor} letters` : ""],
                       ].filter(([, value]) => value).map(([label, value]) => (
                         <div key={label} style={rowStyle}><span>{label}</span><span>{value}</span></div>
@@ -402,6 +404,14 @@ export default function University() {
                 <select value={form.status} onChange={(event) => updateForm("status", event.target.value)} style={{ width: "100%" }}>
                   {STATUS_OPTIONS.map((status) => (
                     <option key={status} value={status}>{status}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Student Work Policy</label>
+                <select value={form.workPolicy} onChange={(event) => updateForm("workPolicy", event.target.value)} style={{ width: "100%" }}>
+                  {["Not set", "Can work", "Cannot work", "Limited hours"].map((option) => (
+                    <option key={option} value={option}>{option}</option>
                   ))}
                 </select>
               </div>
@@ -488,12 +498,12 @@ function Field({ label, value, onChange, placeholder }) {
   );
 }
 
-const labelStyle = { fontSize: 11, color: "#9a9a9a", display: "block", marginBottom: 3 };
-const buttonStyle = { background: "#f2f2f2", color: "#111111", border: "1px solid #676767", borderRadius: 8, padding: "9px 16px", cursor: "pointer" };
-const ghostButtonStyle = { background: "transparent", border: "1px solid #616161", cursor: "pointer", color: "#d3d3d3", borderRadius: 8, padding: "6px 10px", fontSize: 12 };
-const rowStyle = { display: "flex", justifyContent: "space-between", gap: 12, fontSize: 12, color: "#c9c9c9", marginBottom: 6 };
+const labelStyle = { fontSize: 12, color: "#9a9a9a", display: "block", marginBottom: 4 };
+const buttonStyle = { background: "#f2f2f2", color: "#111111", border: "1px solid #676767", borderRadius: 8, padding: "10px 16px", cursor: "pointer", fontSize: 13 };
+const ghostButtonStyle = { background: "transparent", border: "1px solid #616161", cursor: "pointer", color: "#d3d3d3", borderRadius: 8, padding: "7px 11px", fontSize: 13 };
+const rowStyle = { display: "flex", justifyContent: "space-between", gap: 12, fontSize: 13, color: "#c9c9c9", marginBottom: 7 };
 const detailBoxStyle = { padding: 12, borderRadius: 10, background: "#171717", border: "1px solid #303030" };
-const detailTitleStyle = { fontSize: 11, fontWeight: 700, color: "#f1f1f1", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 };
+const detailTitleStyle = { fontSize: 12, fontWeight: 700, color: "#f1f1f1", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 };
 const overlayStyle = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.78)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: 20, overflowY: "auto", zIndex: 1000 };
 const formGridStyle = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 };
-const checkboxStyle = { display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#d0d0d0" };
+const checkboxStyle = { display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#d0d0d0" };
