@@ -3,6 +3,7 @@ import { supabase } from "../supabase";
 
 export function useSupabase(tableName, initialValue) {
   const storageKey = `dashboard-cache:${tableName}`;
+  const metaKey = `dashboard-cache-meta:${tableName}`;
   const initialValueRef = useRef(initialValue);
   const [state, setState] = useState(() => {
     try {
@@ -18,12 +19,21 @@ export function useSupabase(tableName, initialValue) {
 
     async function loadData() {
       let cachedValue = null;
+      let hasDirtyLocalState = false;
 
       try {
         const rawCachedValue = localStorage.getItem(storageKey);
         cachedValue = rawCachedValue ? JSON.parse(rawCachedValue) : null;
       } catch {
         cachedValue = null;
+      }
+
+      try {
+        const rawMeta = localStorage.getItem(metaKey);
+        const meta = rawMeta ? JSON.parse(rawMeta) : null;
+        hasDirtyLocalState = Boolean(meta?.dirty);
+      } catch {
+        hasDirtyLocalState = false;
       }
 
       if (cachedValue != null && isMounted) {
@@ -39,14 +49,16 @@ export function useSupabase(tableName, initialValue) {
 
       if (!isMounted) return;
 
-      // Prefer local cached data when present because remote writes are
-      // currently blocked by RLS and older remote rows can overwrite new input.
-      if (cachedValue != null) {
+      // Never overwrite local unsynced data with remote rows.
+      if (cachedValue != null && hasDirtyLocalState) {
+        setState(cachedValue);
+      } else if (cachedValue != null) {
         setState(cachedValue);
       } else if (data?.data != null) {
         setState(data.data);
         try {
           localStorage.setItem(storageKey, JSON.stringify(data.data));
+          localStorage.setItem(metaKey, JSON.stringify({ dirty: false }));
         } catch {}
       } else {
         setState(initialValueRef.current);
@@ -70,14 +82,28 @@ export function useSupabase(tableName, initialValue) {
 
     try {
       localStorage.setItem(storageKey, JSON.stringify(nextValue));
+      localStorage.setItem(metaKey, JSON.stringify({ dirty: true }));
     } catch {}
 
     const { error } = await supabase.from(tableName).insert({ data: nextValue });
 
     if (error) {
       console.warn(`Supabase save failed for ${tableName}; using local cache instead.`, error.message);
+      return;
     }
+
+    try {
+      localStorage.setItem(metaKey, JSON.stringify({ dirty: false }));
+    } catch {}
   }
 
-  return [state, setAndSave];
+  function clearLocalCache() {
+    try {
+      localStorage.removeItem(storageKey);
+      localStorage.removeItem(metaKey);
+    } catch {}
+    setState(initialValueRef.current);
+  }
+
+  return [state, setAndSave, clearLocalCache];
 }
