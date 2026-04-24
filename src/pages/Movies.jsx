@@ -492,7 +492,7 @@ export default function Movies() {
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 980 }}>
                 <thead>
                   <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
-                    {["Title", "Type", "Rating", "Country", "IMDb", "Added", "Start", "Finish", "Action"].map((head) => (
+                    {["SL", "Title", "Type", "Rating", "Country", "IMDb", "Added", "Start", "Finish", "Action"].map((head) => (
                       <th key={head} style={tableHead}>{head}</th>
                     ))}
                   </tr>
@@ -500,6 +500,7 @@ export default function Movies() {
                 <tbody>
                   {watchedMovies.map((m, index) => (
                     <tr key={m.id} style={{ borderBottom: index === watchedMovies.length - 1 ? "none" : "1px solid #eef2f7", background: index % 2 === 0 ? "#ffffff" : "#fcfcfd" }}>
+                      <td style={tableCell}>{index + 1}</td>
                       <td style={tableCellTitle}>{m.title}</td>
                       <td style={tableCell}>
                         <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 8px", borderRadius: 99, background: TYPE_META[m.type]?.bg || "#eee", color: TYPE_META[m.type]?.color || "#555", whiteSpace: "nowrap" }}>
@@ -526,6 +527,8 @@ export default function Movies() {
           </div>
         )}
       </div>
+
+      <YearAnalysis movies={watchedMovies} />
 
       <Divider label="FUTURE WATCH LIST" />
 
@@ -609,7 +612,7 @@ export default function Movies() {
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760 }}>
                 <thead>
                   <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
-                    {["Title", "Type", "Country", "IMDb", "Added", "Action"].map((head) => (
+                    {["SL", "Title", "Type", "Country", "IMDb", "Added", "Action"].map((head) => (
                       <th key={head} style={tableHead}>{head}</th>
                     ))}
                   </tr>
@@ -617,6 +620,7 @@ export default function Movies() {
                 <tbody>
                   {futureMovies.map((m, index) => (
                     <tr key={m.id} style={{ borderBottom: index === futureMovies.length - 1 ? "none" : "1px solid #eef2f7", background: index % 2 === 0 ? "#ffffff" : "#fcfcfd" }}>
+                      <td style={tableCell}>{index + 1}</td>
                       <td style={tableCellTitle}>{m.title}</td>
                       <td style={tableCell}>
                         <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 8px", borderRadius: 99, background: TYPE_META[m.type]?.bg || "#eee", color: TYPE_META[m.type]?.color || "#555", whiteSpace: "nowrap" }}>
@@ -637,8 +641,6 @@ export default function Movies() {
           </div>
         )}
       </div>
-
-      <YearAnalysis movies={watchedMovies} />
     </div>
   );
 }
