@@ -1,6 +1,6 @@
 // src/pages/JobPrep.jsx
 import { useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useSupabase } from "../hooks/useSupabase";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -31,10 +31,10 @@ const APP_STATUS = {
 const JOB_TYPES = ["Full-time", "Part-time", "Internship", "Remote", "Contract", "Freelance"];
 
 export default function JobPrep() {
-  const [applications, setApplications] = useLocalStorage("dashboard-jobs-applications", []);
-  const [skills, setSkills] = useLocalStorage("dashboard-jobs-skills", []);
-  const [resources, setResources] = useLocalStorage("dashboard-jobs-resources", []);
-  const [requirements, setRequirements] = useLocalStorage("dashboard-jobs-requirements", []);
+  const [applications, setApplications] = useSupabase("dashboard-jobs-applications", []);
+  const [skills, setSkills] = useSupabase("dashboard-jobs-skills", []);
+  const [resources, setResources] = useSupabase("dashboard-jobs-resources", []);
+  const [requirements, setRequirements] = useSupabase("dashboard-jobs-requirements", []);
 
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");

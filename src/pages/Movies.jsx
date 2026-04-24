@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useSupabase } from "../hooks/useSupabase";
 
 const APIKEY = "trilogy";
 const today = new Date().toISOString().split("T")[0];
@@ -201,7 +201,7 @@ function YearAnalysis({ movies }) {
 }
 
 export default function Movies() {
-  const [movies, setMovies] = useLocalStorage("dashboard-movies", []);
+  const [movies, setMovies] = useSupabase("dashboard-movies", []);
   const [watchForm, setWatchForm] = useState({ ...watchFormDefaults });
   const [futureForm, setFutureForm] = useState({ ...futureFormDefaults });
   const [editId, setEditId] = useState(null);

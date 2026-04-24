@@ -3,25 +3,10 @@
 // Add route: <Route path="/university" element={<University />} />
 // Add NavLink: <NavLink to="/university">University</NavLink>
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useSupabase } from "../hooks/useSupabase";
 
 // ── useLocalStorage hook (same as your existing one) ──────────────────────────
-function useLocalStorage(key, initialValue, version = 1) {
-  const versionedKey = `${key}__v${version}`;
-  const [state, setState] = useState(() => {
-    try {
-      const stored = localStorage.getItem(versionedKey);
-      return stored !== null ? JSON.parse(stored) : initialValue;
-    } catch {
-      return initialValue;
-    }
-  });
-  useEffect(() => {
-    localStorage.setItem(versionedKey, JSON.stringify(state));
-  }, [versionedKey, state]);
-  return [state, setState];
-}
-
 // ── constants ─────────────────────────────────────────────────────────────────
 const DEGREE_TYPES = ["Masters", "PhD"];
 const STATUS_OPTIONS = ["Interested", "Researching", "Applied", "Accepted", "Rejected", "Enrolled"];
@@ -75,10 +60,9 @@ function groupByDegree(universities) {
 
 // ── main component ────────────────────────────────────────────────────────────
 export default function University() {
-  const [universities, setUniversities] = useLocalStorage(
+  const [universities, setUniversities] = useSupabase(
     "dashboard-universities",
-    [],
-    1
+    []
   );
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);

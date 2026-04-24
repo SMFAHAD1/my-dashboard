@@ -1,6 +1,6 @@
 // src/pages/Books.jsx
 import { useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useSupabase } from "../hooks/useSupabase";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -167,7 +167,7 @@ function YearAnalysis({ books }) {
 }
 
 export default function Books() {
-  const [books, setBooks] = useLocalStorage("dashboard-books", []);
+  const [books, setBooks] = useSupabase("dashboard-books", []);
 
   const [rTitle, setRTitle] = useState("");
   const [rAuthor, setRAuthor] = useState("");
