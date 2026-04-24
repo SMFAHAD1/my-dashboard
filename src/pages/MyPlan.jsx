@@ -1,6 +1,6 @@
 // src/pages/MyPlan.jsx
 import { useState, useMemo } from "react";
-import { useSupabase } from "../hooks/useSupabase";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const today = new Date().toISOString().split("T")[0];
 const todayDate = new Date();
@@ -198,7 +198,7 @@ function AnalysisPanel({ plans, period }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────
 export default function MyPlan() {
-  const [plans, setPlans] = useSupabase("plans", []);
+  const [plans, setPlans] = useLocalStorage("dashboard-plans", []);
   const [analysisPeriod, setAnalysisPeriod] = useState("weekly");
   const [filter, setFilter]   = useState("all");
 
