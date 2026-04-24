@@ -48,3 +48,60 @@ button {
   font-size: 14px;
 }
 button:hover { background: #185FA5; }
+
+
+/* ─────────────────────────────────────────
+   MOBILE RESPONSIVE  (max 768px)
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* --- Navbar: wrap links so they don't overflow --- */
+  .navbar {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  /* Brand takes full top row, links wrap below it */
+  .brand {
+    width: 100%;
+    font-size: 16px;
+    margin-right: 0;
+  }
+
+  .navbar a {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  /* --- Main content: remove side padding on small screens --- */
+  .main-content {
+    padding: 16px 12px;
+  }
+
+  /* --- Cards: slightly less padding --- */
+  .card {
+    padding: 14px 12px;
+  }
+
+  /* --- Inputs & selects: MUST be 16px to stop iPhone zooming in --- */
+  input, select, textarea {
+    font-size: 16px;   /* ← most important mobile fix */
+    padding: 10px 12px;
+    width: 100%;
+  }
+
+  /* --- Buttons: full width, easier to tap --- */
+  button {
+    font-size: 15px;
+    padding: 10px 16px;
+    width: 100%;
+  }
+
+  /* --- Tables (used in Academic / analysis sections) --- */
+  table {
+    display: block;
+    overflow-x: auto;   /* swipe sideways instead of breaking layout */
+    white-space: nowrap;
+  }
+}
