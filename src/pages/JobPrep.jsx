@@ -414,9 +414,6 @@ export default function JobPrep() {
             <label style={labelStyle}>Link</label>
             <input value={skillLink} onChange={(event) => setSkillLink(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
           </div>
-          <button onClick={addSkill} style={buttonStyle}>
-            Add Skill
-          </button>
         </div>
         <div>
           <label style={labelStyle}>Notes</label>
@@ -426,6 +423,11 @@ export default function JobPrep() {
             placeholder="What to study, roadmap, reminders..."
             style={{ width: "100%", minHeight: 84 }}
           />
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+          <button onClick={addSkill} style={buttonStyle}>
+            Add Skill
+          </button>
         </div>
       </div>
 

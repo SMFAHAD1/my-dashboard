@@ -132,7 +132,22 @@ export default function Books() {
   const [buyPrice, setBuyPrice] = useState("");
   const [buyCurrency, setBuyCurrency] = useState("BDT");
   const [buyNotes, setBuyNotes] = useState("");
-  const [buyCover, setBuyCover] = useState("");
+
+  async function fetchBookCover(title, author) {
+    if (!title) return "";
+    try {
+      const params = new URLSearchParams({ title, limit: "1" });
+      if (author) params.set("author", author);
+      const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`);
+      const data = await response.json();
+      const match = data.docs?.[0];
+      if (match?.cover_i) return `https://covers.openlibrary.org/b/id/${match.cover_i}-M.jpg`;
+      if (match?.isbn?.[0]) return `https://covers.openlibrary.org/b/isbn/${match.isbn[0]}-M.jpg`;
+      return "";
+    } catch {
+      return "";
+    }
+  }
 
   function addReadingBook() {
     if (!readingTitle.trim()) return;
@@ -159,19 +174,22 @@ export default function Books() {
     setReadingFinish("");
   }
 
-  function addBuyBook() {
+  async function addBuyBook() {
     if (!buyTitle.trim()) return;
+    const title = buyTitle.trim();
+    const author = buyAuthor.trim();
+    const coverUrl = await fetchBookCover(title, author);
     setBooks((current) => [
       ...current,
       {
         id: Date.now(),
         section: "buy",
-        title: buyTitle.trim(),
-        author: buyAuthor.trim(),
+        title,
+        author,
         price: buyPrice !== "" ? parseFloat(buyPrice) : null,
         currency: buyCurrency,
         notes: buyNotes.trim(),
-        coverUrl: buyCover.trim(),
+        coverUrl,
         addedDate: today,
       },
     ]);
@@ -179,7 +197,6 @@ export default function Books() {
     setBuyAuthor("");
     setBuyPrice("");
     setBuyNotes("");
-    setBuyCover("");
   }
 
   function deleteBook(id) {
@@ -334,10 +351,6 @@ export default function Books() {
           <div style={{ flex: 1, minWidth: 130 }}>
             <label style={labelStyle}>Notes</label>
             <input value={buyNotes} onChange={(event) => setBuyNotes(event.target.value)} placeholder="Where to buy, edition..." style={{ width: "100%" }} />
-          </div>
-          <div style={{ flex: 2, minWidth: 180 }}>
-            <label style={labelStyle}>Poster / Cover URL</label>
-            <input value={buyCover} onChange={(event) => setBuyCover(event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
           </div>
           <button onClick={addBuyBook} style={buttonStyle}>
             Add

@@ -43,7 +43,6 @@ const watchlistDefaults = {
   name: "",
   type: "movie",
   country: "",
-  poster: "",
   addedDate: today,
 };
 
@@ -168,6 +167,17 @@ export default function Movies() {
     setWatchlistForm((current) => ({ ...current, [key]: value }));
   }
 
+  async function fetchMoviePoster(title) {
+    if (!title) return "";
+    try {
+      const response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${APIKEY}`);
+      const data = await response.json();
+      return data.Poster && data.Poster !== "N/A" ? data.Poster : "";
+    } catch {
+      return "";
+    }
+  }
+
   async function fetchSuggestions(query) {
     if (query.length < 2) {
       setSuggestions([]);
@@ -256,9 +266,11 @@ export default function Movies() {
     if (editId === id) cancelEdit();
   }
 
-  function addToWatchlist() {
+  async function addToWatchlist() {
     if (!watchlistForm.name.trim()) return;
-    setWatchlist((current) => [...current, { id: Date.now(), ...watchlistForm, name: watchlistForm.name.trim() }]);
+    const name = watchlistForm.name.trim();
+    const poster = await fetchMoviePoster(name);
+    setWatchlist((current) => [...current, { id: Date.now(), ...watchlistForm, name, poster }]);
     setWatchlistForm({ ...watchlistDefaults });
   }
 
@@ -518,10 +530,6 @@ export default function Movies() {
           <div style={{ flex: 1, minWidth: 130 }}>
             <label style={labelStyle}>Country</label>
             <input value={watchlistForm.country} onChange={(event) => setWatchlistField("country", event.target.value)} placeholder="Country" style={{ width: "100%" }} />
-          </div>
-          <div style={{ flex: 2, minWidth: 180 }}>
-            <label style={labelStyle}>Poster URL</label>
-            <input value={watchlistForm.poster} onChange={(event) => setWatchlistField("poster", event.target.value)} placeholder="https://..." style={{ width: "100%" }} />
           </div>
           <div style={{ flex: 1, minWidth: 130 }}>
             <label style={labelStyle}>Added Date</label>
