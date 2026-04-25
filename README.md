@@ -1,8 +1,6 @@
 # My Dashboard
 
-Personal dashboard — Planner, Books, Movies, Academic (CGPA), Job Prep.
-
-Live: https://my-dashboard-delta-virid.vercel.app/
+Personal dashboard — Planner, Books, Movies, Academic, Job Prep, University list for Masters and PhD
 
 ## Quick Start
 
