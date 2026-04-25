@@ -2,7 +2,7 @@
 
 Personal dashboard — Planner, Books, Movies, Academic (CGPA), Job Prep.
 
-Live: https://my-dashboard-indol-chi.vercel.app
+Live: https://my-dashboard-delta-virid.vercel.app/
 
 ## Quick Start
 
