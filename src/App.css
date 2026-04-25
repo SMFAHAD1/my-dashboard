@@ -1,20 +1,20 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap");
 
 :root {
-  --bg: #121417;
-  --surface: #1b2026;
-  --surface2: #252c35;
-  --border: #46515f;
-  --accent: #ffffff;
-  --accent2: #d7e4f7;
-  --success: #eaf7ef;
-  --warning: #fff4d6;
-  --danger: #ffe2e2;
-  --text: #f7f9fc;
-  --muted: #b3c0cf;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface2: #f7f8fa;
+  --border: #d9dee7;
+  --accent: #111827;
+  --accent2: #2563eb;
+  --success: #166534;
+  --warning: #92400e;
+  --danger: #b91c1c;
+  --text: #1f2937;
+  --muted: #667085;
   --radius: 12px;
   --radius-sm: 8px;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  --shadow: 0 10px 30px rgba(16, 24, 40, 0.08);
   --font: "DM Sans", sans-serif;
   --mono: "DM Mono", monospace;
 }
@@ -35,10 +35,7 @@ body,
 
 body {
   font-family: var(--font);
-  background:
-    radial-gradient(circle at top right, rgba(111, 180, 255, 0.18), transparent 26%),
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 24%),
-    linear-gradient(180deg, #171b20 0%, var(--bg) 100%);
+  background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   line-height: 1.6;
@@ -62,9 +59,9 @@ textarea {
 
 .sidebar {
   width: 240px;
-  background: linear-gradient(180deg, #212833 0%, #181d25 100%);
+  background: #ffffff;
   border-right: 1px solid var(--border);
-  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.16);
+  box-shadow: 8px 0 30px rgba(16, 24, 40, 0.08);
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
@@ -119,14 +116,14 @@ textarea {
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.09);
+  background: #f3f6fb;
   color: var(--text);
 }
 
 .nav-link.active {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(173, 211, 255, 0.14));
+  background: #eef4ff;
   color: var(--accent);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid #c7d7fe;
 }
 
 .nav-icon {
@@ -137,8 +134,8 @@ textarea {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #f2f4f7;
+  border: 1px solid var(--border);
   font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -150,6 +147,7 @@ textarea {
   flex: 1;
   padding: 32px;
   min-height: 100vh;
+  background: #ffffff;
 }
 
 .page-header {
@@ -279,13 +277,13 @@ select option {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #ffffff 0%, #dcecff 100%);
-  color: #111827;
+  background: #111827;
+  color: #ffffff;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #ffffff 0%, #cde3ff 100%);
-  color: #111111;
+  background: #253041;
+  color: #ffffff;
   transform: translateY(-1px);
 }
 
@@ -298,7 +296,7 @@ select option {
 }
 
 .btn-danger:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: #fff1f1;
 }
 
 .btn-ghost {
@@ -308,9 +306,9 @@ select option {
 }
 
 .btn-ghost:hover {
-  border-color: #dce7f4;
-  color: #f7f9fc;
-  background: rgba(255, 255, 255, 0.05);
+  border-color: #9aa8bd;
+  color: var(--text);
+  background: #f7f8fa;
 }
 
 .table-wrap {
@@ -344,7 +342,7 @@ tr:last-child td {
 }
 
 tr:hover td {
-  background: rgba(255, 255, 255, 0.05);
+  background: #f7f8fa;
 }
 
 .badge {
@@ -356,27 +354,27 @@ tr:hover td {
 }
 
 .badge-green {
-  background: rgba(255, 255, 255, 0.12);
+  background: #e8f5ee;
   color: var(--success);
 }
 
 .badge-yellow {
-  background: rgba(255, 255, 255, 0.12);
+  background: #fff6df;
   color: var(--warning);
 }
 
 .badge-red {
-  background: rgba(255, 255, 255, 0.12);
+  background: #ffecec;
   color: var(--danger);
 }
 
 .badge-blue {
-  background: rgba(160, 205, 255, 0.16);
+  background: #eef4ff;
   color: var(--accent);
 }
 
 .badge-purple {
-  background: rgba(255, 255, 255, 0.12);
+  background: #f3e8ff;
   color: var(--accent2);
 }
 
@@ -391,7 +389,7 @@ tr:hover td {
 .progress-fill {
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(90deg, #ffffff 0%, #a8ccff 100%);
+  background: linear-gradient(90deg, #111827 0%, #7aa7ff 100%);
   transition: width 0.4s ease;
 }
 
