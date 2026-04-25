@@ -17,9 +17,9 @@ function formatRating(value) {
 function Divider({ label }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "28px 0 16px" }}>
-      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
-      <span style={{ fontSize: 12, fontWeight: 600, color: "#9a9a9a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{label}</span>
-      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
+      <div style={{ flex: 1, height: 1, background: "#d9dee7" }} />
+      <span style={{ fontSize: 12, fontWeight: 600, color: "#667085", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{label}</span>
+      <div style={{ flex: 1, height: 1, background: "#d9dee7" }} />
     </div>
   );
 }
@@ -51,7 +51,7 @@ function YearAnalysis({ books }) {
   return (
     <div style={{ marginTop: 32 }}>
       <Divider label="YEAR-BY-YEAR READING ANALYSIS" />
-      <p style={{ fontSize: 11, color: "#888", textAlign: "center", marginBottom: 16, marginTop: -8 }}>Grouped by start reading year</p>
+      <p style={{ fontSize: 11, color: "#667085", textAlign: "center", marginBottom: 16, marginTop: -8 }}>Grouped by start reading year</p>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
         <span style={summaryPillStyle}>{reading.length} books total</span>
@@ -75,31 +75,31 @@ function YearAnalysis({ books }) {
           const isOpen = expandedYear === entry.year;
 
           return (
-            <div key={entry.year} style={{ border: "1px solid #303030", borderRadius: 10, overflow: "hidden", background: "#121212" }}>
+            <div key={entry.year} style={{ border: "1px solid #d9dee7", borderRadius: 10, overflow: "hidden", background: "#ffffff" }}>
               <div
                 onClick={() => setExpandedYear(isOpen ? null : entry.year)}
                 style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", cursor: "pointer", userSelect: "none" }}
               >
-                <span style={{ fontWeight: 600, fontSize: 15, minWidth: 52, color: entry.year === "Not set" ? "#8e8e8e" : "#f0f0f0" }}>{entry.year}</span>
-                <div style={{ flex: 1, height: 8, background: "#2c2c2c", borderRadius: 99, overflow: "hidden" }}>
-                  <div style={{ width: `${barPercent}%`, height: "100%", background: "#f2f2f2", borderRadius: 99 }} />
+                <span style={{ fontWeight: 600, fontSize: 15, minWidth: 52, color: entry.year === "Not set" ? "#667085" : "#111827" }}>{entry.year}</span>
+                <div style={{ flex: 1, height: 8, background: "#e5e7eb", borderRadius: 99, overflow: "hidden" }}>
+                  <div style={{ width: `${barPercent}%`, height: "100%", background: "#2563eb", borderRadius: 99 }} />
                 </div>
-                <span style={{ fontSize: 13, fontWeight: 500, color: "#c6c6c6", minWidth: 20, textAlign: "right" }}>{entry.items.length}</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: "#475467", minWidth: 20, textAlign: "right" }}>{entry.items.length}</span>
                 {avgRating && <span style={summaryPillStyle}>{avgRating}</span>}
-                <span style={{ fontSize: 11, color: "#888", transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>v</span>
+                <span style={{ fontSize: 11, color: "#667085", transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>v</span>
               </div>
 
               {isOpen && (
                 <div style={{ padding: "0 16px 16px", borderTop: "1px solid #292929" }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 12 }}>
                     {entry.items.map((book) => (
-                      <div key={book.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "#181818", borderRadius: 8, border: "1px solid #2f2f2f" }}>
+                      <div key={book.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "#ffffff", borderRadius: 8, border: "1px solid #d9dee7" }}>
                         <div style={{ flex: 1 }}>
                           <p style={{ fontWeight: 500, fontSize: 13 }}>{book.title}</p>
-                          {book.author && <p style={{ fontSize: 11, color: "#9f9f9f" }}>{book.author}</p>}
+                          {book.author && <p style={{ fontSize: 11, color: "#667085" }}>{book.author}</p>}
                         </div>
-                        {book.rating ? <span style={{ fontSize: 12, color: "#e2e2e2" }}>{formatRating(book.rating)}/10</span> : null}
-                        <div style={{ fontSize: 10, color: "#8e8e8e", textAlign: "right" }}>
+                        {book.rating ? <span style={{ fontSize: 12, color: "#475467" }}>{formatRating(book.rating)}/10</span> : null}
+                        <div style={{ fontSize: 10, color: "#667085", textAlign: "right" }}>
                           {book.startDate && <div>Started {formatDate(book.startDate)}</div>}
                           {book.finishDate && <div>Finished {formatDate(book.finishDate)}</div>}
                         </div>
@@ -258,13 +258,13 @@ export default function Books() {
           ].map((stat) => (
             <div key={stat.label} style={statCardStyle}>
               <div style={{ fontSize: 20, fontWeight: 700 }}>{stat.value}</div>
-              <div style={{ fontSize: 10, marginTop: 2, color: "#9e9e9e" }}>{stat.label}</div>
+              <div style={{ fontSize: 10, marginTop: 2, color: "#667085" }}>{stat.label}</div>
             </div>
           ))}
           {totalBuyPrice > 0 && (
             <div style={statCardStyle}>
               <div style={{ fontSize: 16, fontWeight: 700 }}>{totalBuyPrice.toLocaleString()}</div>
-              <div style={{ fontSize: 10, marginTop: 2, color: "#9e9e9e" }}>Est. Cost ({buyBooks[0]?.currency || "BDT"})</div>
+              <div style={{ fontSize: 10, marginTop: 2, color: "#667085" }}>Est. Cost ({buyBooks[0]?.currency || "BDT"})</div>
             </div>
           )}
         </div>
@@ -316,26 +316,26 @@ export default function Books() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 8 }}>
         {readingBooks.length === 0 && (
-          <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: "20px 0" }}>No books yet.</p>
+          <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "20px 0" }}>No books yet.</p>
         )}
         {sortedReadingBooks.map((book, index) => (
           <div key={book.id} className="card" style={{ padding: "12px 16px", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 0 }}>
-            <div style={{ minWidth: 36, height: 36, borderRadius: 999, background: "#1d1d1d", border: "1px solid #373737", display: "flex", alignItems: "center", justifyContent: "center", color: "#f1f1f1", fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
+            <div style={{ minWidth: 36, height: 36, borderRadius: 999, background: "#eef4ff", border: "1px solid #d0d5dd", display: "flex", alignItems: "center", justifyContent: "center", color: "#111827", fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
               {index + 1}
             </div>
             {book.coverUrl ? (
               <img src={book.coverUrl} alt={book.title} style={{ width: 54, height: 76, objectFit: "cover", borderRadius: 6, flexShrink: 0 }} />
             ) : (
-              <div style={{ width: 54, height: 76, borderRadius: 6, background: "#1f1f1f", flexShrink: 0 }} />
+              <div style={{ width: 54, height: 76, borderRadius: 6, background: "#f2f4f7", flexShrink: 0 }} />
             )}
             <div style={{ flex: 1 }}>
               <p style={{ fontWeight: 600, fontSize: 16, marginBottom: 2 }}>{book.title}</p>
-              {book.author && <p style={{ fontSize: 13, color: "#a4a4a4", marginBottom: 4 }}>{book.author}</p>}
-              {book.rating > 0 && <div style={{ marginBottom: 4, fontSize: 13, color: "#efefef" }}>Rating {formatRating(book.rating)}/10</div>}
+              {book.author && <p style={{ fontSize: 13, color: "#667085", marginBottom: 4 }}>{book.author}</p>}
+              {book.rating > 0 && <div style={{ marginBottom: 4, fontSize: 13, color: "#111827" }}>Rating {formatRating(book.rating)}/10</div>}
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                {book.addedDate && <span style={{ fontSize: 12, color: "#8f8f8f" }}>Added {formatDate(book.addedDate)}</span>}
-                {book.startDate && <span style={{ fontSize: 12, color: "#a8a8a8" }}>Started {formatDate(book.startDate)}</span>}
-                {book.finishDate && <span style={{ fontSize: 12, color: "#f1f1f1", fontWeight: 500 }}>Finished {formatDate(book.finishDate)}</span>}
+                {book.addedDate && <span style={{ fontSize: 12, color: "#667085" }}>Added {formatDate(book.addedDate)}</span>}
+                {book.startDate && <span style={{ fontSize: 12, color: "#667085" }}>Started {formatDate(book.startDate)}</span>}
+                {book.finishDate && <span style={{ fontSize: 12, color: "#111827", fontWeight: 500 }}>Finished {formatDate(book.finishDate)}</span>}
               </div>
             </div>
             {book.finishDate && <span style={summaryPillStyle}>Done</span>}
@@ -385,16 +385,16 @@ export default function Books() {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {buyBooks.length === 0 && <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: "20px 0" }}>No books on the buy list yet.</p>}
+        {buyBooks.length === 0 && <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "20px 0" }}>No books on the buy list yet.</p>}
         {sortedBuyBooks.map((book, index) => (
           <div key={book.id} className="card" style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, opacity: book.bought ? 0.55 : 1, marginBottom: 0 }}>
-            <div style={{ minWidth: 36, height: 36, borderRadius: 999, background: "#1d1d1d", border: "1px solid #373737", display: "flex", alignItems: "center", justifyContent: "center", color: "#f1f1f1", fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
+            <div style={{ minWidth: 36, height: 36, borderRadius: 999, background: "#eef4ff", border: "1px solid #d0d5dd", display: "flex", alignItems: "center", justifyContent: "center", color: "#111827", fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
               {index + 1}
             </div>
             {book.coverUrl ? (
               <img src={book.coverUrl} alt={book.title} style={{ width: 48, height: 68, objectFit: "cover", borderRadius: 6, flexShrink: 0 }} />
             ) : (
-              <div style={{ width: 48, height: 68, borderRadius: 6, background: "#1f1f1f", flexShrink: 0 }} />
+              <div style={{ width: 48, height: 68, borderRadius: 6, background: "#f2f4f7", flexShrink: 0 }} />
             )}
             <div
               onClick={() => toggleBought(book.id)}
@@ -404,25 +404,25 @@ export default function Books() {
                 borderRadius: 6,
                 flexShrink: 0,
                 cursor: "pointer",
-                border: book.bought ? "1px solid #888" : "2px solid #5d5d5d",
-                background: book.bought ? "#f1f1f1" : "transparent",
+                border: book.bought ? "1px solid #667085" : "2px solid #98a2b3",
+                background: book.bought ? "#16a34a" : "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: 10,
-                color: "#111",
+                color: "#ffffff",
               }}
             >
               {book.bought ? "OK" : ""}
             </div>
             <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 500, fontSize: 14, textDecoration: book.bought ? "line-through" : "none", color: book.bought ? "#8f8f8f" : "inherit" }}>{book.title}</p>
+              <p style={{ fontWeight: 500, fontSize: 14, textDecoration: book.bought ? "line-through" : "none", color: book.bought ? "#667085" : "inherit" }}>{book.title}</p>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 2 }}>
-                {book.author && <span style={{ fontSize: 12, color: "#9f9f9f" }}>{book.author}</span>}
-                {book.notes && <span style={{ fontSize: 11, color: "#8a8a8a" }}>{book.notes}</span>}
+                {book.author && <span style={{ fontSize: 12, color: "#667085" }}>{book.author}</span>}
+                {book.notes && <span style={{ fontSize: 11, color: "#667085" }}>{book.notes}</span>}
               </div>
             </div>
-            {book.price != null && <span style={{ fontSize: 13, fontWeight: 700, color: "#f2f2f2", whiteSpace: "nowrap" }}>{book.currency} {book.price.toLocaleString()}</span>}
+            {book.price != null && <span style={{ fontSize: 13, fontWeight: 700, color: "#111827", whiteSpace: "nowrap" }}>{book.currency} {book.price.toLocaleString()}</span>}
             {book.bought && <span style={summaryPillStyle}>Bought</span>}
             <button onClick={() => deleteBook(book.id)} style={ghostButtonStyle}>
               Remove
@@ -434,24 +434,24 @@ export default function Books() {
   );
 }
 
-const labelStyle = { fontSize: 12, color: "#9a9a9a", display: "block", marginBottom: 4 };
+const labelStyle = { fontSize: 12, color: "#667085", display: "block", marginBottom: 4 };
 
 const statCardStyle = {
   flex: 1,
   minWidth: 90,
   padding: "12px 14px",
   borderRadius: 10,
-  background: "#121212",
-  color: "#f0f0f0",
+  background: "#ffffff",
+  color: "#111827",
   textAlign: "center",
-  border: "1px solid #363636",
+  border: "1px solid #d9dee7",
 };
 
 const buttonStyle = {
   alignSelf: "flex-end",
-  background: "#f2f2f2",
-  color: "#111111",
-  border: "1px solid #676767",
+  background: "#111827",
+  color: "#ffffff",
+  border: "1px solid #111827",
   borderRadius: 8,
   padding: "10px 16px",
   cursor: "pointer",
@@ -460,9 +460,9 @@ const buttonStyle = {
 
 const ghostButtonStyle = {
   background: "transparent",
-  border: "1px solid #616161",
+  border: "1px solid #d0d5dd",
   cursor: "pointer",
-  color: "#d3d3d3",
+  color: "#475467",
   borderRadius: 8,
   padding: "7px 11px",
   fontSize: 13,
@@ -472,8 +472,8 @@ const summaryPillStyle = {
   fontSize: 12,
   padding: "4px 12px",
   borderRadius: 99,
-  background: "#171717",
-  color: "#f1f1f1",
+  background: "#f7f8fa",
+  color: "#111827",
   fontWeight: 500,
-  border: "1px solid #4a4a4a",
+  border: "1px solid #d0d5dd",
 };

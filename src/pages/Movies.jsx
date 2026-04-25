@@ -77,13 +77,13 @@ function YearAnalysis({ movies }) {
   return (
     <div style={{ marginTop: 36 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-        <div style={{ flex: 1, height: 1, background: "#2f2f2f" }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#bdbdbd", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+        <div style={{ flex: 1, height: 1, background: "#d9dee7" }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#475467", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
           YEAR-BY-YEAR WATCHED ANALYSIS
         </span>
-        <div style={{ flex: 1, height: 1, background: "#2f2f2f" }} />
+        <div style={{ flex: 1, height: 1, background: "#d9dee7" }} />
       </div>
-      <p style={{ fontSize: 11, color: "#888", textAlign: "center", marginBottom: 18 }}>Grouped by start watching year</p>
+      <p style={{ fontSize: 11, color: "#667085", textAlign: "center", marginBottom: 18 }}>Grouped by start watching year</p>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {years.map((entry) => {
@@ -93,38 +93,38 @@ function YearAnalysis({ movies }) {
           const isOpen = expandedYear === entry.year;
 
           return (
-            <div key={entry.year} style={{ border: "1px solid #333", borderRadius: 10, overflow: "hidden", background: "#121212" }}>
+            <div key={entry.year} style={{ border: "1px solid #d9dee7", borderRadius: 10, overflow: "hidden", background: "#ffffff" }}>
               <div
                 onClick={() => setExpandedYear(isOpen ? null : entry.year)}
                 style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", cursor: "pointer", userSelect: "none", flexWrap: "wrap" }}
               >
-                <span style={{ fontWeight: 600, fontSize: 15, minWidth: 52, color: entry.year === "Not set" ? "#8e8e8e" : "#f1f1f1" }}>{entry.year}</span>
-                <div style={{ flex: 1, height: 8, background: "#2d2d2d", borderRadius: 99, overflow: "hidden", minWidth: 120 }}>
-                  <div style={{ width: `${barPercent}%`, height: "100%", background: "#f1f1f1", borderRadius: 99, transition: "width 0.4s" }} />
+                <span style={{ fontWeight: 600, fontSize: 15, minWidth: 52, color: entry.year === "Not set" ? "#667085" : "#111827" }}>{entry.year}</span>
+                <div style={{ flex: 1, height: 8, background: "#d9dee7", borderRadius: 99, overflow: "hidden", minWidth: 120 }}>
+                  <div style={{ width: `${barPercent}%`, height: "100%", background: "#2563eb", borderRadius: 99, transition: "width 0.4s" }} />
                 </div>
-                <span style={{ fontSize: 13, fontWeight: 500, color: "#c8c8c8", minWidth: 24, textAlign: "right" }}>{entry.total}</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: "#475467", minWidth: 24, textAlign: "right" }}>{entry.total}</span>
                 {avgImdb && <span style={pillStyle}>IMDb {avgImdb}</span>}
                 {avgRating && <span style={pillStyle}>Your rating {avgRating}</span>}
-                <span style={{ fontSize: 11, color: "#999", transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>v</span>
+                <span style={{ fontSize: 11, color: "#667085", transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>v</span>
               </div>
 
               {isOpen && (
-                <div style={{ padding: "0 16px 16px", borderTop: "1px solid #2a2a2a" }}>
+                <div style={{ padding: "0 16px 16px", borderTop: "1px solid #d9dee7" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10, marginTop: 12 }}>
                     {entry.items.map((movie) => (
-                      <div key={movie.id} style={{ background: "#181818", border: "1px solid #2f2f2f", borderRadius: 8, overflow: "hidden", display: "flex", gap: 8, padding: 8 }}>
+                      <div key={movie.id} style={{ background: "#ffffff", border: "1px solid #d9dee7", borderRadius: 8, overflow: "hidden", display: "flex", gap: 8, padding: 8 }}>
                         {movie.poster ? (
                           <img src={movie.poster} alt={movie.title} style={{ width: 38, height: 56, objectFit: "cover", borderRadius: 4, flexShrink: 0 }} />
                         ) : (
-                          <div style={{ width: 38, height: 56, background: "#262626", borderRadius: 4, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#aaa" }}>
+                          <div style={{ width: 38, height: 56, background: "#f2f4f7", borderRadius: 4, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#667085" }}>
                             No image
                           </div>
                         )}
                         <div style={{ overflow: "hidden" }}>
                           <p style={{ fontWeight: 500, fontSize: 12, lineHeight: 1.3, marginBottom: 4 }}>{movie.title}</p>
-                          <p style={{ fontSize: 10, color: "#b9b9b9", marginBottom: 3 }}>{TYPE_META[movie.type]?.label}</p>
-                          {movie.imdbRating && <p style={{ fontSize: 10, color: "#d7d7d7" }}>IMDb {movie.imdbRating}</p>}
-                          <p style={{ fontSize: 10, color: "#d7d7d7" }}>Your rating {formatDecimal(movie.rating)}</p>
+                          <p style={{ fontSize: 10, color: "#667085", marginBottom: 3 }}>{TYPE_META[movie.type]?.label}</p>
+                          {movie.imdbRating && <p style={{ fontSize: 10, color: "#475467" }}>IMDb {movie.imdbRating}</p>}
+                          <p style={{ fontSize: 10, color: "#475467" }}>Your rating {formatDecimal(movie.rating)}</p>
                         </div>
                       </div>
                     ))}
@@ -325,11 +325,11 @@ export default function Movies() {
                     {suggestion.Poster && suggestion.Poster !== "N/A" ? (
                       <img src={suggestion.Poster} alt={suggestion.Title} style={{ width: 28, height: 40, borderRadius: 3, objectFit: "cover", flexShrink: 0 }} />
                     ) : (
-                      <div style={{ width: 28, height: 40, borderRadius: 3, background: "#232323", flexShrink: 0 }} />
+                      <div style={{ width: 28, height: 40, borderRadius: 3, background: "#fef3c7", flexShrink: 0 }} />
                     )}
                     <div>
                       <div style={{ fontWeight: 500, fontSize: 13 }}>{suggestion.Title}</div>
-                      <div style={{ fontSize: 11, color: "#9f9f9f" }}>{suggestion.Year} - {suggestion.Type}</div>
+                      <div style={{ fontSize: 11, color: "#667085" }}>{suggestion.Year} - {suggestion.Type}</div>
                     </div>
                   </div>
                 ))}
@@ -393,7 +393,7 @@ export default function Movies() {
       </div>
 
       {movies.length > 0 && (
-        <p style={{ fontSize: 13, color: "#9a9a9a", marginBottom: 12 }}>
+        <p style={{ fontSize: 13, color: "#667085", marginBottom: 12 }}>
           {movies.length} total
           {counts.movie > 0 ? ` - ${counts.movie} movies` : ""}
           {counts.series > 0 ? ` - ${counts.series} series` : ""}
@@ -428,7 +428,7 @@ export default function Movies() {
                       {movie.poster ? (
                         <img src={movie.poster} alt={movie.title} style={{ width: 60, height: 88, objectFit: "cover", borderRadius: 6 }} />
                       ) : (
-                        <div style={{ width: 60, height: 88, background: "#242424", borderRadius: 6 }} />
+                        <div style={{ width: 60, height: 88, background: "#f2f4f7", borderRadius: 6 }} />
                       )}
                     </td>
                     <td>{movie.title}</td>
@@ -453,21 +453,21 @@ export default function Movies() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))", gap: 14, marginBottom: 24 }}>
         {sortedMovies.map((movie, index) => (
-          <div key={movie.id} className="card" style={{ padding: 0, overflow: "hidden", position: "relative", outline: editId === movie.id ? "2px solid #f2f2f2" : "none" }}>
-            <div style={{ position: "relative", aspectRatio: "4/5", background: "#171717" }}>
+          <div key={movie.id} className="card" style={{ padding: 0, overflow: "hidden", position: "relative", outline: editId === movie.id ? "2px solid #2563eb" : "none" }}>
+            <div style={{ position: "relative", aspectRatio: "4/5", background: "#f7f8fa" }}>
               {movie.poster ? (
                 <img src={movie.poster} alt={movie.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               ) : (
-                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#9b9b9b" }}>
+                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#667085" }}>
                   No poster
                 </div>
               )}
 
-              <span style={{ position: "absolute", top: 7, left: 7, fontSize: 10, fontWeight: 500, padding: "2px 8px", borderRadius: 99, background: "#101010", color: "#f1f1f1", border: "1px solid #555" }}>
+              <span style={{ position: "absolute", top: 7, left: 7, fontSize: 10, fontWeight: 500, padding: "2px 8px", borderRadius: 99, background: "#eef2ff", color: "#111827", border: "1px solid #d0d5dd" }}>
                 #{index + 1}
               </span>
 
-              <span style={{ position: "absolute", top: 7, left: 56, fontSize: 10, fontWeight: 500, padding: "2px 8px", borderRadius: 99, background: "#101010", color: "#f1f1f1", border: "1px solid #555" }}>
+              <span style={{ position: "absolute", top: 7, left: 56, fontSize: 10, fontWeight: 500, padding: "2px 8px", borderRadius: 99, background: "#eef2ff", color: "#111827", border: "1px solid #d0d5dd" }}>
                 {TYPE_META[movie.type]?.label || movie.type}
               </span>
 
@@ -483,24 +483,24 @@ export default function Movies() {
 
             <div style={{ padding: "9px 9px 11px" }}>
               <p style={{ fontWeight: 500, fontSize: 12, lineHeight: 1.35, marginBottom: 3 }}>{movie.title}</p>
-              <p style={{ fontSize: 11, color: "#b5b5b5", marginBottom: 4 }}>
+              <p style={{ fontSize: 11, color: "#667085", marginBottom: 4 }}>
                 {[movie.year, movie.runtime, movie.imdbRating ? `IMDb ${movie.imdbRating}` : null].filter(Boolean).join(" - ")}
               </p>
-              {movie.country && <p style={{ fontSize: 11, color: "#b5b5b5", marginBottom: 4 }}>{movie.country}</p>}
-              <p style={{ fontSize: 12, color: "#efefef", marginBottom: 4 }}>Your rating {formatDecimal(movie.rating)}</p>
+              {movie.country && <p style={{ fontSize: 11, color: "#667085", marginBottom: 4 }}>{movie.country}</p>}
+              <p style={{ fontSize: 12, color: "#111827", marginBottom: 4 }}>Your rating {formatDecimal(movie.rating)}</p>
               <div style={{ marginTop: 4 }}>
                 {movie.genre.map((genre) => (
-                  <span key={genre} style={{ display: "inline-block", fontSize: 10, background: "#1c1c1c", color: "#e0e0e0", padding: "2px 7px", borderRadius: 99, marginRight: 3, marginTop: 3, border: "1px solid #444" }}>
+                  <span key={genre} style={{ display: "inline-block", fontSize: 10, background: "#eef4ff", color: "#475467", padding: "2px 7px", borderRadius: 99, marginRight: 3, marginTop: 3, border: "1px solid #d0d5dd" }}>
                     {genre}
                   </span>
                 ))}
               </div>
-              {movie.director && <p style={{ fontSize: 11, color: "#9e9e9e", marginTop: 5 }}>Dir. {movie.director}</p>}
+              {movie.director && <p style={{ fontSize: 11, color: "#667085", marginTop: 5 }}>Dir. {movie.director}</p>}
               {(movie.startDate || movie.endDate || movie.addedDate) && (
-                <div style={{ marginTop: 7, paddingTop: 7, borderTop: "0.5px solid #2c2c2c" }}>
-                  {movie.startDate && <p style={{ fontSize: 11, color: "#a7a7a7", marginBottom: 2 }}>Started {formatDate(movie.startDate)}</p>}
-                  {movie.endDate && <p style={{ fontSize: 11, color: "#a7a7a7", marginBottom: 2 }}>Finished {formatDate(movie.endDate)}</p>}
-                  {movie.addedDate && <p style={{ fontSize: 11, color: "#a7a7a7" }}>Added {formatDate(movie.addedDate)}</p>}
+                <div style={{ marginTop: 7, paddingTop: 7, borderTop: "0.5px solid #d9dee7" }}>
+                  {movie.startDate && <p style={{ fontSize: 11, color: "#667085", marginBottom: 2 }}>Started {formatDate(movie.startDate)}</p>}
+                  {movie.endDate && <p style={{ fontSize: 11, color: "#667085", marginBottom: 2 }}>Finished {formatDate(movie.endDate)}</p>}
+                  {movie.addedDate && <p style={{ fontSize: 11, color: "#667085" }}>Added {formatDate(movie.addedDate)}</p>}
                 </div>
               )}
             </div>
@@ -542,7 +542,7 @@ export default function Movies() {
 
         <div style={{ marginTop: 14 }}>
           {sortedWatchlist.length === 0 ? (
-            <p style={{ fontSize: 13, color: "#909090" }}>No watchlist items yet.</p>
+            <p style={{ fontSize: 13, color: "#667085" }}>No watchlist items yet.</p>
           ) : (
             <div className="table-wrap">
               <table>
@@ -565,7 +565,7 @@ export default function Movies() {
                         {item.poster ? (
                           <img src={item.poster} alt={item.name} style={{ width: 48, height: 68, objectFit: "cover", borderRadius: 6 }} />
                         ) : (
-                          <div style={{ width: 48, height: 68, background: "#242424", borderRadius: 6 }} />
+                          <div style={{ width: 48, height: 68, background: "#f2f4f7", borderRadius: 6 }} />
                         )}
                       </td>
                       <td>{item.name}</td>
@@ -589,30 +589,30 @@ export default function Movies() {
   );
 }
 
-const labelStyle = { fontSize: 11, color: "#9a9a9a", display: "block", marginBottom: 3 };
+const labelStyle = { fontSize: 11, color: "#667085", display: "block", marginBottom: 3 };
 
 const buttonStyle = {
   padding: "9px 16px",
-  background: "#f2f2f2",
-  color: "#111111",
-  border: "1px solid #676767",
+  background: "#111827",
+  color: "#ffffff",
+  border: "1px solid #111827",
   borderRadius: 8,
   cursor: "pointer",
 };
 
 const secondaryButtonStyle = {
   padding: "9px 14px",
-  background: "#141414",
-  color: "#f2f2f2",
-  border: "1px solid #4f4f4f",
+  background: "#f8fafc",
+  color: "#111827",
+  border: "1px solid #d0d5dd",
   borderRadius: 8,
   cursor: "pointer",
 };
 
 const ghostButtonStyle = {
   background: "transparent",
-  color: "#d4d4d4",
-  border: "1px solid #565656",
+  color: "#475467",
+  border: "1px solid #d0d5dd",
   borderRadius: 8,
   padding: "6px 10px",
   cursor: "pointer",
@@ -635,8 +635,8 @@ const suggestBoxStyle = {
   left: 0,
   right: 0,
   zIndex: 20,
-  background: "#111111",
-  border: "1px solid #3e3e3e",
+  background: "#ffffff",
+  border: "1px solid #d0d5dd",
   borderRadius: 8,
   marginTop: 4,
   boxShadow: "0 4px 12px rgba(0,0,0,0.22)",
@@ -649,16 +649,16 @@ const suggestItemStyle = {
   gap: 10,
   padding: "8px 12px",
   cursor: "pointer",
-  borderBottom: "1px solid #252525",
-  background: "#111111",
+  borderBottom: "1px solid #d9dee7",
+  background: "#ffffff",
 };
 
 const pillStyle = {
   fontSize: 11,
   padding: "2px 8px",
   borderRadius: 99,
-  background: "#191919",
-  color: "#efefef",
-  border: "1px solid #525252",
+  background: "#f7f8fa",
+  color: "#111827",
+  border: "1px solid #d0d5dd",
   whiteSpace: "nowrap",
 };

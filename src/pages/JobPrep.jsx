@@ -18,27 +18,27 @@ function normalizeUrl(value) {
 function Divider({ label }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "26px 0 14px" }}>
-      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
-      <span style={{ fontSize: 12, fontWeight: 600, color: "#9a9a9a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+      <div style={{ flex: 1, height: 1, background: "#d9dee7" }} />
+      <span style={{ fontSize: 12, fontWeight: 600, color: "#667085", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
         {label}
       </span>
-      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
+      <div style={{ flex: 1, height: 1, background: "#d9dee7" }} />
     </div>
   );
 }
 
 const APP_STATUS = {
-  ongoing: { label: "Ongoing", bg: "#202020", color: "#ededed", border: "#5a5a5a" },
-  complete: { label: "Complete", bg: "#111111", color: "#ffffff", border: "#707070" },
-  rejection: { label: "Rejected", bg: "#1b1b1b", color: "#d4d4d4", border: "#555555" },
+  ongoing: { label: "Ongoing", bg: "#eef4ff", color: "#1d4ed8", border: "#c7d7fe" },
+  complete: { label: "Complete", bg: "#f2f4f7", color: "#111827", border: "#d0d5dd" },
+  rejection: { label: "Rejected", bg: "#fef2f2", color: "#475467", border: "#d0d5dd" },
 };
 
 const JOB_TYPES = ["Full-time", "Part-time", "Internship", "Remote", "Contract", "Freelance", "Other"];
 
 const SKILL_LEVELS = {
-  learning: { label: "Learning", bg: "#171717", color: "#f5f5f5", border: "#474747" },
-  intermediate: { label: "Intermediate", bg: "#212121", color: "#ededed", border: "#666666" },
-  proficient: { label: "Proficient", bg: "#101010", color: "#ffffff", border: "#7c7c7c" },
+  learning: { label: "Learning", bg: "#f7f8fa", color: "#111827", border: "#c7d7fe" },
+  intermediate: { label: "Intermediate", bg: "#f3e8ff", color: "#1d4ed8", border: "#98a2b3" },
+  proficient: { label: "Proficient", bg: "#eef2ff", color: "#111827", border: "#c084fc" },
 };
 
 const RESOURCE_TYPES = ["Course", "Book", "Platform", "YouTube", "Article", "Practice", "Other"];
@@ -351,10 +351,10 @@ export default function JobPrep() {
                 fontSize: 11,
                 padding: "4px 14px",
                 borderRadius: 99,
-                border: "1px solid #4a4a4a",
+                border: "1px solid #d0d5dd",
                 cursor: "pointer",
-                background: filter === key ? "#f4f4f4" : "#111111",
-                color: filter === key ? "#111111" : "#d6d6d6",
+                background: filter === key ? "#111827" : "#ffffff",
+                color: filter === key ? "#ffffff" : "#475467",
                 fontWeight: filter === key ? 600 : 400,
               }}
             >
@@ -365,8 +365,8 @@ export default function JobPrep() {
       )}
 
       {applicationsWithRequirements.length > 0 && (
-        <div className="card" style={{ marginBottom: 16, border: "1px solid #4d4d4d", background: "#111111" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#f5f5f5", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>
+        <div className="card" style={{ marginBottom: 16, border: "1px solid #d0d5dd", background: "#ffffff" }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#111827", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>
             Requirements
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -398,7 +398,7 @@ export default function JobPrep() {
       )}
 
       {applications.length === 0 && (
-        <p style={{ fontSize: 13, color: "#9a9a9a", textAlign: "center", padding: "24px 0" }}>
+        <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "24px 0" }}>
           No applications yet. Add one above.
         </p>
       )}
@@ -416,14 +416,14 @@ export default function JobPrep() {
                     justifyContent: "space-between",
                     gap: 12,
                     paddingBottom: 8,
-                    borderBottom: "1px solid #2f2f2f",
+                    borderBottom: "1px solid #d9dee7",
                   }}
                 >
                   <div>
                     <div style={{ fontWeight: 600 }}>{item.company || "Untitled"}</div>
-                    <div style={{ fontSize: 12, color: "#a9a9a9" }}>{item.role || item.jobType}</div>
+                    <div style={{ fontSize: 12, color: "#667085" }}>{item.role || item.jobType}</div>
                   </div>
-                  <div style={{ fontSize: 12, color: "#bdbdbd", textAlign: "right" }}>
+                  <div style={{ fontSize: 12, color: "#475467", textAlign: "right" }}>
                     <div>{APP_STATUS[item.status].label}</div>
                     <div>{item.appDate ? formatDate(item.appDate) : "-"}</div>
                   </div>
@@ -505,7 +505,7 @@ export default function JobPrep() {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {skills.length === 0 && <p style={{ fontSize: 13, color: "#9a9a9a", padding: "12px 0" }}>No skills added yet.</p>}
+        {skills.length === 0 && <p style={{ fontSize: 13, color: "#667085", padding: "12px 0" }}>No skills added yet.</p>}
         {skills.map((skill) => {
           const meta = SKILL_LEVELS[skill.level];
           const skillLinksList = skill.links?.filter((linkItem) => linkItem?.url) || (skill.link ? [{ label: "Link", url: skill.link }] : []);
@@ -531,13 +531,13 @@ export default function JobPrep() {
                   {skillLinksList.length > 0 && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: skill.notes ? 4 : 0 }}>
                       {skillLinksList.map((linkItem, index) => (
-                        <a key={`${skill.id}-link-${index}`} href={normalizeUrl(linkItem.url)} target="_blank" rel="noreferrer" style={{ display: "block", fontSize: 12, color: "#dcdcdc" }}>
+                        <a key={`${skill.id}-link-${index}`} href={normalizeUrl(linkItem.url)} target="_blank" rel="noreferrer" style={{ display: "block", fontSize: 12, color: "#2563eb" }}>
                           {linkItem.label || `Link ${index + 1}`}: {linkItem.url}
                         </a>
                       ))}
                     </div>
                   )}
-                  {skill.notes && <p style={{ fontSize: 12, color: "#a6a6a6" }}>{skill.notes}</p>}
+                  {skill.notes && <p style={{ fontSize: 12, color: "#667085" }}>{skill.notes}</p>}
                 </div>
                 <button onClick={() => removeSkill(skill.id)} style={ghostDangerButton}>
                   Remove
@@ -619,7 +619,7 @@ export default function JobPrep() {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {resources.length === 0 && <p style={{ fontSize: 13, color: "#9a9a9a", padding: "12px 0" }}>No resources added yet.</p>}
+        {resources.length === 0 && <p style={{ fontSize: 13, color: "#667085", padding: "12px 0" }}>No resources added yet.</p>}
         {resources.map((resource) => {
           const resourceLinksList = resource.links?.filter((linkItem) => linkItem?.url) || (resource.link ? [{ label: "Link", url: resource.link }] : []);
           return (
@@ -642,9 +642,9 @@ export default function JobPrep() {
                   borderRadius: 5,
                   flexShrink: 0,
                   cursor: "pointer",
-                  border: resource.done ? "1px solid #888" : "2px solid #5c5c5c",
-                  background: resource.done ? "#efefef" : "transparent",
-                  color: "#111111",
+                  border: resource.done ? "1px solid #667085" : "2px solid #98a2b3",
+                  background: resource.done ? "#16a34a" : "transparent",
+                  color: "#111827",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -657,20 +657,20 @@ export default function JobPrep() {
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 4 }}>
                   <p style={{ fontWeight: 500, fontSize: 13, textDecoration: resource.done ? "line-through" : "none" }}>{resource.title}</p>
-                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "#1f1f1f", color: "#efefef", border: "1px solid #555" }}>
+                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "#f2f4f7", color: "#111827", border: "1px solid #d0d5dd" }}>
                     {resource.type}
                   </span>
                 </div>
                 {resourceLinksList.length > 0 && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: resource.notes ? 4 : 0 }}>
                     {resourceLinksList.map((linkItem, index) => (
-                      <a key={`${resource.id}-link-${index}`} href={normalizeUrl(linkItem.url)} target="_blank" rel="noreferrer" style={{ display: "block", fontSize: 12, color: "#d8d8d8" }}>
+                      <a key={`${resource.id}-link-${index}`} href={normalizeUrl(linkItem.url)} target="_blank" rel="noreferrer" style={{ display: "block", fontSize: 12, color: "#475467" }}>
                         {linkItem.label || `Link ${index + 1}`}: {linkItem.url}
                       </a>
                     ))}
                   </div>
                 )}
-                {resource.notes && <p style={{ fontSize: 12, color: "#a6a6a6" }}>{resource.notes}</p>}
+                {resource.notes && <p style={{ fontSize: 12, color: "#667085" }}>{resource.notes}</p>}
               </div>
               <button onClick={() => removeResource(resource.id)} style={ghostDangerButton}>
                 Remove
@@ -693,29 +693,29 @@ function ApplicationCard({ item, statusMeta, onDelete, onChangeStatus }) {
         <div style={{ flex: 1, minWidth: 160 }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 3 }}>
             <p style={{ fontWeight: 700, fontSize: 15 }}>{item.company || "-"}</p>
-            <span style={{ fontSize: 12, padding: "2px 9px", borderRadius: 99, background: "#1c1c1c", color: "#f1f1f1", border: "1px solid #4f4f4f" }}>
+            <span style={{ fontSize: 12, padding: "2px 9px", borderRadius: 99, background: "#eef4ff", color: "#111827", border: "1px solid #d0d5dd" }}>
               {item.jobType}
             </span>
           </div>
-          <p style={{ fontSize: 14, color: "#c9c9c9", marginBottom: 4 }}>{item.role}</p>
+          <p style={{ fontSize: 14, color: "#475467", marginBottom: 4 }}>{item.role}</p>
           {item.requirement && (
             <div style={{ marginBottom: 6 }}>
-              <span style={{ fontSize: 12, color: "#f0f0f0", fontWeight: 600 }}>Requirement:</span>
-              <span style={{ fontSize: 12, color: "#bcbcbc", marginLeft: 6 }}>{item.requirement}</span>
+              <span style={{ fontSize: 12, color: "#111827", fontWeight: 600 }}>Requirement:</span>
+              <span style={{ fontSize: 12, color: "#475467", marginLeft: 6 }}>{item.requirement}</span>
             </div>
           )}
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            {item.appDate && <span style={{ fontSize: 12, color: "#9f9f9f" }}>Applied {formatDate(item.appDate)}</span>}
+            {item.appDate && <span style={{ fontSize: 12, color: "#667085" }}>Applied {formatDate(item.appDate)}</span>}
             {item.deadline && (
-              <span style={{ fontSize: 12, color: isDeadlinePast ? "#ffffff" : "#9f9f9f", fontWeight: isDeadlinePast ? 600 : 400 }}>
+              <span style={{ fontSize: 12, color: isDeadlinePast ? "#111827" : "#667085", fontWeight: isDeadlinePast ? 600 : 400 }}>
                 {isDeadlinePast ? "Deadline past - " : "Deadline - "}
                 {formatDate(item.deadline)}
               </span>
             )}
-            {item.salary && <span style={{ fontSize: 12, color: "#f0f0f0" }}>Salary {item.salary}</span>}
+            {item.salary && <span style={{ fontSize: 12, color: "#111827" }}>Salary {item.salary}</span>}
           </div>
-          {item.notes && <p style={{ fontSize: 12, color: "#aaaaaa", marginTop: 5, fontStyle: "italic" }}>{item.notes}</p>}
-          {item.usage && <p style={{ fontSize: 12, color: "#cfcfcf", marginTop: 4 }}>Use: {item.usage}</p>}
+          {item.notes && <p style={{ fontSize: 12, color: "#667085", marginTop: 5, fontStyle: "italic" }}>{item.notes}</p>}
+          {item.usage && <p style={{ fontSize: 12, color: "#475467", marginTop: 4 }}>Use: {item.usage}</p>}
           {appLinksList.length > 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 4 }}>
               {appLinksList.map((linkItem, index) => (
@@ -724,7 +724,7 @@ function ApplicationCard({ item, statusMeta, onDelete, onChangeStatus }) {
                   href={normalizeUrl(linkItem.url)}
                   target="_blank"
                   rel="noreferrer"
-                  style={{ fontSize: 12, color: "#dfdfdf", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                  style={{ fontSize: 12, color: "#2563eb", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
                 >
                   {linkItem.label || `Link ${index + 1}`}: {linkItem.url}
                 </a>
@@ -770,25 +770,25 @@ function StatCard({ label, value }) {
         minWidth: 80,
         padding: "12px 14px",
         borderRadius: 10,
-        background: "#121212",
-        color: "#f0f0f0",
+        background: "#ffffff",
+        color: "#111827",
         textAlign: "center",
-        border: "1px solid #3f3f3f",
+        border: "1px solid #d0d5dd",
       }}
     >
       <div style={{ fontSize: 20, fontWeight: 700 }}>{value}</div>
-      <div style={{ fontSize: 11, marginTop: 2, color: "#aaaaaa" }}>{label}</div>
+      <div style={{ fontSize: 11, marginTop: 2, color: "#667085" }}>{label}</div>
     </div>
   );
 }
 
-const labelStyle = { fontSize: 12, color: "#9a9a9a", display: "block", marginBottom: 4 };
+const labelStyle = { fontSize: 12, color: "#667085", display: "block", marginBottom: 4 };
 
 const buttonStyle = {
   alignSelf: "flex-end",
-  background: "#f2f2f2",
-  color: "#111111",
-  border: "1px solid #6c6c6c",
+  background: "#111827",
+  color: "#ffffff",
+  border: "1px solid #111827",
   borderRadius: 8,
   padding: "10px 16px",
   cursor: "pointer",
@@ -797,9 +797,9 @@ const buttonStyle = {
 
 const ghostDangerButton = {
   background: "transparent",
-  border: "1px solid #666666",
+  border: "1px solid #98a2b3",
   cursor: "pointer",
-  color: "#d0d0d0",
+  color: "#475467",
   borderRadius: 8,
   padding: "7px 11px",
   fontSize: 13,
@@ -807,9 +807,9 @@ const ghostDangerButton = {
 
 const smallGhostButton = {
   background: "transparent",
-  border: "1px solid #555555",
+  border: "1px solid #d0d5dd",
   cursor: "pointer",
-  color: "#d8d8d8",
+  color: "#475467",
   borderRadius: 8,
   padding: "8px 11px",
   fontSize: 12,

@@ -21,12 +21,12 @@ function useLocalStorage(key, initialValue, version = 1) {
 const DEGREE_TYPES = ["Masters", "PhD"];
 const STATUS_OPTIONS = ["Interested", "Researching", "Applied", "Accepted", "Rejected", "Enrolled"];
 const STATUS_STYLES = {
-  Interested: { bg: "#1d1d1d", text: "#f2f2f2" },
-  Researching: { bg: "#242424", text: "#dcdcdc" },
-  Applied: { bg: "#171717", text: "#ffffff" },
-  Accepted: { bg: "#121212", text: "#ffffff" },
-  Rejected: { bg: "#262626", text: "#cccccc" },
-  Enrolled: { bg: "#101010", text: "#f7f7f7" },
+  Interested: { bg: "#eef4ff", text: "#111827" },
+  Researching: { bg: "#f2f4f7", text: "#2563eb" },
+  Applied: { bg: "#f7f8fa", text: "#111827" },
+  Accepted: { bg: "#f2f4f7", text: "#111827" },
+  Rejected: { bg: "#f2f4f7", text: "#475467" },
+  Enrolled: { bg: "#eef2ff", text: "#111827" },
 };
 
 const EMPTY_FORM = {
@@ -77,11 +77,11 @@ function normalizeUrl(url) {
 function Divider({ label }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "26px 0 14px" }}>
-      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
-      <span style={{ fontSize: 12, fontWeight: 600, color: "#9a9a9a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+      <div style={{ flex: 1, height: 1, background: "#d9dee7" }} />
+      <span style={{ fontSize: 12, fontWeight: 600, color: "#667085", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
         {label}
       </span>
-      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
+      <div style={{ flex: 1, height: 1, background: "#d9dee7" }} />
     </div>
   );
 }
@@ -210,7 +210,7 @@ export default function University() {
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 14 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700 }}>University Tracker</div>
-            <div style={{ fontSize: 12, color: "#9a9a9a" }}>Track Masters and PhD applications in the same grayscale style as the other pages.</div>
+            <div style={{ fontSize: 12, color: "#667085" }}>Track Masters and PhD applications in the same grayscale style as the other pages.</div>
           </div>
           <button onClick={openAdd} style={buttonStyle}>Add University</button>
         </div>
@@ -228,10 +228,10 @@ export default function University() {
               style={{
                 padding: "7px 16px",
                 borderRadius: 999,
-                border: "1px solid #4f4f4f",
+                border: "1px solid #d0d5dd",
                 cursor: "pointer",
-                background: activeTab === degreeType ? "#f2f2f2" : "#111111",
-                color: activeTab === degreeType ? "#111111" : "#dedede",
+                background: activeTab === degreeType ? "#111827" : "#ffffff",
+                color: activeTab === degreeType ? "#ffffff" : "#475467",
                 fontWeight: 600,
               }}
             >
@@ -246,9 +246,9 @@ export default function University() {
             style={{
               padding: "5px 12px",
               borderRadius: 999,
-              border: "1px solid #444",
-              background: filterStatus === "All" ? "#f2f2f2" : "#171717",
-              color: filterStatus === "All" ? "#111111" : "#d8d8d8",
+              border: "1px solid #d0d5dd",
+              background: filterStatus === "All" ? "#111827" : "#ffffff",
+              color: filterStatus === "All" ? "#ffffff" : "#475467",
               cursor: "pointer",
             }}
           >
@@ -262,9 +262,9 @@ export default function University() {
                 style={{
                   padding: "5px 12px",
                   borderRadius: 999,
-                  border: "1px solid #444",
-                  background: filterStatus === status ? "#f2f2f2" : STATUS_STYLES[status].bg,
-                  color: filterStatus === status ? "#111111" : STATUS_STYLES[status].text,
+                  border: "1px solid #d0d5dd",
+                  background: filterStatus === status ? "#111827" : STATUS_STYLES[status].bg,
+                  color: filterStatus === status ? "#ffffff" : STATUS_STYLES[status].text,
                   cursor: "pointer",
                 }}
               >
@@ -286,24 +286,24 @@ export default function University() {
       </div>
 
       {visibleList.length === 0 ? (
-        <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: "24px 0" }}>
+        <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "24px 0" }}>
           {(grouped[activeTab] || []).length === 0 ? `No ${activeTab} universities added yet.` : "No results match your search or filter."}
         </p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {visibleList.map((entry) => (
-            <div key={entry.id} className="card" style={{ marginBottom: 0, borderLeft: "3px solid #666666" }}>
+            <div key={entry.id} className="card" style={{ marginBottom: 0, borderLeft: "3px solid #98a2b3" }}>
             <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                <div style={{ minWidth: 56, textAlign: "center", padding: "7px 9px", borderRadius: 8, background: "#1a1a1a", border: "1px solid #373737", color: "#d9d9d9", fontSize: 13 }}>
+                <div style={{ minWidth: 56, textAlign: "center", padding: "7px 9px", borderRadius: 8, background: "#f2f4f7", border: "1px solid #d0d5dd", color: "#475467", fontSize: 13 }}>
                   {entry.ranking ? `#${entry.ranking}` : "-"}
                 </div>
                 <div style={{ flex: 1, minWidth: 160 }}>
                   <div style={{ fontWeight: 600, fontSize: 16 }}>{entry.universityName}</div>
-                  <div style={{ fontSize: 13, color: "#9d9d9d", marginTop: 2 }}>
+                  <div style={{ fontSize: 13, color: "#667085", marginTop: 2 }}>
                     {[entry.country || "Country not set", entry.deadline ? `Deadline ${entry.deadline}` : null, entry.tuitionFee || null, entry.workPolicy !== "Not set" ? entry.workPolicy : null].filter(Boolean).join(" - ")}
                   </div>
                 </div>
-                <span style={{ fontSize: 12, padding: "5px 11px", borderRadius: 999, background: STATUS_STYLES[entry.status]?.bg, color: STATUS_STYLES[entry.status]?.text, border: "1px solid #444" }}>
+                <span style={{ fontSize: 12, padding: "5px 11px", borderRadius: 999, background: STATUS_STYLES[entry.status]?.bg, color: STATUS_STYLES[entry.status]?.text, border: "1px solid #d0d5dd" }}>
                   {entry.status}
                 </span>
                 <button onClick={() => openEdit(entry)} style={ghostButtonStyle}>Edit</button>
@@ -314,7 +314,7 @@ export default function University() {
               </div>
 
               {deleteId === entry.id && (
-                <div style={{ marginTop: 12, padding: 14, borderRadius: 10, background: "#171717", border: "1px solid #404040" }}>
+                <div style={{ marginTop: 12, padding: 14, borderRadius: 10, background: "#f7f8fa", border: "1px solid #d0d5dd" }}>
                   <div style={{ fontSize: 13, marginBottom: 10 }}>Delete <strong>{entry.universityName}</strong>?</div>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button onClick={() => deleteEntry(entry.id)} style={buttonStyle}>Yes, Delete</button>
@@ -324,7 +324,7 @@ export default function University() {
               )}
 
               {expandedId === entry.id && (
-                <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #2a2a2a" }}>
+                <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #d9dee7" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
                     <div style={detailBoxStyle}>
                       <div style={detailTitleStyle}>Requirements</div>
@@ -343,7 +343,7 @@ export default function University() {
                       ))}
                       <div style={rowStyle}><span>SOP</span><span>{entry.requirements.sop ? "Required" : "Not required"}</span></div>
                       <div style={rowStyle}><span>CV</span><span>{entry.requirements.cv ? "Required" : "Not required"}</span></div>
-                      {entry.requirements.other && <div style={{ fontSize: 12, color: "#b6b6b6", marginTop: 8 }}>{entry.requirements.other}</div>}
+                      {entry.requirements.other && <div style={{ fontSize: 12, color: "#667085", marginTop: 8 }}>{entry.requirements.other}</div>}
                     </div>
 
                     <div style={detailBoxStyle}>
@@ -358,7 +358,7 @@ export default function University() {
                       {entry.additionalLinks?.filter((item) => item.url).length > 0 && (
                         <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
                           {entry.additionalLinks.filter((item) => item.url).map((item, index) => (
-                            <a key={index} href={normalizeUrl(item.url)} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#f1f1f1" }}>
+                            <a key={index} href={normalizeUrl(item.url)} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#111827" }}>
                               {item.label || item.url}
                             </a>
                           ))}
@@ -368,8 +368,8 @@ export default function University() {
                   </div>
 
                   {entry.notes && (
-                    <div style={{ marginTop: 12, padding: 12, borderRadius: 10, background: "#171717", border: "1px solid #303030", fontSize: 12, color: "#b4b4b4" }}>
-                      <strong style={{ color: "#f1f1f1" }}>Notes</strong>
+                    <div style={{ marginTop: 12, padding: 12, borderRadius: 10, background: "#f7f8fa", border: "1px solid #d9dee7", fontSize: 12, color: "#667085" }}>
+                      <strong style={{ color: "#111827" }}>Notes</strong>
                       <div style={{ marginTop: 6 }}>{entry.notes}</div>
                     </div>
                   )}
@@ -393,10 +393,10 @@ export default function University() {
                   style={{
                     padding: "7px 14px",
                     borderRadius: 999,
-                    border: "1px solid #4f4f4f",
+                    border: "1px solid #d0d5dd",
                     cursor: "pointer",
-                    background: form.degreeType === degreeType ? "#f2f2f2" : "#111111",
-                    color: form.degreeType === degreeType ? "#111111" : "#d8d8d8",
+                    background: form.degreeType === degreeType ? "#111827" : "#ffffff",
+                    color: form.degreeType === degreeType ? "#ffffff" : "#475467",
                   }}
                 >
                   {degreeType}
@@ -510,12 +510,12 @@ function Field({ label, value, onChange, placeholder }) {
   );
 }
 
-const labelStyle = { fontSize: 12, color: "#9a9a9a", display: "block", marginBottom: 4 };
-const buttonStyle = { background: "#f2f2f2", color: "#111111", border: "1px solid #676767", borderRadius: 8, padding: "10px 16px", cursor: "pointer", fontSize: 13 };
-const ghostButtonStyle = { background: "transparent", border: "1px solid #616161", cursor: "pointer", color: "#d3d3d3", borderRadius: 8, padding: "7px 11px", fontSize: 13 };
-const rowStyle = { display: "flex", justifyContent: "space-between", gap: 12, fontSize: 13, color: "#c9c9c9", marginBottom: 7 };
-const detailBoxStyle = { padding: 12, borderRadius: 10, background: "#171717", border: "1px solid #303030" };
-const detailTitleStyle = { fontSize: 12, fontWeight: 700, color: "#f1f1f1", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 };
+const labelStyle = { fontSize: 12, color: "#667085", display: "block", marginBottom: 4 };
+const buttonStyle = { background: "#111827", color: "#ffffff", border: "1px solid #98a2b3", borderRadius: 8, padding: "10px 16px", cursor: "pointer", fontSize: 13 };
+const ghostButtonStyle = { background: "transparent", border: "1px solid #d0d5dd", cursor: "pointer", color: "#475467", borderRadius: 8, padding: "7px 11px", fontSize: 13 };
+const rowStyle = { display: "flex", justifyContent: "space-between", gap: 12, fontSize: 13, color: "#475467", marginBottom: 7 };
+const detailBoxStyle = { padding: 12, borderRadius: 10, background: "#f7f8fa", border: "1px solid #d9dee7" };
+const detailTitleStyle = { fontSize: 12, fontWeight: 700, color: "#111827", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 };
 const overlayStyle = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.78)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: 20, overflowY: "auto", zIndex: 1000 };
 const formGridStyle = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 };
-const checkboxStyle = { display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#d0d0d0" };
+const checkboxStyle = { display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#475467" };

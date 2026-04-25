@@ -36,19 +36,19 @@ function getDayKey(dateString) {
 function Divider({ label }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "26px 0 14px" }}>
-      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
-      <span style={{ fontSize: 12, fontWeight: 600, color: "#9a9a9a", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+      <div style={{ flex: 1, height: 1, background: "#d9dee7" }} />
+      <span style={{ fontSize: 12, fontWeight: 600, color: "#667085", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
         {label}
       </span>
-      <div style={{ flex: 1, height: 1, background: "#2d2d2d" }} />
+      <div style={{ flex: 1, height: 1, background: "#d9dee7" }} />
     </div>
   );
 }
 
 const PLAN_STATUS = {
-  ongoing: { label: "Ongoing", bg: "#1c1c1c", color: "#f4f4f4" },
-  complete: { label: "Complete", bg: "#111111", color: "#ffffff" },
-  rejection: { label: "Rejected", bg: "#232323", color: "#cccccc" },
+  ongoing: { label: "Ongoing", bg: "#eef4ff", color: "#111827" },
+  complete: { label: "Complete", bg: "#f2f4f7", color: "#111827" },
+  rejection: { label: "Rejected", bg: "#fef3c7", color: "#475467" },
 };
 
 const PLAN_PERIODS = {
@@ -63,7 +63,7 @@ const PLAN_CATEGORIES = ["Personal", "Career", "Health", "Finance", "Learning", 
 function PieChart({ data, size = 120 }) {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   if (total === 0) {
-    return <div style={{ width: size, height: size, borderRadius: "50%", background: "#242424" }} />;
+    return <div style={{ width: size, height: size, borderRadius: "50%", background: "#f2f4f7" }} />;
   }
 
   let angleCursor = -Math.PI / 2;
@@ -90,11 +90,11 @@ function PieChart({ data, size = 120 }) {
           key={index}
           d={`M${cx},${cy} L${slice.x1},${slice.y1} A${radius},${radius} 0 ${slice.largeArc},1 ${slice.x2},${slice.y2} Z`}
           fill={slice.color}
-          stroke="#0d0d0d"
+          stroke="#111827"
           strokeWidth={1.5}
         />
       ))}
-      <circle cx={cx} cy={cy} r={radius * 0.42} fill="#0f0f0f" />
+      <circle cx={cx} cy={cy} r={radius * 0.42} fill="#111827" />
     </svg>
   );
 }
@@ -117,7 +117,7 @@ function AnalysisPanel({ plans, period }) {
   const periodKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   if (!plans.length) {
-    return <p style={{ fontSize: 13, color: "#9b9b9b", textAlign: "center", padding: "16px 0" }}>No plans to analyze.</p>;
+    return <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "16px 0" }}>No plans to analyze.</p>;
   }
 
   function periodLabel(key) {
@@ -146,9 +146,9 @@ function AnalysisPanel({ plans, period }) {
           rejection: items.filter((plan) => plan.status === "rejection").length,
         };
         const pieData = [
-          { label: "Ongoing", value: counts.ongoing, color: "#f2f2f2" },
-          { label: "Complete", value: counts.complete, color: "#9f9f9f" },
-          { label: "Rejected", value: counts.rejection, color: "#555555" },
+          { label: "Ongoing", value: counts.ongoing, color: "#111827" },
+          { label: "Complete", value: counts.complete, color: "#667085" },
+          { label: "Rejected", value: counts.rejection, color: "#d0d5dd" },
         ];
         const isCurrent = key === currentKey;
 
@@ -156,22 +156,22 @@ function AnalysisPanel({ plans, period }) {
           <div
             key={key}
             style={{
-              border: `1px solid ${isCurrent ? "#6c6c6c" : "#303030"}`,
+              border: `1px solid ${isCurrent ? "#98a2b3" : "#d9dee7"}`,
               borderRadius: 12,
               padding: 16,
-              background: isCurrent ? "#141414" : "#121212",
+              background: isCurrent ? "#f8fafc" : "#ffffff",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
               <div>
-                <span style={{ fontSize: 14, fontWeight: 700, color: "#f1f1f1" }}>{periodLabel(key)}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{periodLabel(key)}</span>
                 {isCurrent && (
-                  <span style={{ fontSize: 10, marginLeft: 8, padding: "1px 7px", borderRadius: 99, background: "#f2f2f2", color: "#111111" }}>
+                  <span style={{ fontSize: 10, marginLeft: 8, padding: "1px 7px", borderRadius: 99, background: "#111827", color: "#ffffff" }}>
                     Current
                   </span>
                 )}
               </div>
-              <span style={{ fontSize: 12, color: "#a6a6a6" }}>{items.length} plan{items.length !== 1 ? "s" : ""}</span>
+              <span style={{ fontSize: 12, color: "#667085" }}>{items.length} plan{items.length !== 1 ? "s" : ""}</span>
             </div>
 
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
@@ -182,7 +182,7 @@ function AnalysisPanel({ plans, period }) {
                     item.value > 0 ? (
                       <span key={item.label} style={{ fontSize: 10, display: "flex", alignItems: "center", gap: 4 }}>
                         <span style={{ width: 8, height: 8, borderRadius: "50%", background: item.color, display: "inline-block" }} />
-                        <span style={{ color: "#cfcfcf" }}>{item.label} {item.value}</span>
+                        <span style={{ color: "#475467" }}>{item.label} {item.value}</span>
                       </span>
                     ) : null
                   )}
@@ -194,12 +194,12 @@ function AnalysisPanel({ plans, period }) {
                   {items.map((plan) => {
                     const meta = PLAN_STATUS[plan.status];
                     return (
-                      <div key={plan.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 8, background: "#181818", border: "1px solid #2a2a2a" }}>
-                        <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: "#f1f1f1", textDecoration: plan.status === "rejection" ? "line-through" : "none" }}>
+                      <div key={plan.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 8, background: "#ffffff", border: "1px solid #d9dee7" }}>
+                        <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: "#111827", textDecoration: plan.status === "rejection" ? "line-through" : "none" }}>
                           {plan.title}
                         </span>
-                        {plan.category && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 99, background: "#222222", color: "#cfcfcf" }}>{plan.category}</span>}
-                        <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 99, background: meta.bg, color: meta.color, border: "1px solid #444" }}>
+                        {plan.category && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 99, background: "#f2f4f7", color: "#475467" }}>{plan.category}</span>}
+                        <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 99, background: meta.bg, color: meta.color, border: "1px solid #d0d5dd" }}>
                           {meta.label}
                         </span>
                       </div>
@@ -359,10 +359,10 @@ export default function MyPlan() {
                   fontSize: 11,
                   padding: "4px 14px",
                   borderRadius: 99,
-                  border: "1px solid #4f4f4f",
+                  border: "1px solid #d0d5dd",
                   cursor: "pointer",
-                  background: periodFilter === key ? "#f2f2f2" : "#111111",
-                  color: periodFilter === key ? "#111111" : "#d8d8d8",
+                  background: periodFilter === key ? "#111827" : "#ffffff",
+                  color: periodFilter === key ? "#ffffff" : "#475467",
                   fontWeight: periodFilter === key ? 600 : 400,
                 }}
               >
@@ -379,10 +379,10 @@ export default function MyPlan() {
                   fontSize: 11,
                   padding: "4px 14px",
                   borderRadius: 99,
-                  border: "1px solid #4f4f4f",
+                  border: "1px solid #d0d5dd",
                   cursor: "pointer",
-                  background: filter === key ? "#f2f2f2" : "#111111",
-                  color: filter === key ? "#111111" : "#d8d8d8",
+                  background: filter === key ? "#111827" : "#ffffff",
+                  color: filter === key ? "#ffffff" : "#475467",
                   fontWeight: filter === key ? 600 : 400,
                 }}
               >
@@ -394,8 +394,8 @@ export default function MyPlan() {
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {plans.length === 0 && <p style={{ fontSize: 13, color: "#9b9b9b", textAlign: "center", padding: "24px 0" }}>No plans yet. Add your first plan above.</p>}
-        {plans.length > 0 && filtered.length === 0 && <p style={{ fontSize: 13, color: "#9b9b9b", textAlign: "center", padding: "24px 0" }}>No plans match these filters.</p>}
+        {plans.length === 0 && <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "24px 0" }}>No plans yet. Add your first plan above.</p>}
+        {plans.length > 0 && filtered.length === 0 && <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "24px 0" }}>No plans match these filters.</p>}
         {visiblePeriods.map((periodKey) => {
           const periodPlans = filteredByPeriod[periodKey];
           if (!periodPlans.length) return null;
@@ -408,26 +408,26 @@ export default function MyPlan() {
                   const meta = PLAN_STATUS[plan.status];
                   const isOverdue = plan.dueDate && plan.dueDate < today && plan.status === "ongoing";
                   return (
-                    <div key={plan.id} className="card" style={{ padding: "12px 16px", borderLeft: "3px solid #666666", marginBottom: 0 }}>
+                    <div key={plan.id} className="card" style={{ padding: "12px 16px", borderLeft: "3px solid #98a2b3", marginBottom: 0 }}>
                       <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
                         <div style={{ flex: 1, minWidth: 160 }}>
                           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 3 }}>
-                            <p style={{ fontWeight: 600, fontSize: 14, textDecoration: plan.status === "rejection" ? "line-through" : "none", color: plan.status === "rejection" ? "#8f8f8f" : "inherit" }}>
+                            <p style={{ fontWeight: 600, fontSize: 14, textDecoration: plan.status === "rejection" ? "line-through" : "none", color: plan.status === "rejection" ? "#667085" : "inherit" }}>
                               {plan.title}
                             </p>
-                            <span style={{ fontSize: 10, padding: "1px 7px", borderRadius: 99, background: "#f2f2f2", color: "#111111", fontWeight: 600 }}>
+                            <span style={{ fontSize: 10, padding: "1px 7px", borderRadius: 99, background: "#eef4ff", color: "#1d4ed8", fontWeight: 600 }}>
                               {PLAN_PERIODS[plan.period || "daily"].label}
                             </span>
-                            {plan.category && <span style={{ fontSize: 10, padding: "1px 7px", borderRadius: 99, background: "#202020", color: "#d0d0d0" }}>{plan.category}</span>}
+                            {plan.category && <span style={{ fontSize: 10, padding: "1px 7px", borderRadius: 99, background: "#eef4ff", color: "#475467" }}>{plan.category}</span>}
                           </div>
-                          {plan.description && <p style={{ fontSize: 12, color: "#a2a2a2", marginBottom: 4 }}>{plan.description}</p>}
+                          {plan.description && <p style={{ fontSize: 12, color: "#667085", marginBottom: 4 }}>{plan.description}</p>}
                           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                            {plan.addedDate && <span style={{ fontSize: 11, color: "#8f8f8f" }}>Added {formatDate(plan.addedDate)}</span>}
-                            {plan.dueDate && <span style={{ fontSize: 11, color: isOverdue ? "#ffffff" : "#a2a2a2", fontWeight: isOverdue ? 600 : 400 }}>{isOverdue ? "Overdue - " : "Due - "}{formatDate(plan.dueDate)}</span>}
+                            {plan.addedDate && <span style={{ fontSize: 11, color: "#667085" }}>Added {formatDate(plan.addedDate)}</span>}
+                            {plan.dueDate && <span style={{ fontSize: 11, color: isOverdue ? "#111827" : "#667085", fontWeight: isOverdue ? 600 : 400 }}>{isOverdue ? "Overdue - " : "Due - "}{formatDate(plan.dueDate)}</span>}
                           </div>
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
-                          <select value={plan.status} onChange={(event) => updateStatus(plan.id, event.target.value)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 99, background: meta.bg, color: meta.color, cursor: "pointer", fontWeight: 600, border: "1px solid #444" }}>
+                          <select value={plan.status} onChange={(event) => updateStatus(plan.id, event.target.value)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 99, background: meta.bg, color: meta.color, cursor: "pointer", fontWeight: 600, border: "1px solid #d0d5dd" }}>
                             {Object.entries(PLAN_STATUS).map(([key, item]) => (
                               <option key={key} value={key}>
                                 {item.label}
@@ -458,10 +458,10 @@ export default function MyPlan() {
                   fontSize: 12,
                   padding: "6px 18px",
                   borderRadius: 99,
-                  border: "1px solid #4f4f4f",
+                  border: "1px solid #d0d5dd",
                   cursor: "pointer",
-                  background: analysisPeriod === period ? "#f2f2f2" : "#111111",
-                  color: analysisPeriod === period ? "#111111" : "#d8d8d8",
+                  background: analysisPeriod === period ? "#111827" : "#ffffff",
+                  color: analysisPeriod === period ? "#ffffff" : "#475467",
                   fontWeight: analysisPeriod === period ? 600 : 400,
                   textTransform: "capitalize",
                 }}
@@ -479,13 +479,13 @@ export default function MyPlan() {
 
 function StatCard({ label, value }) {
   return (
-    <div style={{ flex: 1, minWidth: 80, padding: "12px 14px", borderRadius: 10, background: "#121212", color: "#f0f0f0", textAlign: "center", border: "1px solid #363636" }}>
+    <div style={{ flex: 1, minWidth: 80, padding: "12px 14px", borderRadius: 10, background: "#ffffff", color: "#111827", textAlign: "center", border: "1px solid #d9dee7" }}>
       <div style={{ fontSize: 20, fontWeight: 700 }}>{value}</div>
-      <div style={{ fontSize: 10, marginTop: 2, color: "#9e9e9e" }}>{label}</div>
+      <div style={{ fontSize: 10, marginTop: 2, color: "#667085" }}>{label}</div>
     </div>
   );
 }
 
-const labelStyle = { fontSize: 11, color: "#9a9a9a", display: "block", marginBottom: 3 };
-const buttonStyle = { alignSelf: "flex-end", background: "#f2f2f2", color: "#111111", border: "1px solid #676767", borderRadius: 8, padding: "9px 16px", cursor: "pointer" };
-const ghostButtonStyle = { background: "transparent", border: "1px solid #616161", cursor: "pointer", color: "#d3d3d3", borderRadius: 8, padding: "6px 10px", fontSize: 12 };
+const labelStyle = { fontSize: 11, color: "#667085", display: "block", marginBottom: 3 };
+const buttonStyle = { alignSelf: "flex-end", background: "#111827", color: "#ffffff", border: "1px solid #98a2b3", borderRadius: 8, padding: "9px 16px", cursor: "pointer" };
+const ghostButtonStyle = { background: "transparent", border: "1px solid #d0d5dd", cursor: "pointer", color: "#475467", borderRadius: 8, padding: "6px 10px", fontSize: 12 };
