@@ -23,9 +23,9 @@ function getMonthKey(dateString) {
   return dateString.slice(0, 7);
 }
 
-function getYearKey(dateString) {
+function getDayKey(dateString) {
   if (!dateString) return null;
-  return dateString.slice(0, 4);
+  return dateString;
 }
 
 function Divider({ label }) {
@@ -44,6 +44,12 @@ const PLAN_STATUS = {
   ongoing: { label: "Ongoing", bg: "#1c1c1c", color: "#f4f4f4" },
   complete: { label: "Complete", bg: "#111111", color: "#ffffff" },
   rejection: { label: "Rejected", bg: "#232323", color: "#cccccc" },
+};
+
+const PLAN_PERIODS = {
+  daily: { label: "Daily" },
+  weekly: { label: "Weekly" },
+  monthly: { label: "Monthly" },
 };
 
 const PLAN_CATEGORIES = ["Personal", "Career", "Health", "Finance", "Learning", "Project", "Other"];
@@ -88,7 +94,7 @@ function PieChart({ data, size = 120 }) {
 }
 
 function AnalysisPanel({ plans, period }) {
-  const getKey = period === "weekly" ? getWeekKey : period === "monthly" ? getMonthKey : getYearKey;
+  const getKey = period === "daily" ? getDayKey : period === "weekly" ? getWeekKey : getMonthKey;
   const currentKey = getKey(today);
 
   const grouped = useMemo(() => {
@@ -109,6 +115,9 @@ function AnalysisPanel({ plans, period }) {
   }
 
   function periodLabel(key) {
+    if (period === "daily") {
+      return formatDate(key);
+    }
     if (period === "weekly") {
       const [year, week] = key.split("-W");
       return `Week ${parseInt(week, 10)}, ${year}`;
@@ -204,9 +213,11 @@ export default function MyPlan() {
   const [plans, setPlans] = useLocalStorage("dashboard-my-plan-items", [], 1);
   const [analysisPeriod, setAnalysisPeriod] = useState("weekly");
   const [filter, setFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Personal");
+  const [planPeriod, setPlanPeriod] = useState("daily");
   const [status, setStatus] = useState("ongoing");
   const [addedDate, setAddedDate] = useState(today);
   const [dueDate, setDueDate] = useState("");
@@ -215,11 +226,12 @@ export default function MyPlan() {
     if (!title.trim()) return;
     setPlans((current) => [
       ...current,
-      { id: Date.now(), title: title.trim(), description: description.trim(), category, status, addedDate, dueDate },
+      { id: Date.now(), title: title.trim(), description: description.trim(), category, period: planPeriod, status, addedDate, dueDate },
     ]);
     setTitle("");
     setDescription("");
     setCategory("Personal");
+    setPlanPeriod("daily");
     setStatus("ongoing");
     setAddedDate(today);
     setDueDate("");
@@ -238,7 +250,25 @@ export default function MyPlan() {
     return accumulator;
   }, {});
 
-  const filtered = filter === "all" ? plans : plans.filter((plan) => plan.status === filter);
+  const periodCounts = Object.keys(PLAN_PERIODS).reduce((accumulator, key) => {
+    accumulator[key] = plans.filter((plan) => (plan.period || "daily") === key).length;
+    return accumulator;
+  }, {});
+
+  const filtered = plans.filter((plan) => {
+    const matchesStatus = filter === "all" || plan.status === filter;
+    const matchesPeriod = periodFilter === "all" || (plan.period || "daily") === periodFilter;
+    return matchesStatus && matchesPeriod;
+  });
+
+  const filteredByPeriod = Object.keys(PLAN_PERIODS).reduce((accumulator, key) => {
+    accumulator[key] = [...filtered]
+      .filter((plan) => (plan.period || "daily") === key)
+      .sort((a, b) => (b.addedDate || "").localeCompare(a.addedDate || ""));
+    return accumulator;
+  }, {});
+
+  const visiblePeriods = periodFilter === "all" ? Object.keys(PLAN_PERIODS) : [periodFilter];
 
   return (
     <div>
@@ -275,6 +305,16 @@ export default function MyPlan() {
             </select>
           </div>
           <div style={{ minWidth: 115 }}>
+            <label style={labelStyle}>Plan Type</label>
+            <select value={planPeriod} onChange={(event) => setPlanPeriod(event.target.value)} style={{ width: "100%" }}>
+              {Object.entries(PLAN_PERIODS).map(([key, meta]) => (
+                <option key={key} value={key}>
+                  {meta.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ minWidth: 115 }}>
             <label style={labelStyle}>Status</label>
             <select value={status} onChange={(event) => setStatus(event.target.value)} style={{ width: "100%" }}>
               {Object.entries(PLAN_STATUS).map(([key, meta]) => (
@@ -303,59 +343,97 @@ export default function MyPlan() {
       </div>
 
       {plans.length > 0 && (
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
-          {[["all", "All"], ...Object.entries(PLAN_STATUS).map(([key, meta]) => [key, meta.label])].map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setFilter(key)}
-              style={{
-                fontSize: 11,
-                padding: "4px 14px",
-                borderRadius: 99,
-                border: "1px solid #4f4f4f",
-                cursor: "pointer",
-                background: filter === key ? "#f2f2f2" : "#111111",
-                color: filter === key ? "#111111" : "#d8d8d8",
-                fontWeight: filter === key ? 600 : 400,
-              }}
-            >
-              {label} ({key === "all" ? plans.length : counts[key] || 0})
-            </button>
-          ))}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 12 }}>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {[["all", "All"], ...Object.entries(PLAN_PERIODS).map(([key, meta]) => [key, meta.label])].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setPeriodFilter(key)}
+                style={{
+                  fontSize: 11,
+                  padding: "4px 14px",
+                  borderRadius: 99,
+                  border: "1px solid #4f4f4f",
+                  cursor: "pointer",
+                  background: periodFilter === key ? "#f2f2f2" : "#111111",
+                  color: periodFilter === key ? "#111111" : "#d8d8d8",
+                  fontWeight: periodFilter === key ? 600 : 400,
+                }}
+              >
+                {label} ({key === "all" ? plans.length : periodCounts[key] || 0})
+              </button>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {[["all", "All Status"], ...Object.entries(PLAN_STATUS).map(([key, meta]) => [key, meta.label])].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setFilter(key)}
+                style={{
+                  fontSize: 11,
+                  padding: "4px 14px",
+                  borderRadius: 99,
+                  border: "1px solid #4f4f4f",
+                  cursor: "pointer",
+                  background: filter === key ? "#f2f2f2" : "#111111",
+                  color: filter === key ? "#111111" : "#d8d8d8",
+                  fontWeight: filter === key ? 600 : 400,
+                }}
+              >
+                {label} ({key === "all" ? plans.length : counts[key] || 0})
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {plans.length === 0 && <p style={{ fontSize: 13, color: "#9b9b9b", textAlign: "center", padding: "24px 0" }}>No plans yet. Add your first plan above.</p>}
-        {[...filtered].sort((a, b) => (b.addedDate || "").localeCompare(a.addedDate || "")).map((plan) => {
-          const meta = PLAN_STATUS[plan.status];
-          const isOverdue = plan.dueDate && plan.dueDate < today && plan.status === "ongoing";
+        {plans.length > 0 && filtered.length === 0 && <p style={{ fontSize: 13, color: "#9b9b9b", textAlign: "center", padding: "24px 0" }}>No plans match these filters.</p>}
+        {visiblePeriods.map((periodKey) => {
+          const periodPlans = filteredByPeriod[periodKey];
+          if (!periodPlans.length) return null;
+
           return (
-            <div key={plan.id} className="card" style={{ padding: "12px 16px", borderLeft: "3px solid #666666", marginBottom: 0 }}>
-              <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: 160 }}>
-                  <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 3 }}>
-                    <p style={{ fontWeight: 600, fontSize: 14, textDecoration: plan.status === "rejection" ? "line-through" : "none", color: plan.status === "rejection" ? "#8f8f8f" : "inherit" }}>
-                      {plan.title}
-                    </p>
-                    {plan.category && <span style={{ fontSize: 10, padding: "1px 7px", borderRadius: 99, background: "#202020", color: "#d0d0d0" }}>{plan.category}</span>}
-                  </div>
-                  {plan.description && <p style={{ fontSize: 12, color: "#a2a2a2", marginBottom: 4 }}>{plan.description}</p>}
-                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                    {plan.addedDate && <span style={{ fontSize: 11, color: "#8f8f8f" }}>Added {formatDate(plan.addedDate)}</span>}
-                    {plan.dueDate && <span style={{ fontSize: 11, color: isOverdue ? "#ffffff" : "#a2a2a2", fontWeight: isOverdue ? 600 : 400 }}>{isOverdue ? "Overdue - " : "Due - "}{formatDate(plan.dueDate)}</span>}
-                  </div>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
-                  <select value={plan.status} onChange={(event) => updateStatus(plan.id, event.target.value)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 99, background: meta.bg, color: meta.color, cursor: "pointer", fontWeight: 600, border: "1px solid #444" }}>
-                    {Object.entries(PLAN_STATUS).map(([key, item]) => (
-                      <option key={key} value={key}>
-                        {item.label}
-                      </option>
-                    ))}
-                  </select>
-                  <button onClick={() => deletePlan(plan.id)} style={ghostButtonStyle}>Remove</button>
-                </div>
+            <div key={periodKey}>
+              <Divider label={`${PLAN_PERIODS[periodKey].label.toUpperCase()} PLANS`} />
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {periodPlans.map((plan) => {
+                  const meta = PLAN_STATUS[plan.status];
+                  const isOverdue = plan.dueDate && plan.dueDate < today && plan.status === "ongoing";
+                  return (
+                    <div key={plan.id} className="card" style={{ padding: "12px 16px", borderLeft: "3px solid #666666", marginBottom: 0 }}>
+                      <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
+                        <div style={{ flex: 1, minWidth: 160 }}>
+                          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 3 }}>
+                            <p style={{ fontWeight: 600, fontSize: 14, textDecoration: plan.status === "rejection" ? "line-through" : "none", color: plan.status === "rejection" ? "#8f8f8f" : "inherit" }}>
+                              {plan.title}
+                            </p>
+                            <span style={{ fontSize: 10, padding: "1px 7px", borderRadius: 99, background: "#f2f2f2", color: "#111111", fontWeight: 600 }}>
+                              {PLAN_PERIODS[plan.period || "daily"].label}
+                            </span>
+                            {plan.category && <span style={{ fontSize: 10, padding: "1px 7px", borderRadius: 99, background: "#202020", color: "#d0d0d0" }}>{plan.category}</span>}
+                          </div>
+                          {plan.description && <p style={{ fontSize: 12, color: "#a2a2a2", marginBottom: 4 }}>{plan.description}</p>}
+                          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                            {plan.addedDate && <span style={{ fontSize: 11, color: "#8f8f8f" }}>Added {formatDate(plan.addedDate)}</span>}
+                            {plan.dueDate && <span style={{ fontSize: 11, color: isOverdue ? "#ffffff" : "#a2a2a2", fontWeight: isOverdue ? 600 : 400 }}>{isOverdue ? "Overdue - " : "Due - "}{formatDate(plan.dueDate)}</span>}
+                          </div>
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
+                          <select value={plan.status} onChange={(event) => updateStatus(plan.id, event.target.value)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 99, background: meta.bg, color: meta.color, cursor: "pointer", fontWeight: 600, border: "1px solid #444" }}>
+                            {Object.entries(PLAN_STATUS).map(([key, item]) => (
+                              <option key={key} value={key}>
+                                {item.label}
+                              </option>
+                            ))}
+                          </select>
+                          <button onClick={() => deletePlan(plan.id)} style={ghostButtonStyle}>Remove</button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
@@ -366,7 +444,7 @@ export default function MyPlan() {
         <>
           <Divider label="ANALYSIS" />
           <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
-            {["weekly", "monthly", "yearly"].map((period) => (
+            {Object.keys(PLAN_PERIODS).map((period) => (
               <button
                 key={period}
                 onClick={() => setAnalysisPeriod(period)}
