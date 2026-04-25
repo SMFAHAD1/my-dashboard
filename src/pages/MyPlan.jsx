@@ -23,6 +23,11 @@ function getMonthKey(dateString) {
   return dateString.slice(0, 7);
 }
 
+function getYearKey(dateString) {
+  if (!dateString) return null;
+  return dateString.slice(0, 4);
+}
+
 function getDayKey(dateString) {
   if (!dateString) return null;
   return dateString;
@@ -50,6 +55,7 @@ const PLAN_PERIODS = {
   daily: { label: "Daily" },
   weekly: { label: "Weekly" },
   monthly: { label: "Monthly" },
+  yearly: { label: "Yearly" },
 };
 
 const PLAN_CATEGORIES = ["Personal", "Career", "Health", "Finance", "Learning", "Project", "Other"];
@@ -94,7 +100,7 @@ function PieChart({ data, size = 120 }) {
 }
 
 function AnalysisPanel({ plans, period }) {
-  const getKey = period === "daily" ? getDayKey : period === "weekly" ? getWeekKey : getMonthKey;
+  const getKey = period === "daily" ? getDayKey : period === "weekly" ? getWeekKey : period === "monthly" ? getMonthKey : getYearKey;
   const currentKey = getKey(today);
 
   const grouped = useMemo(() => {
