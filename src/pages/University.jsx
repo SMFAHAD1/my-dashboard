@@ -1,22 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-
-function useLocalStorage(key, initialValue, version = 1) {
-  const versionedKey = `${key}__v${version}`;
-  const [state, setState] = useState(() => {
-    try {
-      const stored = localStorage.getItem(versionedKey);
-      return stored !== null ? JSON.parse(stored) : initialValue;
-    } catch {
-      return initialValue;
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem(versionedKey, JSON.stringify(state));
-  }, [state, versionedKey]);
-
-  return [state, setState];
-}
+import { useFirestore } from "../hooks/useFirestore";
 
 const DEGREE_TYPES = ["Masters", "PhD"];
 const STATUS_OPTIONS = ["Interested", "Researching", "Applied", "Accepted", "Rejected", "Enrolled"];
@@ -87,7 +70,7 @@ function Divider({ label }) {
 }
 
 export default function University() {
-  const [universities, setUniversities] = useLocalStorage("dashboard-universities", [], 1);
+  const [universities, setUniversities] = useFirestore("dashboard-universities", []);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(cloneEntry(EMPTY_FORM));
   const [editingId, setEditingId] = useState(null);
@@ -293,7 +276,7 @@ export default function University() {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {visibleList.map((entry) => (
             <div key={entry.id} className="card" style={{ marginBottom: 0, borderLeft: "3px solid #98a2b3" }}>
-            <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ minWidth: 56, textAlign: "center", padding: "7px 9px", borderRadius: 8, background: "#f2f4f7", border: "1px solid #d0d5dd", color: "#475467", fontSize: 13 }}>
                   {entry.ranking ? `#${entry.ranking}` : "-"}
                 </div>
