@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useFirestore } from "../hooks/useFirestore";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -100,14 +100,7 @@ function PieChart({ data, size = 120 }) {
 }
 
 function AnalysisPanel({ plans, period }) {
-  const getKey =
-    period === "daily"
-      ? getDayKey
-      : period === "weekly"
-      ? getWeekKey
-      : period === "monthly"
-      ? getMonthKey
-      : getYearKey;
+  const getKey = period === "daily" ? getDayKey : period === "weekly" ? getWeekKey : period === "monthly" ? getMonthKey : getYearKey;
   const currentKey = getKey(today);
 
   const grouped = useMemo(() => {
@@ -124,15 +117,13 @@ function AnalysisPanel({ plans, period }) {
   const periodKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   if (!plans.length) {
-    return (
-      <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "16px 0" }}>
-        No plans to analyze.
-      </p>
-    );
+    return <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "16px 0" }}>No plans to analyze.</p>;
   }
 
   function periodLabel(key) {
-    if (period === "daily") return formatDate(key);
+    if (period === "daily") {
+      return formatDate(key);
+    }
     if (period === "weekly") {
       const [year, week] = key.split("-W");
       return `Week ${parseInt(week, 10)}, ${year}`;
@@ -171,36 +162,16 @@ function AnalysisPanel({ plans, period }) {
               background: isCurrent ? "#f8fafc" : "#ffffff",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: 8,
-                marginBottom: 14,
-              }}
-            >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
               <div>
                 <span style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{periodLabel(key)}</span>
                 {isCurrent && (
-                  <span
-                    style={{
-                      fontSize: 10,
-                      marginLeft: 8,
-                      padding: "1px 7px",
-                      borderRadius: 99,
-                      background: "#111827",
-                      color: "#ffffff",
-                    }}
-                  >
+                  <span style={{ fontSize: 10, marginLeft: 8, padding: "1px 7px", borderRadius: 99, background: "#111827", color: "#ffffff" }}>
                     Current
                   </span>
                 )}
               </div>
-              <span style={{ fontSize: 12, color: "#667085" }}>
-                {items.length} plan{items.length !== 1 ? "s" : ""}
-              </span>
+              <span style={{ fontSize: 12, color: "#667085" }}>{items.length} plan{items.length !== 1 ? "s" : ""}</span>
             </div>
 
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
@@ -210,18 +181,8 @@ function AnalysisPanel({ plans, period }) {
                   {pieData.map((item) =>
                     item.value > 0 ? (
                       <span key={item.label} style={{ fontSize: 10, display: "flex", alignItems: "center", gap: 4 }}>
-                        <span
-                          style={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: "50%",
-                            background: item.color,
-                            display: "inline-block",
-                          }}
-                        />
-                        <span style={{ color: "#475467" }}>
-                          {item.label} {item.value}
-                        </span>
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: item.color, display: "inline-block" }} />
+                        <span style={{ color: "#475467" }}>{item.label} {item.value}</span>
                       </span>
                     ) : null
                   )}
@@ -233,52 +194,12 @@ function AnalysisPanel({ plans, period }) {
                   {items.map((plan) => {
                     const meta = PLAN_STATUS[plan.status];
                     return (
-                      <div
-                        key={plan.id}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                          padding: "8px 10px",
-                          borderRadius: 8,
-                          background: "#ffffff",
-                          border: "1px solid #d9dee7",
-                        }}
-                      >
-                        <span
-                          style={{
-                            flex: 1,
-                            fontSize: 12,
-                            fontWeight: 500,
-                            color: "#111827",
-                            textDecoration: plan.status === "rejection" ? "line-through" : "none",
-                          }}
-                        >
+                      <div key={plan.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 8, background: "#ffffff", border: "1px solid #d9dee7" }}>
+                        <span style={{ flex: 1, fontSize: 12, fontWeight: 500, color: "#111827", textDecoration: plan.status === "rejection" ? "line-through" : "none" }}>
                           {plan.title}
                         </span>
-                        {plan.category && (
-                          <span
-                            style={{
-                              fontSize: 9,
-                              padding: "1px 6px",
-                              borderRadius: 99,
-                              background: "#f2f4f7",
-                              color: "#475467",
-                            }}
-                          >
-                            {plan.category}
-                          </span>
-                        )}
-                        <span
-                          style={{
-                            fontSize: 10,
-                            padding: "2px 7px",
-                            borderRadius: 99,
-                            background: meta.bg,
-                            color: meta.color,
-                            border: "1px solid #d0d5dd",
-                          }}
-                        >
+                        {plan.category && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 99, background: "#f2f4f7", color: "#475467" }}>{plan.category}</span>}
+                        <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 99, background: meta.bg, color: meta.color, border: "1px solid #d0d5dd" }}>
                           {meta.label}
                         </span>
                       </div>
@@ -295,13 +216,10 @@ function AnalysisPanel({ plans, period }) {
 }
 
 export default function MyPlan() {
-  const [plans, setPlans] = useFirestore("dashboard-my-plan-items", []);
-
+  const [plans, setPlans] = useLocalStorage("dashboard-my-plan-items", [], 1);
   const [analysisPeriod, setAnalysisPeriod] = useState("weekly");
   const [filter, setFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("all");
-
-  // ── Add form state ───────────────────────────────────────────
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Personal");
@@ -310,67 +228,11 @@ export default function MyPlan() {
   const [addedDate, setAddedDate] = useState(today);
   const [dueDate, setDueDate] = useState("");
 
-  // ── Edit state ───────────────────────────────────────────────
-  const [editingId, setEditingId] = useState(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editDescription, setEditDescription] = useState("");
-  const [editCategory, setEditCategory] = useState("Personal");
-  const [editPlanPeriod, setEditPlanPeriod] = useState("daily");
-  const [editStatus, setEditStatus] = useState("ongoing");
-  const [editAddedDate, setEditAddedDate] = useState(today);
-  const [editDueDate, setEditDueDate] = useState("");
-
-  function openEdit(plan) {
-    setEditingId(plan.id);
-    setEditTitle(plan.title);
-    setEditDescription(plan.description || "");
-    setEditCategory(plan.category || "Personal");
-    setEditPlanPeriod(plan.period || "daily");
-    setEditStatus(plan.status || "ongoing");
-    setEditAddedDate(plan.addedDate || today);
-    setEditDueDate(plan.dueDate || "");
-  }
-
-  function cancelEdit() {
-    setEditingId(null);
-  }
-
-  function saveEdit(id) {
-    if (!editTitle.trim()) return;
-    setPlans((current) =>
-      current.map((plan) =>
-        plan.id === id
-          ? {
-              ...plan,
-              title: editTitle.trim(),
-              description: editDescription.trim(),
-              category: editCategory,
-              period: editPlanPeriod,
-              status: editStatus,
-              addedDate: editAddedDate,
-              dueDate: editDueDate,
-            }
-          : plan
-      )
-    );
-    setEditingId(null);
-  }
-  // ────────────────────────────────────────────────────────────
-
   function addPlan() {
     if (!title.trim()) return;
     setPlans((current) => [
       ...current,
-      {
-        id: Date.now(),
-        title: title.trim(),
-        description: description.trim(),
-        category,
-        period: planPeriod,
-        status,
-        addedDate,
-        dueDate,
-      },
+      { id: Date.now(), title: title.trim(), description: description.trim(), category, period: planPeriod, status, addedDate, dueDate },
     ]);
     setTitle("");
     setDescription("");
@@ -382,9 +244,7 @@ export default function MyPlan() {
   }
 
   function updateStatus(id, value) {
-    setPlans((current) =>
-      current.map((plan) => (plan.id === id ? { ...plan, status: value } : plan))
-    );
+    setPlans((current) => current.map((plan) => (plan.id === id ? { ...plan, status: value } : plan)));
   }
 
   function deletePlan(id) {
@@ -427,10 +287,7 @@ export default function MyPlan() {
             <StatCard key={key} label={meta.label} value={counts[key]} />
           ))}
           {counts.complete + counts.rejection > 0 && (
-            <StatCard
-              label="Success"
-              value={`${Math.round((counts.complete / (counts.complete + counts.rejection)) * 100)}%`}
-            />
+            <StatCard label="Success" value={`${Math.round((counts.complete / (counts.complete + counts.rejection)) * 100)}%`} />
           )}
         </div>
       )}
@@ -441,13 +298,7 @@ export default function MyPlan() {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
           <div style={{ flex: 3, minWidth: 180 }}>
             <label style={labelStyle}>Plan Title</label>
-            <input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              onKeyDown={(event) => event.key === "Enter" && addPlan()}
-              placeholder="What do you want to achieve?"
-              style={{ width: "100%" }}
-            />
+            <input value={title} onChange={(event) => setTitle(event.target.value)} onKeyDown={(event) => event.key === "Enter" && addPlan()} placeholder="What do you want to achieve?" style={{ width: "100%" }} />
           </div>
           <div style={{ minWidth: 120 }}>
             <label style={labelStyle}>Category</label>
@@ -482,12 +333,7 @@ export default function MyPlan() {
         </div>
         <div style={{ marginBottom: 10 }}>
           <label style={labelStyle}>Description</label>
-          <input
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            placeholder="Details, milestones, notes..."
-            style={{ width: "100%" }}
-          />
+          <input value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Details, milestones, notes..." style={{ width: "100%" }} />
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 1, minWidth: 130 }}>
@@ -498,73 +344,58 @@ export default function MyPlan() {
             <label style={labelStyle}>Due / Target Date</label>
             <input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} />
           </div>
-          <button onClick={addPlan} style={buttonStyle}>
-            Add Plan
-          </button>
+          <button onClick={addPlan} style={buttonStyle}>Add Plan</button>
         </div>
       </div>
 
       {plans.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 12 }}>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {[["all", "All"], ...Object.entries(PLAN_PERIODS).map(([key, meta]) => [key, meta.label])].map(
-              ([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => setPeriodFilter(key)}
-                  style={{
-                    fontSize: 11,
-                    padding: "4px 14px",
-                    borderRadius: 99,
-                    border: "1px solid #d0d5dd",
-                    cursor: "pointer",
-                    background: periodFilter === key ? "#111827" : "#ffffff",
-                    color: periodFilter === key ? "#ffffff" : "#475467",
-                    fontWeight: periodFilter === key ? 600 : 400,
-                  }}
-                >
-                  {label} ({key === "all" ? plans.length : periodCounts[key] || 0})
-                </button>
-              )
-            )}
+            {[["all", "All"], ...Object.entries(PLAN_PERIODS).map(([key, meta]) => [key, meta.label])].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setPeriodFilter(key)}
+                style={{
+                  fontSize: 11,
+                  padding: "4px 14px",
+                  borderRadius: 99,
+                  border: "1px solid #d0d5dd",
+                  cursor: "pointer",
+                  background: periodFilter === key ? "#111827" : "#ffffff",
+                  color: periodFilter === key ? "#ffffff" : "#475467",
+                  fontWeight: periodFilter === key ? 600 : 400,
+                }}
+              >
+                {label} ({key === "all" ? plans.length : periodCounts[key] || 0})
+              </button>
+            ))}
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {[["all", "All Status"], ...Object.entries(PLAN_STATUS).map(([key, meta]) => [key, meta.label])].map(
-              ([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => setFilter(key)}
-                  style={{
-                    fontSize: 11,
-                    padding: "4px 14px",
-                    borderRadius: 99,
-                    border: "1px solid #d0d5dd",
-                    cursor: "pointer",
-                    background: filter === key ? "#111827" : "#ffffff",
-                    color: filter === key ? "#ffffff" : "#475467",
-                    fontWeight: filter === key ? 600 : 400,
-                  }}
-                >
-                  {label} ({key === "all" ? plans.length : counts[key] || 0})
-                </button>
-              )
-            )}
+            {[["all", "All Status"], ...Object.entries(PLAN_STATUS).map(([key, meta]) => [key, meta.label])].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setFilter(key)}
+                style={{
+                  fontSize: 11,
+                  padding: "4px 14px",
+                  borderRadius: 99,
+                  border: "1px solid #d0d5dd",
+                  cursor: "pointer",
+                  background: filter === key ? "#111827" : "#ffffff",
+                  color: filter === key ? "#ffffff" : "#475467",
+                  fontWeight: filter === key ? 600 : 400,
+                }}
+              >
+                {label} ({key === "all" ? plans.length : counts[key] || 0})
+              </button>
+            ))}
           </div>
         </div>
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {plans.length === 0 && (
-          <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "24px 0" }}>
-            No plans yet. Add your first plan above.
-          </p>
-        )}
-        {plans.length > 0 && filtered.length === 0 && (
-          <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "24px 0" }}>
-            No plans match these filters.
-          </p>
-        )}
-
+        {plans.length === 0 && <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "24px 0" }}>No plans yet. Add your first plan above.</p>}
+        {plans.length > 0 && filtered.length === 0 && <p style={{ fontSize: 13, color: "#667085", textAlign: "center", padding: "24px 0" }}>No plans match these filters.</p>}
         {visiblePeriods.map((periodKey) => {
           const periodPlans = filteredByPeriod[periodKey];
           if (!periodPlans.length) return null;
@@ -575,221 +406,35 @@ export default function MyPlan() {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {periodPlans.map((plan) => {
                   const meta = PLAN_STATUS[plan.status];
-                  const isOverdue =
-                    plan.dueDate && plan.dueDate < today && plan.status === "ongoing";
-
-                  // ── EDIT MODE ──────────────────────────────────────────
-                  if (editingId === plan.id) {
-                    return (
-                      <div
-                        key={plan.id}
-                        className="card"
-                        style={{ padding: "14px 16px", borderLeft: "3px solid #111827", marginBottom: 0 }}
-                      >
-                        <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 600, color: "#111827" }}>
-                          EDITING PLAN
-                        </div>
-                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-                          <div style={{ flex: 3, minWidth: 180 }}>
-                            <label style={labelStyle}>Plan Title</label>
-                            <input
-                              value={editTitle}
-                              onChange={(e) => setEditTitle(e.target.value)}
-                              onKeyDown={(e) => e.key === "Enter" && saveEdit(plan.id)}
-                              style={{ width: "100%" }}
-                            />
-                          </div>
-                          <div style={{ minWidth: 120 }}>
-                            <label style={labelStyle}>Category</label>
-                            <select
-                              value={editCategory}
-                              onChange={(e) => setEditCategory(e.target.value)}
-                              style={{ width: "100%" }}
-                            >
-                              {PLAN_CATEGORIES.map((item) => (
-                                <option key={item} value={item}>
-                                  {item}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div style={{ minWidth: 115 }}>
-                            <label style={labelStyle}>Plan Type</label>
-                            <select
-                              value={editPlanPeriod}
-                              onChange={(e) => setEditPlanPeriod(e.target.value)}
-                              style={{ width: "100%" }}
-                            >
-                              {Object.entries(PLAN_PERIODS).map(([key, m]) => (
-                                <option key={key} value={key}>
-                                  {m.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div style={{ minWidth: 115 }}>
-                            <label style={labelStyle}>Status</label>
-                            <select
-                              value={editStatus}
-                              onChange={(e) => setEditStatus(e.target.value)}
-                              style={{ width: "100%" }}
-                            >
-                              {Object.entries(PLAN_STATUS).map(([key, m]) => (
-                                <option key={key} value={key}>
-                                  {m.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        <div style={{ marginBottom: 8 }}>
-                          <label style={labelStyle}>Description</label>
-                          <input
-                            value={editDescription}
-                            onChange={(e) => setEditDescription(e.target.value)}
-                            placeholder="Details, milestones, notes..."
-                            style={{ width: "100%" }}
-                          />
-                        </div>
-                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
-                          <div style={{ flex: 1, minWidth: 130 }}>
-                            <label style={labelStyle}>Added Date</label>
-                            <input
-                              type="date"
-                              value={editAddedDate}
-                              onChange={(e) => setEditAddedDate(e.target.value)}
-                            />
-                          </div>
-                          <div style={{ flex: 1, minWidth: 130 }}>
-                            <label style={labelStyle}>Due / Target Date</label>
-                            <input
-                              type="date"
-                              value={editDueDate}
-                              onChange={(e) => setEditDueDate(e.target.value)}
-                            />
-                          </div>
-                          <div style={{ display: "flex", gap: 6 }}>
-                            <button onClick={() => saveEdit(plan.id)} style={buttonStyle}>
-                              Save
-                            </button>
-                            <button onClick={cancelEdit} style={ghostButtonStyle}>
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  // ── NORMAL VIEW ────────────────────────────────────────
+                  const isOverdue = plan.dueDate && plan.dueDate < today && plan.status === "ongoing";
                   return (
-                    <div
-                      key={plan.id}
-                      className="card"
-                      style={{ padding: "12px 16px", borderLeft: "3px solid #98a2b3", marginBottom: 0 }}
-                    >
+                    <div key={plan.id} className="card" style={{ padding: "12px 16px", borderLeft: "3px solid #98a2b3", marginBottom: 0 }}>
                       <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
                         <div style={{ flex: 1, minWidth: 160 }}>
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: 8,
-                              alignItems: "center",
-                              flexWrap: "wrap",
-                              marginBottom: 3,
-                            }}
-                          >
-                            <p
-                              style={{
-                                fontWeight: 600,
-                                fontSize: 14,
-                                textDecoration: plan.status === "rejection" ? "line-through" : "none",
-                                color: plan.status === "rejection" ? "#667085" : "inherit",
-                              }}
-                            >
+                          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 3 }}>
+                            <p style={{ fontWeight: 600, fontSize: 14, textDecoration: plan.status === "rejection" ? "line-through" : "none", color: plan.status === "rejection" ? "#667085" : "inherit" }}>
                               {plan.title}
                             </p>
-                            <span
-                              style={{
-                                fontSize: 10,
-                                padding: "1px 7px",
-                                borderRadius: 99,
-                                background: "#eef4ff",
-                                color: "#1d4ed8",
-                                fontWeight: 600,
-                              }}
-                            >
+                            <span style={{ fontSize: 10, padding: "1px 7px", borderRadius: 99, background: "#eef4ff", color: "#1d4ed8", fontWeight: 600 }}>
                               {PLAN_PERIODS[plan.period || "daily"].label}
                             </span>
-                            {plan.category && (
-                              <span
-                                style={{
-                                  fontSize: 10,
-                                  padding: "1px 7px",
-                                  borderRadius: 99,
-                                  background: "#eef4ff",
-                                  color: "#475467",
-                                }}
-                              >
-                                {plan.category}
-                              </span>
-                            )}
+                            {plan.category && <span style={{ fontSize: 10, padding: "1px 7px", borderRadius: 99, background: "#eef4ff", color: "#475467" }}>{plan.category}</span>}
                           </div>
-                          {plan.description && (
-                            <p style={{ fontSize: 12, color: "#667085", marginBottom: 4 }}>
-                              {plan.description}
-                            </p>
-                          )}
+                          {plan.description && <p style={{ fontSize: 12, color: "#667085", marginBottom: 4 }}>{plan.description}</p>}
                           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                            {plan.addedDate && (
-                              <span style={{ fontSize: 11, color: "#667085" }}>
-                                Added {formatDate(plan.addedDate)}
-                              </span>
-                            )}
-                            {plan.dueDate && (
-                              <span
-                                style={{
-                                  fontSize: 11,
-                                  color: isOverdue ? "#111827" : "#667085",
-                                  fontWeight: isOverdue ? 600 : 400,
-                                }}
-                              >
-                                {isOverdue ? "Overdue - " : "Due - "}
-                                {formatDate(plan.dueDate)}
-                              </span>
-                            )}
+                            {plan.addedDate && <span style={{ fontSize: 11, color: "#667085" }}>Added {formatDate(plan.addedDate)}</span>}
+                            {plan.dueDate && <span style={{ fontSize: 11, color: isOverdue ? "#111827" : "#667085", fontWeight: isOverdue ? 600 : 400 }}>{isOverdue ? "Overdue - " : "Due - "}{formatDate(plan.dueDate)}</span>}
                           </div>
                         </div>
-
                         <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
-                          <select
-                            value={plan.status}
-                            onChange={(event) => updateStatus(plan.id, event.target.value)}
-                            style={{
-                              fontSize: 11,
-                              padding: "4px 10px",
-                              borderRadius: 99,
-                              background: meta.bg,
-                              color: meta.color,
-                              cursor: "pointer",
-                              fontWeight: 600,
-                              border: "1px solid #d0d5dd",
-                            }}
-                          >
+                          <select value={plan.status} onChange={(event) => updateStatus(plan.id, event.target.value)} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 99, background: meta.bg, color: meta.color, cursor: "pointer", fontWeight: 600, border: "1px solid #d0d5dd" }}>
                             {Object.entries(PLAN_STATUS).map(([key, item]) => (
                               <option key={key} value={key}>
                                 {item.label}
                               </option>
                             ))}
                           </select>
-                          <div style={{ display: "flex", gap: 6 }}>
-                            <button onClick={() => openEdit(plan)} style={editButtonStyle}>
-                              Edit
-                            </button>
-                            <button onClick={() => deletePlan(plan.id)} style={ghostButtonStyle}>
-                              Remove
-                            </button>
-                          </div>
+                          <button onClick={() => deletePlan(plan.id)} style={ghostButtonStyle}>Remove</button>
                         </div>
                       </div>
                     </div>
@@ -834,18 +479,7 @@ export default function MyPlan() {
 
 function StatCard({ label, value }) {
   return (
-    <div
-      style={{
-        flex: 1,
-        minWidth: 80,
-        padding: "12px 14px",
-        borderRadius: 10,
-        background: "#ffffff",
-        color: "#111827",
-        textAlign: "center",
-        border: "1px solid #d9dee7",
-      }}
-    >
+    <div style={{ flex: 1, minWidth: 80, padding: "12px 14px", borderRadius: 10, background: "#ffffff", color: "#111827", textAlign: "center", border: "1px solid #d9dee7" }}>
       <div style={{ fontSize: 20, fontWeight: 700 }}>{value}</div>
       <div style={{ fontSize: 10, marginTop: 2, color: "#667085" }}>{label}</div>
     </div>
@@ -853,31 +487,5 @@ function StatCard({ label, value }) {
 }
 
 const labelStyle = { fontSize: 11, color: "#667085", display: "block", marginBottom: 3 };
-const buttonStyle = {
-  alignSelf: "flex-end",
-  background: "#111827",
-  color: "#ffffff",
-  border: "1px solid #98a2b3",
-  borderRadius: 8,
-  padding: "9px 16px",
-  cursor: "pointer",
-};
-const ghostButtonStyle = {
-  background: "transparent",
-  border: "1px solid #d0d5dd",
-  cursor: "pointer",
-  color: "#475467",
-  borderRadius: 8,
-  padding: "6px 10px",
-  fontSize: 12,
-};
-const editButtonStyle = {
-  background: "#f8fafc",
-  border: "1px solid #d0d5dd",
-  cursor: "pointer",
-  color: "#111827",
-  borderRadius: 8,
-  padding: "6px 10px",
-  fontSize: 12,
-  fontWeight: 600,
-};
+const buttonStyle = { alignSelf: "flex-end", background: "#111827", color: "#ffffff", border: "1px solid #98a2b3", borderRadius: 8, padding: "9px 16px", cursor: "pointer" };
+const ghostButtonStyle = { background: "transparent", border: "1px solid #d0d5dd", cursor: "pointer", color: "#475467", borderRadius: 8, padding: "6px 10px", fontSize: 12 };
