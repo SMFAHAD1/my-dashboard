@@ -107,14 +107,17 @@ function calcFinalCGPA(terms) {
 }
 
 // ── Shared style helpers ──────────────────────────────────────────────────
-const labelStyle = { fontSize: 11, color: "#667085", display: "block", marginBottom: 3 };
+const pageTitleStyle = { marginBottom: 20, fontSize: 28, fontWeight: 800, color: "#f8fafc" };
+const sectionTitleStyle = { fontSize: 18, fontWeight: 800, marginBottom: 12, color: "#f8fafc" };
+const cardSectionTitleStyle = { fontSize: 14, fontWeight: 700, color: "#e5e7eb", marginBottom: 10 };
+const labelStyle = { fontSize: 11, fontWeight: 700, color: "#98a2b3", display: "block", marginBottom: 5, letterSpacing: 0.2 };
 
 function pill(bg, color) {
-  return { fontSize: 11, padding: "3px 10px", borderRadius: 99, background: bg, color, fontWeight: 500, border: "1px solid #d9dee7" };
+  return { fontSize: 11, padding: "4px 10px", borderRadius: 99, background: bg, color, fontWeight: 700, border: "1px solid #d9dee7" };
 }
 
 function statBox(bg, color) {
-  return { padding: "10px 16px", borderRadius: 10, background: bg, color, textAlign: "center", minWidth: 80, border: "1px solid #d9dee7" };
+  return { padding: "12px 16px", borderRadius: 10, background: bg, color, textAlign: "center", minWidth: 80, border: "1px solid #d9dee7", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.4)" };
 }
 
 // ── Overall CGPA Summary ──────────────────────────────────────────────────
@@ -305,7 +308,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
           {/* Add course form */}
           <div style={{ background: "#19222d", borderRadius: 10, padding: "12px 14px",
             marginBottom: 14, border: "1px solid #d9dee7" }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: "#475467", marginBottom: 10 }}>
+            <p style={cardSectionTitleStyle}>
               {editingCourseId ? `Edit course in ${term.name}` : `Add course to ${term.name}`}
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
@@ -376,8 +379,8 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3,
                     borderRadius: "10px 10px 0 0", background: col.color }} />
                   <div style={{ marginTop: 6 }}>
-                    <p style={{ fontWeight: 600, fontSize: 13, marginBottom: 2, lineHeight: 1.3 }}>{c.name}</p>
-                    {c.institution && <p style={{ fontSize: 10, color: "#667085", marginBottom: 4 }}>{c.institution}</p>}
+                    <p style={{ fontWeight: 800, fontSize: 14, marginBottom: 3, lineHeight: 1.3, color: "#111827" }}>{c.name}</p>
+                    {c.institution && <p style={{ fontSize: 11, color: "#667085", marginBottom: 5, fontWeight: 600 }}>{c.institution}</p>}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, marginBottom: 4 }}>
                       <select value={c.status}
                         onChange={e => updateCourseField(c.id, "status", e.target.value)}
@@ -389,7 +392,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
                     </div>
                     {(c.grade || gp !== null) && (
                       <div style={{ display: "flex", gap: 5, alignItems: "center", marginBottom: 4 }}>
-                        {c.grade && <span style={{ fontSize: 13, fontWeight: 700, color: col.color }}>{c.grade}</span>}
+                        {c.grade && <span style={{ fontSize: 14, fontWeight: 800, color: col.color }}>{c.grade}</span>}
                         {gp !== null && (
                           <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 99,
                             background: cgpaColor(gp).bg, color: cgpaColor(gp).color, fontWeight: 600 }}>
@@ -530,11 +533,11 @@ function ClassTests({ terms }) {
 
   return (
     <div>
-      <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 10, color: "#d0d5dd" }}>Class Tests</h3>
+      <h3 style={sectionTitleStyle}>Class Tests</h3>
 
       {/* Add form */}
       <div className="card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 12, fontWeight: 600, color: "#475467", marginBottom: 10 }}>
+        <p style={cardSectionTitleStyle}>
           {editingTestId ? "Edit class test" : "Add class test"}
         </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
@@ -599,7 +602,7 @@ function ClassTests({ terms }) {
           {/* Subject-wise analysis */}
           {testSubjects.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: "#667085", marginBottom: 10, letterSpacing: 0.3 }}>
+              <p style={{ fontSize: 12, fontWeight: 800, color: "#475467", marginBottom: 10, letterSpacing: 0.2 }}>
                 SUBJECT-WISE ANALYSIS
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
@@ -856,7 +859,7 @@ export default function Academic() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: 20 }}>Academic</h2>
+      <h2 style={pageTitleStyle}>Academic Dashboard</h2>
 
       {/* Stats row */}
       {(terms.length > 0 || tasks.length > 0) && (
@@ -875,21 +878,21 @@ export default function Academic() {
           ].filter(Boolean).map(s => (
             <div key={s.label} style={{ flex: 1, minWidth: 80, padding: "12px 14px", borderRadius: 10,
               background: s.bg, color: s.color, textAlign: "center" }}>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{s.value}</div>
-              <div style={{ fontSize: 10, marginTop: 2 }}>{s.label}</div>
+              <div style={{ fontSize: 22, fontWeight: 800 }}>{s.value}</div>
+              <div style={{ fontSize: 11, marginTop: 3, fontWeight: 700, opacity: 0.92 }}>{s.label}</div>
             </div>
           ))}
         </div>
       )}
 
       {/* ══ COURSES — TERM WISE ══ */}
-      <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 10, color: "#d0d5dd" }}>
+      <h3 style={sectionTitleStyle}>
         Courses & Subjects — Term Wise
       </h3>
 
       {/* Add term */}
       <div className="card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 13, fontWeight: 500, marginBottom: 10, color: "#d0d5dd" }}>
+        <p style={cardSectionTitleStyle}>
           {editingTermId ? "Edit term / semester" : "Add new term / semester"}
         </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
@@ -940,12 +943,12 @@ export default function Academic() {
       </div>
 
       {/* ══ TASKS ══ */}
-      <h3 style={{ fontSize: 15, fontWeight: 600, margin: "0 0 10px", color: "#d0d5dd" }}>
+      <h3 style={{ ...sectionTitleStyle, margin: "0 0 12px" }}>
         Assignments & Tasks
       </h3>
 
       <div className="card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 13, fontWeight: 500, marginBottom: 10, color: "#d0d5dd" }}>
+        <p style={cardSectionTitleStyle}>
           {editingTaskId ? "Edit assignment / task" : "Add assignment / task"}
         </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
@@ -1000,12 +1003,12 @@ export default function Academic() {
                   {t.done ? "✓" : ""}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: 500, fontSize: 14,
+                  <p style={{ fontWeight: 800, fontSize: 15,
                     textDecoration: t.done ? "line-through" : "none",
-                    color: t.done ? "#667085" : "inherit" }}>
+                    color: t.done ? "#667085" : "#111827" }}>
                     {t.title}
                   </p>
-                  <p style={{ fontSize: 12, color: "#667085", marginTop: 1 }}>
+                  <p style={{ fontSize: 12, color: "#667085", marginTop: 3, fontWeight: 600 }}>
                     {t.subject && <span style={{ marginRight: 8 }}>{t.subject}</span>}
                     {t.due && (
                       <span style={{ color: isOverdue ? "#A32D2D" : "#667085", fontWeight: isOverdue ? 600 : 400 }}>
