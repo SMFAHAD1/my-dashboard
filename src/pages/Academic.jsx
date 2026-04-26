@@ -107,10 +107,13 @@ function calcFinalCGPA(terms) {
 }
 
 // ── Shared style helpers ──────────────────────────────────────────────────
-const pageTitleStyle = { marginBottom: 20, fontSize: 28, fontWeight: 800, color: "#f8fafc" };
-const sectionTitleStyle = { fontSize: 18, fontWeight: 800, marginBottom: 12, color: "#f8fafc" };
-const cardSectionTitleStyle = { fontSize: 14, fontWeight: 700, color: "#e5e7eb", marginBottom: 10 };
+const pageTitleStyle = { marginBottom: 20, fontSize: 28, fontWeight: 800, color: "#111827" };
+const sectionTitleStyle = { fontSize: 18, fontWeight: 800, marginBottom: 12, color: "#111827" };
+const cardSectionTitleStyle = { fontSize: 14, fontWeight: 700, color: "#344054", marginBottom: 10 };
 const labelStyle = { fontSize: 11, fontWeight: 700, color: "#98a2b3", display: "block", marginBottom: 5, letterSpacing: 0.2 };
+const subTextStyle = { fontSize: 11, color: "#667085", fontWeight: 600 };
+const actionLinkStyle = { background: "none", border: "none", cursor: "pointer", color: "#475467", fontSize: 11, fontWeight: 700, padding: 0 };
+const ghostActionButtonStyle = { background: "#ffffff", border: "1px solid #d0d5dd", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "#475467", fontSize: 12, fontWeight: 700 };
 
 function pill(bg, color) {
   return { fontSize: 11, padding: "4px 10px", borderRadius: 99, background: bg, color, fontWeight: 700, border: "1px solid #d9dee7" };
@@ -272,17 +275,17 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
 
   return (
     <div style={{ border: "1px solid #d9dee7", borderRadius: 12, overflow: "hidden",
-      marginBottom: 16, background: "#121821" }}>
+      marginBottom: 16, background: "#ffffff", boxShadow: "0 1px 2px rgba(16,24,40,0.04)" }}>
 
       {/* Term header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px",
-        background: "#19222d", borderBottom: collapsed ? "none" : "1px solid #d9dee7", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px",
+        background: "#f8fafc", borderBottom: collapsed ? "none" : "1px solid #d9dee7", flexWrap: "wrap" }}>
         <button onClick={() => setCollapsed(p => !p)}
           style={{ background: "none", border: "none", cursor: "pointer",
             fontSize: 13, color: "#667085", padding: 0 }}>
           {collapsed ? "▶" : "▼"}
         </button>
-        <span style={{ fontWeight: 700, fontSize: 15, color: "#111827", flex: 1, minWidth: 120 }}>{term.name}</span>
+        <span style={{ fontWeight: 800, fontSize: 16, color: "#111827", flex: 1, minWidth: 120 }}>{term.name}</span>
         <select value={term.status} onChange={e => onUpdateTerm(term.id, { status: e.target.value })}
           style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 99, border: "none",
             background: tStyle.bg, color: tStyle.color, cursor: "pointer" }}>
@@ -297,7 +300,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
           </span>
         )}
         <button onClick={() => onEditTerm(term)}
-          style={{ background: "none", border: "none", cursor: "pointer", color: "#667085", fontSize: 12, padding: "0 4px" }}>Edit</button>
+          style={actionLinkStyle}>Edit</button>
         <button onClick={() => onDeleteTerm(term.id)}
           style={{ background: "none", border: "none", cursor: "pointer", color: "#ddd", fontSize: 14, padding: "0 4px" }}>✕</button>
       </div>
@@ -306,7 +309,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
         <div style={{ padding: "14px 16px" }}>
 
           {/* Add course form */}
-          <div style={{ background: "#19222d", borderRadius: 10, padding: "12px 14px",
+          <div style={{ background: "#f8fafc", borderRadius: 10, padding: "12px 14px",
             marginBottom: 14, border: "1px solid #d9dee7" }}>
             <p style={cardSectionTitleStyle}>
               {editingCourseId ? `Edit course in ${term.name}` : `Add course to ${term.name}`}
@@ -349,7 +352,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
                 <label style={labelStyle}>End date</label>
                 <input type="date" value={courseEnd} onChange={e => setCourseEnd(e.target.value)} />
               </div>
-              <div style={{ fontSize: 10, color: "#667085", alignSelf: "flex-end", paddingBottom: 6, flex: 2 }}>
+              <div style={{ ...subTextStyle, alignSelf: "flex-end", paddingBottom: 6, flex: 2 }}>
                 Use letter grades or GPA values from 0.0 to 4.0 only
               </div>
               <div style={{ display: "flex", gap: 8 }}>
@@ -359,7 +362,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
                     setEditingCourseId(null);
                     setCourseName(""); setCourseInst(""); setCourseGrade("");
                     setCourseCredit(""); setCourseStart(""); setCourseEnd(""); setCourseStatus("ongoing");
-                  }} style={{ alignSelf: "flex-end" }}>Cancel</button>
+                  }} style={{ ...ghostActionButtonStyle, alignSelf: "flex-end" }}>Cancel</button>
                 )}
               </div>
             </div>
@@ -408,12 +411,8 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
                       </div>
                     )}
                     <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
-                      <button onClick={() => startEditCourse(c)}
-                        style={{ fontSize: 10, color: "#667085", background: "none",
-                          border: "none", cursor: "pointer", padding: 0 }}>Edit</button>
-                      <button onClick={() => deleteCourse(c.id)}
-                        style={{ fontSize: 10, color: "#667085", background: "none",
-                          border: "none", cursor: "pointer", padding: 0 }}>Remove</button>
+                      <button onClick={() => startEditCourse(c)} style={actionLinkStyle}>Edit</button>
+                      <button onClick={() => deleteCourse(c.id)} style={actionLinkStyle}>Remove</button>
                     </div>
                   </div>
                 </div>
@@ -425,7 +424,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
           {eligibleCourses.length > 0 && (
             <div style={{ padding: "10px 14px", background: "#fafafa", borderRadius: 10,
               border: "1px solid #d9dee7" }}>
-              <p style={{ fontSize: 11, fontWeight: 600, color: "#667085", marginBottom: 8 }}>
+              <p style={{ fontSize: 11, fontWeight: 800, color: "#475467", marginBottom: 8 }}>
                 GPA Breakdown — {term.name}
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
@@ -434,7 +433,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
                   const col = cgpaColor(gp);
                   return (
                     <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 11, color: "#d0d5dd", minWidth: 120, overflow: "hidden",
+                      <span style={{ fontSize: 11, color: "#344054", minWidth: 120, overflow: "hidden",
                         textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</span>
                       <span style={{ fontSize: 10, color: "#667085", minWidth: 28 }}>{c.credit}cr</span>
                       <div style={{ flex: 1, height: 5, background: "#eee", borderRadius: 99, overflow: "hidden" }}>
@@ -617,7 +616,7 @@ function ClassTests({ terms }) {
                       {/* Card header */}
                       <div style={{ padding: "10px 14px", background: col.bg, borderBottom: "1px solid #eee" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 2 }}>
-                          <span style={{ fontWeight: 700, fontSize: 13, color: col.color }}>{subj}</span>
+                          <span style={{ fontWeight: 800, fontSize: 14, color: col.color }}>{subj}</span>
                           <span style={{ fontSize: 12, fontWeight: 700, padding: "2px 10px", borderRadius: 99,
                             background: avgCol.bg, color: avgCol.color }}>Avg {stats.avg.toFixed(1)}%</span>
                         </div>
@@ -647,7 +646,7 @@ function ClassTests({ terms }) {
                             return (
                               <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 7 }}>
                                 <span style={{ fontSize: 13, minWidth: 20 }}>{medals[idx]}</span>
-                                <span style={{ fontSize: 11, color: "#d0d5dd", flex: 1, overflow: "hidden",
+                                <span style={{ fontSize: 11, color: "#344054", fontWeight: 700, flex: 1, overflow: "hidden",
                                   textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</span>
                                 {t.date && <span style={{ fontSize: 9, color: "#667085", whiteSpace: "nowrap" }}>{formatDate(t.date)}</span>}
                                 <div style={{ width: 55, height: 5, background: "#eee", borderRadius: 99, overflow: "hidden", flexShrink: 0 }}>
@@ -677,7 +676,7 @@ function ClassTests({ terms }) {
                                   return (
                                     <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                       <span style={{ fontSize: 9, color: isBest ? "#f0a500" : "#ddd", minWidth: 12 }}>★</span>
-                                      <span style={{ fontSize: 10, color: "#d0d5dd", flex: 1, overflow: "hidden",
+                                      <span style={{ fontSize: 10, color: "#344054", fontWeight: 600, flex: 1, overflow: "hidden",
                                         textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</span>
                                       <div style={{ width: 48, height: 4, background: "#eee", borderRadius: 99, overflow: "hidden", flexShrink: 0 }}>
                                         <div style={{ width: `${Math.min(pct, 100)}%`, height: "100%",
@@ -707,7 +706,7 @@ function ClassTests({ terms }) {
                   border: "1px solid #475467", cursor: "pointer",
                   fontWeight: activeTab === s ? 600 : 400,
                   background: activeTab === s ? "#185FA5" : "#fff",
-                  color: activeTab === s ? "#fff" : "#d0d5dd", transition: "all 0.15s" }}>
+                  color: activeTab === s ? "#fff" : "#475467", transition: "all 0.15s" }}>
                 {s === "all" ? "All tests" : s}
               </button>
             ))}
@@ -728,7 +727,7 @@ function ClassTests({ terms }) {
                     <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                       <div style={{ flex: 1, minWidth: 160 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <p style={{ fontWeight: 500, fontSize: 13 }}>{t.title}</p>
+                          <p style={{ fontWeight: 800, fontSize: 14, color: "#111827" }}>{t.title}</p>
                           {isBest && (
                             <span style={{ fontSize: 9, background: "#fff8e1", color: "#854F0B",
                               padding: "1px 6px", borderRadius: 99, fontWeight: 600 }}>Top 3</span>
@@ -753,9 +752,7 @@ function ClassTests({ terms }) {
                       ) : (
                         <span style={{ fontSize: 12, color: "#667085" }}>No score</span>
                       )}
-                      <button onClick={() => startEditTest(t)}
-                        style={{ background: "none", border: "none", cursor: "pointer",
-                          color: "#667085", fontSize: 12, padding: "0 2px" }}>Edit</button>
+                      <button onClick={() => startEditTest(t)} style={actionLinkStyle}>Edit</button>
                       <button onClick={() => deleteTest(t.id)}
                         style={{ background: "none", border: "none", cursor: "pointer",
                           color: "#667085", fontSize: 14, padding: "0 2px" }}>✕</button>
@@ -970,7 +967,7 @@ export default function Academic() {
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={addTask} style={{ alignSelf: "flex-end" }}>{editingTaskId ? "Save Task" : "Add Task"}</button>
-            {editingTaskId && <button onClick={() => { setEditingTaskId(null); setTaskTitle(""); setTaskSubject(""); setTaskDue(""); setTaskPriority("medium"); }} style={{ alignSelf: "flex-end" }}>Cancel</button>}
+            {editingTaskId && <button onClick={() => { setEditingTaskId(null); setTaskTitle(""); setTaskSubject(""); setTaskDue(""); setTaskPriority("medium"); }} style={{ ...ghostActionButtonStyle, alignSelf: "flex-end" }}>Cancel</button>}
           </div>
         </div>
       </div>
