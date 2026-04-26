@@ -118,6 +118,8 @@ function YearAnalysis({ books }) {
 
 export default function Books() {
   const [books, setBooks] = useLocalStorage("dashboard-books", [], 1);
+  const [editingReadingId, setEditingReadingId] = useState(null);
+  const [editingBuyId, setEditingBuyId] = useState(null);
 
   const [readingTitle, setReadingTitle] = useState("");
   const [readingAuthor, setReadingAuthor] = useState("");
@@ -157,21 +159,80 @@ export default function Books() {
     const title = readingTitle.trim();
     if (!title) return;
     const author = readingAuthor.trim();
-    const coverUrl = await fetchBookCover(title, author);
-    setBooks((current) => [
-      ...current,
-      {
-        id: Date.now(),
-        section: "reading",
-        title,
-        author,
-        rating: readingRating !== "" ? Number(readingRating) : 0,
-        coverUrl,
-        addedDate: readingAdded,
-        startDate: readingStart,
-        finishDate: readingFinish,
-      },
-    ]);
+    const existing = editingReadingId ? books.find((book) => book.id === editingReadingId) : null;
+    const coverUrl = existing?.title === title && existing?.author === author
+      ? existing.coverUrl || ""
+      : await fetchBookCover(title, author);
+    const entry = {
+      id: editingReadingId || Date.now(),
+      section: "reading",
+      title,
+      author,
+      rating: readingRating !== "" ? Number(readingRating) : 0,
+      coverUrl,
+      addedDate: readingAdded,
+      startDate: readingStart,
+      finishDate: readingFinish,
+    };
+    setBooks((current) => (
+      editingReadingId
+        ? current.map((book) => (book.id === editingReadingId ? entry : book))
+        : [...current, entry]
+    ));
+    setReadingTitle("");
+    setReadingAuthor("");
+    setReadingRating("0");
+    setReadingAdded(today);
+    setReadingStart("");
+    setReadingFinish("");
+    setEditingReadingId(null);
+  }
+
+  async function addBuyBook() {
+    if (!buyTitle.trim()) return;
+    const title = buyTitle.trim();
+    const author = buyAuthor.trim();
+    const existing = editingBuyId ? books.find((book) => book.id === editingBuyId) : null;
+    const coverUrl = existing?.title === title && existing?.author === author
+      ? existing.coverUrl || ""
+      : await fetchBookCover(title, author);
+    const entry = {
+      id: editingBuyId || Date.now(),
+      section: "buy",
+      title,
+      author,
+      price: buyPrice !== "" ? parseFloat(buyPrice) : null,
+      currency: buyCurrency,
+      notes: buyNotes.trim(),
+      coverUrl,
+      addedDate: existing?.addedDate || today,
+      bought: existing?.bought || false,
+    };
+    setBooks((current) => (
+      editingBuyId
+        ? current.map((book) => (book.id === editingBuyId ? entry : book))
+        : [...current, entry]
+    ));
+    setBuyTitle("");
+    setBuyAuthor("");
+    setBuyPrice("");
+    setBuyCurrency("BDT");
+    setBuyNotes("");
+    setEditingBuyId(null);
+  }
+
+  function startEditReading(book) {
+    setEditingReadingId(book.id);
+    setReadingTitle(book.title || "");
+    setReadingAuthor(book.author || "");
+    setReadingRating(book.rating != null ? String(book.rating) : "0");
+    setReadingAdded(book.addedDate || today);
+    setReadingStart(book.startDate || "");
+    setReadingFinish(book.finishDate || "");
+  }
+
+  function cancelEditReading() {
+    setEditingReadingId(null);
     setReadingTitle("");
     setReadingAuthor("");
     setReadingRating("0");
@@ -180,33 +241,28 @@ export default function Books() {
     setReadingFinish("");
   }
 
-  async function addBuyBook() {
-    if (!buyTitle.trim()) return;
-    const title = buyTitle.trim();
-    const author = buyAuthor.trim();
-    const coverUrl = await fetchBookCover(title, author);
-    setBooks((current) => [
-      ...current,
-      {
-        id: Date.now(),
-        section: "buy",
-        title,
-        author,
-        price: buyPrice !== "" ? parseFloat(buyPrice) : null,
-        currency: buyCurrency,
-        notes: buyNotes.trim(),
-        coverUrl,
-        addedDate: today,
-      },
-    ]);
+  function startEditBuy(book) {
+    setEditingBuyId(book.id);
+    setBuyTitle(book.title || "");
+    setBuyAuthor(book.author || "");
+    setBuyPrice(book.price != null ? String(book.price) : "");
+    setBuyCurrency(book.currency || "BDT");
+    setBuyNotes(book.notes || "");
+  }
+
+  function cancelEditBuy() {
+    setEditingBuyId(null);
     setBuyTitle("");
     setBuyAuthor("");
     setBuyPrice("");
+    setBuyCurrency("BDT");
     setBuyNotes("");
   }
 
   function deleteBook(id) {
     setBooks((current) => current.filter((book) => book.id !== id));
+    if (editingReadingId === id) cancelEditReading();
+    if (editingBuyId === id) cancelEditBuy();
   }
 
   function toggleBought(id) {
@@ -273,6 +329,9 @@ export default function Books() {
       <Divider label="READING LIST" />
 
       <div className="card" style={{ marginBottom: 16 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: "#111827" }}>
+          {editingReadingId ? "Edit reading book" : "Add reading book"}
+        </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 2, minWidth: 160 }}>
             <label style={labelStyle}>Book Title</label>
@@ -308,9 +367,16 @@ export default function Books() {
             <label style={labelStyle}>Finish Date</label>
             <input type="date" value={readingFinish} onChange={(event) => setReadingFinish(event.target.value)} />
           </div>
-          <button onClick={addReadingBookWithCover} style={buttonStyle}>
-            Add Book
-          </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={addReadingBookWithCover} style={buttonStyle}>
+              {editingReadingId ? "Save Changes" : "Add Book"}
+            </button>
+            {editingReadingId && (
+              <button onClick={cancelEditReading} style={ghostButtonStyle}>
+                Cancel
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -339,9 +405,14 @@ export default function Books() {
               </div>
             </div>
             {book.finishDate && <span style={summaryPillStyle}>Done</span>}
-            <button onClick={() => deleteBook(book.id)} style={ghostButtonStyle}>
-              Remove
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => startEditReading(book)} style={ghostButtonStyle}>
+                Edit
+              </button>
+              <button onClick={() => deleteBook(book.id)} style={ghostButtonStyle}>
+                Remove
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -351,6 +422,9 @@ export default function Books() {
       <Divider label="BOOKS TO BUY" />
 
       <div className="card" style={{ marginBottom: 16 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: "#111827" }}>
+          {editingBuyId ? "Edit buy-list book" : "Add book to buy list"}
+        </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 2, minWidth: 160 }}>
             <label style={labelStyle}>Book Title</label>
@@ -378,9 +452,16 @@ export default function Books() {
             <label style={labelStyle}>Notes</label>
             <input value={buyNotes} onChange={(event) => setBuyNotes(event.target.value)} placeholder="Where to buy, edition..." style={{ width: "100%" }} />
           </div>
-          <button onClick={addBuyBook} style={buttonStyle}>
-            Add
-          </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={addBuyBook} style={buttonStyle}>
+              {editingBuyId ? "Save Changes" : "Add"}
+            </button>
+            {editingBuyId && (
+              <button onClick={cancelEditBuy} style={ghostButtonStyle}>
+                Cancel
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -424,9 +505,14 @@ export default function Books() {
             </div>
             {book.price != null && <span style={{ fontSize: 13, fontWeight: 700, color: "#111827", whiteSpace: "nowrap" }}>{book.currency} {book.price.toLocaleString()}</span>}
             {book.bought && <span style={summaryPillStyle}>Bought</span>}
-            <button onClick={() => deleteBook(book.id)} style={ghostButtonStyle}>
-              Remove
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => startEditBuy(book)} style={ghostButtonStyle}>
+                Edit
+              </button>
+              <button onClick={() => deleteBook(book.id)} style={ghostButtonStyle}>
+                Remove
+              </button>
+            </div>
           </div>
         ))}
       </div>

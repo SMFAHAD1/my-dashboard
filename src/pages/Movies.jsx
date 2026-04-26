@@ -145,6 +145,7 @@ export default function Movies() {
   const [form, setForm] = useState({ ...watchedDefaults });
   const [watchlistForm, setWatchlistForm] = useState({ ...watchlistDefaults });
   const [editId, setEditId] = useState(null);
+  const [watchlistEditId, setWatchlistEditId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const suggestTimeout = useRef(null);
@@ -269,13 +270,38 @@ export default function Movies() {
   async function addToWatchlist() {
     if (!watchlistForm.name.trim()) return;
     const name = watchlistForm.name.trim();
-    const poster = await fetchMoviePoster(name);
-    setWatchlist((current) => [...current, { id: Date.now(), ...watchlistForm, name, poster }]);
+    const existing = watchlistEditId ? watchlist.find((item) => item.id === watchlistEditId) : null;
+    const poster = existing?.name === name ? existing.poster || "" : await fetchMoviePoster(name);
+    const entry = { id: watchlistEditId || Date.now(), ...watchlistForm, name, poster };
+    setWatchlist((current) => (
+      watchlistEditId
+        ? current.map((item) => (item.id === watchlistEditId ? entry : item))
+        : [...current, entry]
+    ));
+    setWatchlistForm({ ...watchlistDefaults });
+    setWatchlistEditId(null);
+  }
+
+  function startWatchlistEdit(id) {
+    const item = watchlist.find((entry) => entry.id === id);
+    if (!item) return;
+    setWatchlistEditId(id);
+    setWatchlistForm({
+      name: item.name || "",
+      type: item.type || "movie",
+      country: item.country || "",
+      addedDate: item.addedDate || today,
+    });
+  }
+
+  function cancelWatchlistEdit() {
+    setWatchlistEditId(null);
     setWatchlistForm({ ...watchlistDefaults });
   }
 
   function deleteWatchlistItem(id) {
     setWatchlist((current) => current.filter((item) => item.id !== id));
+    if (watchlistEditId === id) cancelWatchlistEdit();
   }
 
   const counts = TYPE_OPTIONS.reduce((accumulator, { value }) => {
@@ -511,7 +537,7 @@ export default function Movies() {
       <YearAnalysis movies={movies} />
 
       <div className="card" style={{ marginTop: 24, marginBottom: 20 }}>
-        <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Want to Watch</p>
+        <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>{watchlistEditId ? "Edit watchlist item" : "Want to Watch"}</p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 2, minWidth: 180 }}>
             <label style={labelStyle}>Name</label>
@@ -535,9 +561,16 @@ export default function Movies() {
             <label style={labelStyle}>Added Date</label>
             <input type="date" value={watchlistForm.addedDate} onChange={(event) => setWatchlistField("addedDate", event.target.value)} />
           </div>
-          <button onClick={addToWatchlist} style={buttonStyle}>
-            Add to Box
-          </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={addToWatchlist} style={buttonStyle}>
+              {watchlistEditId ? "Save Changes" : "Add to Box"}
+            </button>
+            {watchlistEditId && (
+              <button onClick={cancelWatchlistEdit} style={secondaryButtonStyle}>
+                Cancel
+              </button>
+            )}
+          </div>
         </div>
 
         <div style={{ marginTop: 14 }}>
@@ -573,9 +606,14 @@ export default function Movies() {
                       <td>{item.country || "-"}</td>
                       <td>{item.addedDate ? formatDate(item.addedDate) : "-"}</td>
                       <td>
-                        <button onClick={() => deleteWatchlistItem(item.id)} style={ghostButtonStyle}>
-                          Remove
-                        </button>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <button onClick={() => startWatchlistEdit(item.id)} style={ghostButtonStyle}>
+                            Edit
+                          </button>
+                          <button onClick={() => deleteWatchlistItem(item.id)} style={ghostButtonStyle}>
+                            Remove
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

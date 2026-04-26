@@ -202,7 +202,7 @@ function CGPASummary({ terms }) {
 }
 
 // ── Single Term Block ─────────────────────────────────────────────────────
-function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
+function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }) {
   const [courseName,   setCourseName]   = useState("");
   const [courseInst,   setCourseInst]   = useState("");
   const [courseStatus, setCourseStatus] = useState("ongoing");
@@ -211,28 +211,48 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
   const [courseStart,  setCourseStart]  = useState("");
   const [courseEnd,    setCourseEnd]    = useState("");
   const [collapsed,    setCollapsed]    = useState(false);
+  const [editingCourseId, setEditingCourseId] = useState(null);
 
   function addCourse() {
     if (!courseName.trim()) return;
+    const existing = editingCourseId ? term.courses.find(c => c.id === editingCourseId) : null;
+    const entry = {
+      id: editingCourseId || Date.now(),
+      name: courseName.trim(),
+      institution: courseInst.trim(),
+      status: courseStatus,
+      grade: courseGrade.trim(),
+      credit: courseCredit !== "" ? parseFloat(courseCredit) : 0,
+      startDate: courseStart,
+      endDate: courseEnd,
+      colorIdx: existing?.colorIdx ?? ((colorOffset + term.courses.length) % SUBJECT_COLORS.length),
+    };
     onUpdateTerm(term.id, {
-      courses: [...term.courses, {
-        id: Date.now(),
-        name: courseName.trim(),
-        institution: courseInst.trim(),
-        status: courseStatus,
-        grade: courseGrade.trim(),
-        credit: courseCredit !== "" ? parseFloat(courseCredit) : 0,
-        startDate: courseStart,
-        endDate: courseEnd,
-        colorIdx: (colorOffset + term.courses.length) % SUBJECT_COLORS.length,
-      }],
+      courses: editingCourseId ? term.courses.map(c => c.id === editingCourseId ? entry : c) : [...term.courses, entry],
     });
     setCourseName(""); setCourseInst(""); setCourseGrade("");
     setCourseCredit(""); setCourseStart(""); setCourseEnd(""); setCourseStatus("ongoing");
+    setEditingCourseId(null);
   }
 
   function deleteCourse(cid) {
     onUpdateTerm(term.id, { courses: term.courses.filter(c => c.id !== cid) });
+    if (editingCourseId === cid) {
+      setEditingCourseId(null);
+      setCourseName(""); setCourseInst(""); setCourseGrade("");
+      setCourseCredit(""); setCourseStart(""); setCourseEnd(""); setCourseStatus("ongoing");
+    }
+  }
+
+  function startEditCourse(course) {
+    setEditingCourseId(course.id);
+    setCourseName(course.name || "");
+    setCourseInst(course.institution || "");
+    setCourseStatus(course.status || "ongoing");
+    setCourseGrade(course.grade || "");
+    setCourseCredit(course.credit ? String(course.credit) : "");
+    setCourseStart(course.startDate || "");
+    setCourseEnd(course.endDate || "");
   }
 
   function updateCourseField(cid, field, val) {
@@ -273,6 +293,8 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
             GPA {termGPA.toFixed(2)}
           </span>
         )}
+        <button onClick={() => onEditTerm(term)}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "#667085", fontSize: 12, padding: "0 4px" }}>Edit</button>
         <button onClick={() => onDeleteTerm(term.id)}
           style={{ background: "none", border: "none", cursor: "pointer", color: "#ddd", fontSize: 14, padding: "0 4px" }}>✕</button>
       </div>
@@ -283,7 +305,9 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
           {/* Add course form */}
           <div style={{ background: "#19222d", borderRadius: 10, padding: "12px 14px",
             marginBottom: 14, border: "1px solid #d9dee7" }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: "#475467", marginBottom: 10 }}>Add course to {term.name}</p>
+            <p style={{ fontSize: 12, fontWeight: 600, color: "#475467", marginBottom: 10 }}>
+              {editingCourseId ? `Edit course in ${term.name}` : `Add course to ${term.name}`}
+            </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
               <div style={{ flex: 2, minWidth: 150 }}>
                 <label style={labelStyle}>Course name</label>
@@ -325,7 +349,16 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
               <div style={{ fontSize: 10, color: "#667085", alignSelf: "flex-end", paddingBottom: 6, flex: 2 }}>
                 Use letter grades or GPA values from 0.0 to 4.0 only
               </div>
-              <button onClick={addCourse} style={{ alignSelf: "flex-end" }}>Add Course</button>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={addCourse} style={{ alignSelf: "flex-end" }}>{editingCourseId ? "Save Course" : "Add Course"}</button>
+                {editingCourseId && (
+                  <button onClick={() => {
+                    setEditingCourseId(null);
+                    setCourseName(""); setCourseInst(""); setCourseGrade("");
+                    setCourseCredit(""); setCourseStart(""); setCourseEnd(""); setCourseStatus("ongoing");
+                  }} style={{ alignSelf: "flex-end" }}>Cancel</button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -371,9 +404,14 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, colorOffset }) {
                         {c.endDate   && <p style={{ fontSize: 10, color: "#667085" }}>⬛ {formatDate(c.endDate)}</p>}
                       </div>
                     )}
-                    <button onClick={() => deleteCourse(c.id)}
-                      style={{ marginTop: 8, fontSize: 10, color: "#667085", background: "none",
-                        border: "none", cursor: "pointer", padding: 0 }}>Remove</button>
+                    <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                      <button onClick={() => startEditCourse(c)}
+                        style={{ fontSize: 10, color: "#667085", background: "none",
+                          border: "none", cursor: "pointer", padding: 0 }}>Edit</button>
+                      <button onClick={() => deleteCourse(c.id)}
+                        style={{ fontSize: 10, color: "#667085", background: "none",
+                          border: "none", cursor: "pointer", padding: 0 }}>Remove</button>
+                    </div>
                   </div>
                 </div>
               );
@@ -436,6 +474,7 @@ function ClassTests({ terms }) {
   const [testScore, setTestScore]     = useState("");
   const [testTotal, setTestTotal]     = useState("");
   const [activeTab, setActiveTab]     = useState("all");
+  const [editingTestId, setEditingTestId] = useState(null);
 
   const allCourseNames = [
     ...new Set(terms.flatMap(t => t.courses.map(c => c.name)).filter(Boolean)),
@@ -444,18 +483,35 @@ function ClassTests({ terms }) {
 
   function addTest() {
     if (!testTitle.trim() || testTotal === "") return;
-    setTests(prev => [...prev, {
-      id: Date.now(),
+    const entry = {
+      id: editingTestId || Date.now(),
       title: testTitle.trim(),
       subject: testSubject.trim(),
       date: testDate,
       score: testScore !== "" ? parseFloat(testScore) : null,
       total: parseFloat(testTotal),
-    }]);
+    };
+    setTests(prev => editingTestId ? prev.map(t => t.id === editingTestId ? entry : t) : [...prev, entry]);
     setTestTitle(""); setTestSubject(""); setTestDate(""); setTestScore(""); setTestTotal("");
+    setEditingTestId(null);
   }
 
-  function deleteTest(id) { setTests(prev => prev.filter(t => t.id !== id)); }
+  function deleteTest(id) {
+    setTests(prev => prev.filter(t => t.id !== id));
+    if (editingTestId === id) {
+      setEditingTestId(null);
+      setTestTitle(""); setTestSubject(""); setTestDate(""); setTestScore(""); setTestTotal("");
+    }
+  }
+
+  function startEditTest(test) {
+    setEditingTestId(test.id);
+    setTestTitle(test.title || "");
+    setTestSubject(test.subject || "");
+    setTestDate(test.date || "");
+    setTestScore(test.score != null ? String(test.score) : "");
+    setTestTotal(test.total != null ? String(test.total) : "");
+  }
 
   const testSubjects = [...new Set(tests.map(t => t.subject).filter(Boolean))];
 
@@ -478,6 +534,9 @@ function ClassTests({ terms }) {
 
       {/* Add form */}
       <div className="card" style={{ marginBottom: 16 }}>
+        <p style={{ fontSize: 12, fontWeight: 600, color: "#475467", marginBottom: 10 }}>
+          {editingTestId ? "Edit class test" : "Add class test"}
+        </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 2, minWidth: 160 }}>
             <label style={labelStyle}>Test / Quiz title</label>
@@ -507,7 +566,15 @@ function ClassTests({ terms }) {
             <label style={labelStyle}>Test date</label>
             <input type="date" value={testDate} onChange={e => setTestDate(e.target.value)} style={{ width: "100%" }} />
           </div>
-          <button onClick={addTest} style={{ alignSelf: "flex-end" }}>Add Test</button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={addTest} style={{ alignSelf: "flex-end" }}>{editingTestId ? "Save Test" : "Add Test"}</button>
+            {editingTestId && (
+              <button onClick={() => {
+                setEditingTestId(null);
+                setTestTitle(""); setTestSubject(""); setTestDate(""); setTestScore(""); setTestTotal("");
+              }} style={{ alignSelf: "flex-end" }}>Cancel</button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -683,6 +750,9 @@ function ClassTests({ terms }) {
                       ) : (
                         <span style={{ fontSize: 12, color: "#667085" }}>No score</span>
                       )}
+                      <button onClick={() => startEditTest(t)}
+                        style={{ background: "none", border: "none", cursor: "pointer",
+                          color: "#667085", fontSize: 12, padding: "0 2px" }}>Edit</button>
                       <button onClick={() => deleteTest(t.id)}
                         style={{ background: "none", border: "none", cursor: "pointer",
                           color: "#667085", fontSize: 14, padding: "0 2px" }}>✕</button>
@@ -702,38 +772,72 @@ export default function Academic() {
   const [terms, setTerms]                 = useState([]);
   const [newTermName, setNewTermName]     = useState("");
   const [newTermStatus, setNewTermStatus] = useState("ongoing");
+  const [editingTermId, setEditingTermId] = useState(null);
 
   const [tasks, setTasks]               = useState([]);
   const [taskTitle, setTaskTitle]       = useState("");
   const [taskSubject, setTaskSubject]   = useState("");
   const [taskDue, setTaskDue]           = useState("");
   const [taskPriority, setTaskPriority] = useState("medium");
+  const [editingTaskId, setEditingTaskId] = useState(null);
 
   function addTerm() {
     if (!newTermName.trim()) return;
-    setTerms(prev => [...prev, {
-      id: Date.now(), name: newTermName.trim(), status: newTermStatus, courses: [],
-    }]);
+    const existing = editingTermId ? terms.find(term => term.id === editingTermId) : null;
+    const entry = {
+      id: editingTermId || Date.now(), name: newTermName.trim(), status: newTermStatus, courses: existing?.courses || [],
+    };
+    setTerms(prev => editingTermId ? prev.map(term => term.id === editingTermId ? entry : term) : [...prev, entry]);
     setNewTermName(""); setNewTermStatus("ongoing");
+    setEditingTermId(null);
   }
 
   function updateTerm(id, patch) {
     setTerms(prev => prev.map(t => t.id === id ? { ...t, ...patch } : t));
   }
 
-  function deleteTerm(id) { setTerms(prev => prev.filter(t => t.id !== id)); }
+  function deleteTerm(id) {
+    setTerms(prev => prev.filter(t => t.id !== id));
+    if (editingTermId === id) {
+      setEditingTermId(null);
+      setNewTermName(""); setNewTermStatus("ongoing");
+    }
+  }
+
+  function startEditTerm(term) {
+    setEditingTermId(term.id);
+    setNewTermName(term.name || "");
+    setNewTermStatus(term.status || "ongoing");
+  }
 
   function addTask() {
     if (!taskTitle.trim()) return;
-    setTasks(prev => [...prev, {
-      id: Date.now(), title: taskTitle.trim(), subject: taskSubject.trim(),
-      due: taskDue, priority: taskPriority, done: false, addedDate: today,
-    }]);
+    const existing = editingTaskId ? tasks.find(task => task.id === editingTaskId) : null;
+    const entry = {
+      id: editingTaskId || Date.now(), title: taskTitle.trim(), subject: taskSubject.trim(),
+      due: taskDue, priority: taskPriority, done: existing?.done || false, addedDate: existing?.addedDate || today,
+    };
+    setTasks(prev => editingTaskId ? prev.map(task => task.id === editingTaskId ? entry : task) : [...prev, entry]);
     setTaskTitle(""); setTaskSubject(""); setTaskDue(""); setTaskPriority("medium");
+    setEditingTaskId(null);
   }
 
   function toggleTask(id) { setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t)); }
-  function deleteTask(id) { setTasks(prev => prev.filter(t => t.id !== id)); }
+  function deleteTask(id) {
+    setTasks(prev => prev.filter(t => t.id !== id));
+    if (editingTaskId === id) {
+      setEditingTaskId(null);
+      setTaskTitle(""); setTaskSubject(""); setTaskDue(""); setTaskPriority("medium");
+    }
+  }
+
+  function startEditTask(task) {
+    setEditingTaskId(task.id);
+    setTaskTitle(task.title || "");
+    setTaskSubject(task.subject || "");
+    setTaskDue(task.due || "");
+    setTaskPriority(task.priority || "medium");
+  }
 
   const PRIORITY = {
     high:   { bg: "#fce8e8", color: "#A32D2D", label: "High" },
@@ -785,7 +889,9 @@ export default function Academic() {
 
       {/* Add term */}
       <div className="card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 13, fontWeight: 500, marginBottom: 10, color: "#d0d5dd" }}>Add new term / semester</p>
+        <p style={{ fontSize: 13, fontWeight: 500, marginBottom: 10, color: "#d0d5dd" }}>
+          {editingTermId ? "Edit term / semester" : "Add new term / semester"}
+        </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 2, minWidth: 180 }}>
             <label style={labelStyle}>Term name</label>
@@ -800,7 +906,10 @@ export default function Academic() {
               {TERM_STATUS_OPTIONS.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
             </select>
           </div>
-          <button onClick={addTerm} style={{ alignSelf: "flex-end" }}>Add Term</button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={addTerm} style={{ alignSelf: "flex-end" }}>{editingTermId ? "Save Term" : "Add Term"}</button>
+            {editingTermId && <button onClick={() => { setEditingTermId(null); setNewTermName(""); setNewTermStatus("ongoing"); }} style={{ alignSelf: "flex-end" }}>Cancel</button>}
+          </div>
         </div>
       </div>
 
@@ -819,7 +928,7 @@ export default function Academic() {
           .reduce((sum, currentTerm) => sum + currentTerm.courses.length, 0);
         const block = (
           <TermBlock key={term.id} term={term}
-            onUpdateTerm={updateTerm} onDeleteTerm={deleteTerm}
+            onUpdateTerm={updateTerm} onDeleteTerm={deleteTerm} onEditTerm={startEditTerm}
             colorOffset={colorOffset} />
         );
         return block;
@@ -836,6 +945,9 @@ export default function Academic() {
       </h3>
 
       <div className="card" style={{ marginBottom: 16 }}>
+        <p style={{ fontSize: 13, fontWeight: 500, marginBottom: 10, color: "#d0d5dd" }}>
+          {editingTaskId ? "Edit assignment / task" : "Add assignment / task"}
+        </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
           <input value={taskTitle} onChange={e => setTaskTitle(e.target.value)}
             onKeyDown={e => e.key === "Enter" && addTask()}
@@ -853,7 +965,10 @@ export default function Academic() {
             <label style={labelStyle}>Due date</label>
             <input type="date" value={taskDue} onChange={e => setTaskDue(e.target.value)} />
           </div>
-          <button onClick={addTask} style={{ alignSelf: "flex-end" }}>Add Task</button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={addTask} style={{ alignSelf: "flex-end" }}>{editingTaskId ? "Save Task" : "Add Task"}</button>
+            {editingTaskId && <button onClick={() => { setEditingTaskId(null); setTaskTitle(""); setTaskSubject(""); setTaskDue(""); setTaskPriority("medium"); }} style={{ alignSelf: "flex-end" }}>Cancel</button>}
+          </div>
         </div>
       </div>
 
@@ -901,6 +1016,9 @@ export default function Academic() {
                 </div>
                 <span style={{ fontSize: 11, fontWeight: 500, padding: "3px 10px", borderRadius: 99,
                   background: pr.bg, color: pr.color, whiteSpace: "nowrap" }}>{pr.label}</span>
+                <button onClick={() => startEditTask(t)}
+                  style={{ background: "none", border: "none", cursor: "pointer",
+                    color: "#667085", fontSize: 12, padding: "0 4px" }}>Edit</button>
                 <button onClick={() => deleteTask(t.id)}
                   style={{ background: "none", border: "none", cursor: "pointer",
                     color: "#667085", fontSize: 14, padding: "0 4px" }}>✕</button>

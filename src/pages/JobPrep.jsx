@@ -61,16 +61,19 @@ export default function JobPrep() {
   const [notes, setNotes] = useState("");
   const [usage, setUsage] = useState("");
   const [filter, setFilter] = useState("all");
+  const [editingApplicationId, setEditingApplicationId] = useState(null);
 
   const [skillName, setSkillName] = useState("");
   const [skillLevel, setSkillLevel] = useState("learning");
   const [skillLinks, setSkillLinks] = useState([{ ...EMPTY_LINK }]);
   const [skillNotes, setSkillNotes] = useState("");
+  const [editingSkillId, setEditingSkillId] = useState(null);
 
   const [resourceTitle, setResourceTitle] = useState("");
   const [resourceType, setResourceType] = useState("Course");
   const [resourceLinks, setResourceLinks] = useState([{ ...EMPTY_LINK }]);
   const [resourceNotes, setResourceNotes] = useState("");
+  const [editingResourceId, setEditingResourceId] = useState(null);
 
   function cleanLinks(links) {
     return links
@@ -95,25 +98,59 @@ export default function JobPrep() {
 
   function addApplication() {
     if (!company.trim() && !role.trim()) return;
+    const existing = editingApplicationId ? applications.find((item) => item.id === editingApplicationId) : null;
+    const entry = {
+      id: editingApplicationId || Date.now(),
+      company: company.trim(),
+      role: role.trim(),
+      jobType,
+      status,
+      requirement: requirement.trim(),
+      appDate,
+      deadline,
+      links: cleanLinks(appLinks),
+      salary: salary.trim(),
+      notes: notes.trim(),
+      usage: usage.trim(),
+      link: existing?.link,
+    };
+    setApplications((current) => (
+      editingApplicationId
+        ? current.map((item) => (item.id === editingApplicationId ? entry : item))
+        : [...current, entry]
+    ));
 
-    setApplications((current) => [
-      ...current,
-      {
-        id: Date.now(),
-        company: company.trim(),
-        role: role.trim(),
-        jobType,
-        status,
-        requirement: requirement.trim(),
-        appDate,
-        deadline,
-        links: cleanLinks(appLinks),
-        salary: salary.trim(),
-        notes: notes.trim(),
-        usage: usage.trim(),
-      },
-    ]);
+    setCompany("");
+    setRole("");
+    setJobType("Full-time");
+    setStatus("ongoing");
+    setRequirement("");
+    setAppDate(today);
+    setDeadline("");
+    setAppLinks([{ ...EMPTY_LINK }]);
+    setSalary("");
+    setNotes("");
+    setUsage("");
+    setEditingApplicationId(null);
+  }
 
+  function startEditApplication(item) {
+    setEditingApplicationId(item.id);
+    setCompany(item.company || "");
+    setRole(item.role || "");
+    setJobType(item.jobType || "Full-time");
+    setStatus(item.status === "requirement" ? "ongoing" : (item.status || "ongoing"));
+    setRequirement(item.requirement || "");
+    setAppDate(item.appDate || today);
+    setDeadline(item.deadline || "");
+    setAppLinks(item.links?.length ? item.links.map((linkItem) => ({ ...EMPTY_LINK, ...linkItem })) : item.link ? [{ label: "Job Link", url: item.link }] : [{ ...EMPTY_LINK }]);
+    setSalary(item.salary || "");
+    setNotes(item.notes || "");
+    setUsage(item.usage || "");
+  }
+
+  function cancelEditApplication() {
+    setEditingApplicationId(null);
     setCompany("");
     setRole("");
     setJobType("Full-time");
@@ -135,20 +172,42 @@ export default function JobPrep() {
 
   function deleteApplication(id) {
     setApplications((current) => current.filter((item) => item.id !== id));
+    if (editingApplicationId === id) cancelEditApplication();
   }
 
   function addSkill() {
     if (!skillName.trim()) return;
-    setSkills((current) => [
-      ...current,
-      {
-        id: Date.now(),
-        name: skillName.trim(),
-        level: skillLevel,
-        links: cleanLinks(skillLinks),
-        notes: skillNotes.trim(),
-      },
-    ]);
+    const existing = editingSkillId ? skills.find((item) => item.id === editingSkillId) : null;
+    const entry = {
+      id: editingSkillId || Date.now(),
+      name: skillName.trim(),
+      level: skillLevel,
+      links: cleanLinks(skillLinks),
+      notes: skillNotes.trim(),
+      link: existing?.link,
+    };
+    setSkills((current) => (
+      editingSkillId
+        ? current.map((item) => (item.id === editingSkillId ? entry : item))
+        : [...current, entry]
+    ));
+    setSkillName("");
+    setSkillLevel("learning");
+    setSkillLinks([{ ...EMPTY_LINK }]);
+    setSkillNotes("");
+    setEditingSkillId(null);
+  }
+
+  function startEditSkill(skill) {
+    setEditingSkillId(skill.id);
+    setSkillName(skill.name || "");
+    setSkillLevel(skill.level || "learning");
+    setSkillLinks(skill.links?.length ? skill.links.map((linkItem) => ({ ...EMPTY_LINK, ...linkItem })) : skill.link ? [{ label: "Link", url: skill.link }] : [{ ...EMPTY_LINK }]);
+    setSkillNotes(skill.notes || "");
+  }
+
+  function cancelEditSkill() {
+    setEditingSkillId(null);
     setSkillName("");
     setSkillLevel("learning");
     setSkillLinks([{ ...EMPTY_LINK }]);
@@ -157,21 +216,43 @@ export default function JobPrep() {
 
   function removeSkill(id) {
     setSkills((current) => current.filter((item) => item.id !== id));
+    if (editingSkillId === id) cancelEditSkill();
   }
 
   function addResource() {
     if (!resourceTitle.trim()) return;
-    setResources((current) => [
-      ...current,
-      {
-        id: Date.now(),
-        title: resourceTitle.trim(),
-        type: resourceType,
-        links: cleanLinks(resourceLinks),
-        notes: resourceNotes.trim(),
-        done: false,
-      },
-    ]);
+    const existing = editingResourceId ? resources.find((item) => item.id === editingResourceId) : null;
+    const entry = {
+      id: editingResourceId || Date.now(),
+      title: resourceTitle.trim(),
+      type: resourceType,
+      links: cleanLinks(resourceLinks),
+      notes: resourceNotes.trim(),
+      done: existing?.done || false,
+      link: existing?.link,
+    };
+    setResources((current) => (
+      editingResourceId
+        ? current.map((item) => (item.id === editingResourceId ? entry : item))
+        : [...current, entry]
+    ));
+    setResourceTitle("");
+    setResourceType("Course");
+    setResourceLinks([{ ...EMPTY_LINK }]);
+    setResourceNotes("");
+    setEditingResourceId(null);
+  }
+
+  function startEditResource(resource) {
+    setEditingResourceId(resource.id);
+    setResourceTitle(resource.title || "");
+    setResourceType(resource.type || "Course");
+    setResourceLinks(resource.links?.length ? resource.links.map((linkItem) => ({ ...EMPTY_LINK, ...linkItem })) : resource.link ? [{ label: "Link", url: resource.link }] : [{ ...EMPTY_LINK }]);
+    setResourceNotes(resource.notes || "");
+  }
+
+  function cancelEditResource() {
+    setEditingResourceId(null);
     setResourceTitle("");
     setResourceType("Course");
     setResourceLinks([{ ...EMPTY_LINK }]);
@@ -186,6 +267,7 @@ export default function JobPrep() {
 
   function removeResource(id) {
     setResources((current) => current.filter((item) => item.id !== id));
+    if (editingResourceId === id) cancelEditResource();
   }
 
   const normalizedApplications = applications.map((item) => ({
@@ -229,6 +311,9 @@ export default function JobPrep() {
       <Divider label="APPLICATION TRACKER" />
 
       <div className="card" style={{ marginBottom: 16 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: "#111827" }}>
+          {editingApplicationId ? "Edit application" : "Add application"}
+        </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12, marginBottom: 12 }}>
           <div style={{ flex: 2, minWidth: 150 }}>
             <label style={labelStyle}>Company</label>
@@ -331,9 +416,16 @@ export default function JobPrep() {
             />
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gridColumn: "1 / -1", marginTop: 4 }}>
-            <button onClick={addApplication} style={buttonStyle}>
-              Add
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={addApplication} style={buttonStyle}>
+                {editingApplicationId ? "Save Changes" : "Add"}
+              </button>
+              {editingApplicationId && (
+                <button onClick={cancelEditApplication} style={smallGhostButton}>
+                  Cancel
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -377,6 +469,7 @@ export default function JobPrep() {
                 statusMeta={APP_STATUS[item.status]}
                 onDelete={() => deleteApplication(item.id)}
                 onChangeStatus={(value) => updateApplicationStatus(item.id, value)}
+                onEdit={() => startEditApplication(item)}
               />
             ))}
           </div>
@@ -392,6 +485,7 @@ export default function JobPrep() {
               statusMeta={APP_STATUS[item.status]}
               onDelete={() => deleteApplication(item.id)}
               onChangeStatus={(value) => updateApplicationStatus(item.id, value)}
+              onEdit={() => startEditApplication(item)}
             />
           ))}
         </div>
@@ -437,6 +531,9 @@ export default function JobPrep() {
       <Divider label="SKILLS TO LEARN" />
 
       <div className="card" style={{ marginBottom: 12 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: "#111827" }}>
+          {editingSkillId ? "Edit skill" : "Add skill"}
+        </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 10 }}>
           <div style={{ flex: 2, minWidth: 160 }}>
             <label style={labelStyle}>Skill Name</label>
@@ -498,9 +595,10 @@ export default function JobPrep() {
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
-          <button onClick={addSkill} style={buttonStyle}>
-            Add Skill
+                <button onClick={addSkill} style={buttonStyle}>
+            {editingSkillId ? "Save Skill" : "Add Skill"}
           </button>
+          {editingSkillId && <button onClick={cancelEditSkill} style={{ ...smallGhostButton, marginLeft: 8 }}>Cancel</button>}
         </div>
       </div>
 
@@ -539,9 +637,14 @@ export default function JobPrep() {
                   )}
                   {skill.notes && <p style={{ fontSize: 12, color: "#667085" }}>{skill.notes}</p>}
                 </div>
-                <button onClick={() => removeSkill(skill.id)} style={ghostDangerButton}>
-                  Remove
-                </button>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={() => startEditSkill(skill)} style={ghostDangerButton}>
+                    Edit
+                  </button>
+                  <button onClick={() => removeSkill(skill.id)} style={ghostDangerButton}>
+                    Remove
+                  </button>
+                </div>
               </div>
             </div>
           );
@@ -551,6 +654,9 @@ export default function JobPrep() {
       <Divider label="RESOURCES AND PREPARATION" />
 
       <div className="card" style={{ marginBottom: 12 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: "#111827" }}>
+          {editingResourceId ? "Edit resource" : "Add resource"}
+        </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginBottom: 10 }}>
           <div style={{ flex: 2, minWidth: 160 }}>
             <label style={labelStyle}>Resource / Course Name</label>
@@ -613,8 +719,9 @@ export default function JobPrep() {
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
           <button onClick={addResource} style={buttonStyle}>
-            Add
+            {editingResourceId ? "Save Changes" : "Add"}
           </button>
+          {editingResourceId && <button onClick={cancelEditResource} style={{ ...smallGhostButton, marginLeft: 8 }}>Cancel</button>}
         </div>
       </div>
 
@@ -672,9 +779,14 @@ export default function JobPrep() {
                 )}
                 {resource.notes && <p style={{ fontSize: 12, color: "#667085" }}>{resource.notes}</p>}
               </div>
-              <button onClick={() => removeResource(resource.id)} style={ghostDangerButton}>
-                Remove
-              </button>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => startEditResource(resource)} style={ghostDangerButton}>
+                  Edit
+                </button>
+                <button onClick={() => removeResource(resource.id)} style={ghostDangerButton}>
+                  Remove
+                </button>
+              </div>
             </div>
           );
         })}
@@ -683,7 +795,7 @@ export default function JobPrep() {
   );
 }
 
-function ApplicationCard({ item, statusMeta, onDelete, onChangeStatus }) {
+function ApplicationCard({ item, statusMeta, onDelete, onChangeStatus, onEdit }) {
   const isDeadlinePast = item.deadline && item.deadline < today && item.status === "ongoing";
   const appLinksList = item.links?.filter((linkItem) => linkItem?.url) || (item.link ? [{ label: "Job Link", url: item.link }] : []);
 
@@ -753,9 +865,14 @@ function ApplicationCard({ item, statusMeta, onDelete, onChangeStatus }) {
               </option>
             ))}
           </select>
-          <button onClick={onDelete} style={ghostDangerButton}>
-            Remove
-          </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={onEdit} style={ghostDangerButton}>
+              Edit
+            </button>
+            <button onClick={onDelete} style={ghostDangerButton}>
+              Remove
+            </button>
+          </div>
         </div>
       </div>
     </div>

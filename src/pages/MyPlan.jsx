@@ -227,13 +227,48 @@ export default function MyPlan() {
   const [status, setStatus] = useState("ongoing");
   const [addedDate, setAddedDate] = useState(today);
   const [dueDate, setDueDate] = useState("");
+  const [editingId, setEditingId] = useState(null);
 
   function addPlan() {
     if (!title.trim()) return;
-    setPlans((current) => [
-      ...current,
-      { id: Date.now(), title: title.trim(), description: description.trim(), category, period: planPeriod, status, addedDate, dueDate },
-    ]);
+    const entry = {
+      id: editingId || Date.now(),
+      title: title.trim(),
+      description: description.trim(),
+      category,
+      period: planPeriod,
+      status,
+      addedDate,
+      dueDate,
+    };
+    setPlans((current) => (
+      editingId
+        ? current.map((plan) => (plan.id === editingId ? entry : plan))
+        : [...current, entry]
+    ));
+    setTitle("");
+    setDescription("");
+    setCategory("Personal");
+    setPlanPeriod("daily");
+    setStatus("ongoing");
+    setAddedDate(today);
+    setDueDate("");
+    setEditingId(null);
+  }
+
+  function startEdit(plan) {
+    setEditingId(plan.id);
+    setTitle(plan.title || "");
+    setDescription(plan.description || "");
+    setCategory(plan.category || "Personal");
+    setPlanPeriod(plan.period || "daily");
+    setStatus(plan.status || "ongoing");
+    setAddedDate(plan.addedDate || today);
+    setDueDate(plan.dueDate || "");
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
     setTitle("");
     setDescription("");
     setCategory("Personal");
@@ -249,6 +284,7 @@ export default function MyPlan() {
 
   function deletePlan(id) {
     setPlans((current) => current.filter((plan) => plan.id !== id));
+    if (editingId === id) cancelEdit();
   }
 
   const counts = Object.keys(PLAN_STATUS).reduce((accumulator, key) => {
@@ -295,6 +331,9 @@ export default function MyPlan() {
       <Divider label="ADD PLAN" />
 
       <div className="card" style={{ marginBottom: 16 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: "#111827" }}>
+          {editingId ? "Edit plan" : "Add plan"}
+        </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
           <div style={{ flex: 3, minWidth: 180 }}>
             <label style={labelStyle}>Plan Title</label>
@@ -344,7 +383,10 @@ export default function MyPlan() {
             <label style={labelStyle}>Due / Target Date</label>
             <input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} />
           </div>
-          <button onClick={addPlan} style={buttonStyle}>Add Plan</button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={addPlan} style={buttonStyle}>{editingId ? "Save Changes" : "Add Plan"}</button>
+            {editingId && <button onClick={cancelEdit} style={ghostButtonStyle}>Cancel</button>}
+          </div>
         </div>
       </div>
 
@@ -434,7 +476,10 @@ export default function MyPlan() {
                               </option>
                             ))}
                           </select>
-                          <button onClick={() => deletePlan(plan.id)} style={ghostButtonStyle}>Remove</button>
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <button onClick={() => startEdit(plan)} style={ghostButtonStyle}>Edit</button>
+                            <button onClick={() => deletePlan(plan.id)} style={ghostButtonStyle}>Remove</button>
+                          </div>
                         </div>
                       </div>
                     </div>
