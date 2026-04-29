@@ -2,23 +2,20 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./App.css";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 window.clearDashboardPage = (page) => {
-  const keys = Object.keys(localStorage).filter((key) => key.startsWith(`dashboard-${page}`));
-  keys.forEach((key) => localStorage.removeItem(key));
-  console.log(`Cleared ${keys.length} key(s) for page: ${page}`);
-  window.location.reload();
+  console.warn(`clearDashboardPage("${page}") now uses Firebase-backed storage. Remove or rebuild this debug helper if needed.`);
 };
 
 window.clearAllDashboard = () => {
-  const keys = Object.keys(localStorage).filter((key) => key.startsWith("dashboard-"));
-  keys.forEach((key) => localStorage.removeItem(key));
-  console.log(`Cleared all ${keys.length} dashboard key(s).`);
-  window.location.reload();
+  console.warn("clearAllDashboard() now uses Firebase-backed storage. Remove or rebuild this debug helper if needed.");
 };
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </React.StrictMode>
 );

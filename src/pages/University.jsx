@@ -1,22 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-
-function useLocalStorage(key, initialValue, version = 1) {
-  const versionedKey = `${key}__v${version}`;
-  const [state, setState] = useState(() => {
-    try {
-      const stored = localStorage.getItem(versionedKey);
-      return stored !== null ? JSON.parse(stored) : initialValue;
-    } catch {
-      return initialValue;
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem(versionedKey, JSON.stringify(state));
-  }, [state, versionedKey]);
-
-  return [state, setState];
-}
+import { useMemo, useState } from "react";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const DEGREE_TYPES = ["Masters", "PhD"];
 const STATUS_OPTIONS = ["Interested", "Researching", "Applied", "Accepted", "Rejected", "Enrolled"];

@@ -1,32 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
-/**
- * Drop-in replacement for useState that persists data in localStorage.
- * Data survives navigation, page refresh, and browser restart.
- *
- * @param {string} key       - Base key name (e.g. 'dashboard-plans')
- * @param {*}      initialValue - Default value if nothing stored yet
- * @param {number} version   - Bump this (1→2) when you change the data shape
- */
+function resolveInitialValue(initialValue) {
+  return typeof initialValue === "function" ? initialValue() : initialValue;
+}
+
+function serialize(value) {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return "";
+  }
+}
+
 export function useLocalStorage(key, initialValue, version = 1) {
   const versionedKey = `${key}__v${version}`;
-
-  const [state, setState] = useState(() => {
-    try {
-      const stored = localStorage.getItem(versionedKey);
-      return stored !== null ? JSON.parse(stored) : initialValue;
-    } catch {
-      return initialValue;
-    }
-  });
+  const { authReady, currentUser, dashboardData, updateDashboardData } = useAuth();
+  const initialValueRef = useRef(resolveInitialValue(initialValue));
+  const [state, setState] = useState(() => initialValueRef.current);
+  const isHydratedRef = useRef(false);
+  const lastSyncedRef = useRef(serialize(initialValueRef.current));
 
   useEffect(() => {
-    try {
-      localStorage.setItem(versionedKey, JSON.stringify(state));
-    } catch (e) {
-      console.warn('localStorage write failed:', e);
-    }
-  }, [versionedKey, state]);
+    if (!authReady) return;
+
+    const fallbackValue = initialValueRef.current;
+    const nextState =
+      currentUser && Object.prototype.hasOwnProperty.call(dashboardData, versionedKey)
+        ? dashboardData[versionedKey]
+        : fallbackValue;
+
+    setState(nextState);
+    lastSyncedRef.current = serialize(nextState);
+    isHydratedRef.current = true;
+  }, [authReady, currentUser, dashboardData, versionedKey]);
+
+  useEffect(() => {
+    if (!authReady || !currentUser || !isHydratedRef.current) return;
+
+    const serializedState = serialize(state);
+    if (serializedState === lastSyncedRef.current) return;
+
+    lastSyncedRef.current = serializedState;
+    void updateDashboardData(versionedKey, state);
+  }, [authReady, currentUser, state, updateDashboardData, versionedKey]);
 
   return [state, setState];
 }

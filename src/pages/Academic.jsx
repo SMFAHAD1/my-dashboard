@@ -1,5 +1,6 @@
 // src/pages/Academic.jsx
 import { useState } from "react";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -468,8 +469,7 @@ function TermBlock({ term, onUpdateTerm, onDeleteTerm, onEditTerm, colorOffset }
 }
 
 // ── Class Tests ───────────────────────────────────────────────────────────
-function ClassTests({ terms }) {
-  const [tests, setTests]             = useState([]);
+function ClassTests({ terms, tests, setTests }) {
   const [testTitle, setTestTitle]     = useState("");
   const [testSubject, setTestSubject] = useState("");
   const [testDate, setTestDate]       = useState("");
@@ -769,12 +769,13 @@ function ClassTests({ terms }) {
 
 // ── Main Component ────────────────────────────────────────────────────────
 export default function Academic() {
-  const [terms, setTerms]                 = useState([]);
+  const [terms, setTerms]                 = useLocalStorage("dashboard-academic-terms", [], 1);
   const [newTermName, setNewTermName]     = useState("");
   const [newTermStatus, setNewTermStatus] = useState("ongoing");
   const [editingTermId, setEditingTermId] = useState(null);
 
-  const [tasks, setTasks]               = useState([]);
+  const [tasks, setTasks]               = useLocalStorage("dashboard-academic-tasks", [], 1);
+  const [tests, setTests]               = useLocalStorage("dashboard-academic-tests", [], 1);
   const [taskTitle, setTaskTitle]       = useState("");
   const [taskSubject, setTaskSubject]   = useState("");
   const [taskDue, setTaskDue]           = useState("");
@@ -936,7 +937,7 @@ export default function Academic() {
 
       {/* ══ CLASS TESTS ══ */}
       <div style={{ marginTop: 8, marginBottom: 28 }}>
-        <ClassTests terms={terms} />
+        <ClassTests terms={terms} tests={tests} setTests={setTests} />
       </div>
 
       {/* ══ TASKS ══ */}
