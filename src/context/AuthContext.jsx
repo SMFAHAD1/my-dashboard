@@ -13,11 +13,12 @@ import {
   deleteUserDashboardFields,
   getUserData,
   saveUserData,
-  updateUserDashboardField,
+  updateUserDashboardFields,
 } from "../firebaseUserData";
 
 const AuthContext = createContext(null);
 const googleProvider = new GoogleAuthProvider();
+const SAVE_DEBOUNCE_MS = 500;
 
 function emptyDashboardData(value) {
   return value && typeof value === "object" ? value : {};
@@ -28,9 +29,58 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [dashboardData, setDashboardData] = useState({});
   const [authReady, setAuthReady] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [lastSavedAt, setLastSavedAt] = useState(null);
+
+  const pendingUpdatesRef = useState(() => new Map())[0];
+  const flushTimerRef = useState(() => ({ current: null }))[0];
+
+  const clearPendingFlush = useCallback(() => {
+    if (flushTimerRef.current) {
+      clearTimeout(flushTimerRef.current);
+      flushTimerRef.current = null;
+    }
+  }, [flushTimerRef]);
+
+  const flushPendingUpdates = useCallback(async () => {
+    clearPendingFlush();
+
+    if (!auth.currentUser || pendingUpdatesRef.size === 0) return;
+
+    const updates = Object.fromEntries(pendingUpdatesRef.entries());
+    pendingUpdatesRef.clear();
+    setIsSaving(true);
+    setSaveError("");
+
+    try {
+      await updateUserDashboardFields(auth.currentUser.uid, updates);
+      setLastSavedAt(new Date().toISOString());
+    } catch (error) {
+      Object.entries(updates).forEach(([key, value]) => {
+        pendingUpdatesRef.set(key, value);
+      });
+      setSaveError(error?.message || "Failed to save dashboard changes.");
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [clearPendingFlush, pendingUpdatesRef]);
+
+  const scheduleFlush = useCallback(() => {
+    clearPendingFlush();
+    flushTimerRef.current = setTimeout(() => {
+      void flushPendingUpdates();
+    }, SAVE_DEBOUNCE_MS);
+  }, [clearPendingFlush, flushPendingUpdates, flushTimerRef]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      clearPendingFlush();
+      pendingUpdatesRef.clear();
+      setIsSaving(false);
+      setSaveError("");
+      setLastSavedAt(null);
       setCurrentUser(user);
 
       if (!user) {
@@ -54,7 +104,23 @@ export function AuthProvider({ children }) {
     });
 
     return unsubscribe;
-  }, []);
+  }, [clearPendingFlush, pendingUpdatesRef]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        void flushPendingUpdates();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [flushPendingUpdates]);
 
   const registerUser = useCallback(async (name, email, password, contactNumber) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -108,16 +174,17 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logoutUser = useCallback(async () => {
+    await flushPendingUpdates();
     await signOut(auth);
-  }, []);
+  }, [flushPendingUpdates]);
 
   const updateDashboardData = useCallback(async (key, value) => {
     if (!auth.currentUser) return;
 
     setDashboardData((current) => ({ ...current, [key]: value }));
-
-    await updateUserDashboardField(auth.currentUser.uid, key, value);
-  }, []);
+    pendingUpdatesRef.set(key, value);
+    scheduleFlush();
+  }, [pendingUpdatesRef, scheduleFlush]);
 
   const clearDashboardData = useCallback(async (prefix = "") => {
     if (!auth.currentUser) return;
@@ -128,9 +195,11 @@ export function AuthProvider({ children }) {
     );
 
     setDashboardData(nextDashboardData);
+    keysToDelete.forEach((key) => pendingUpdatesRef.delete(key));
 
     await deleteUserDashboardFields(auth.currentUser.uid, keysToDelete);
-  }, [dashboardData]);
+    setLastSavedAt(new Date().toISOString());
+  }, [dashboardData, pendingUpdatesRef]);
 
   const value = useMemo(
     () => ({
@@ -138,14 +207,33 @@ export function AuthProvider({ children }) {
       currentUser,
       profile,
       dashboardData,
+      isSaving,
+      saveError,
+      lastSavedAt,
       loginUser,
       loginWithGoogle,
       logoutUser,
       registerUser,
       updateDashboardData,
       clearDashboardData,
+      flushPendingUpdates,
     }),
-    [authReady, currentUser, profile, dashboardData, loginUser, loginWithGoogle, logoutUser, registerUser, updateDashboardData, clearDashboardData]
+    [
+      authReady,
+      currentUser,
+      profile,
+      dashboardData,
+      isSaving,
+      saveError,
+      lastSavedAt,
+      loginUser,
+      loginWithGoogle,
+      logoutUser,
+      registerUser,
+      updateDashboardData,
+      clearDashboardData,
+      flushPendingUpdates,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

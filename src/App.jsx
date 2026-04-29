@@ -18,7 +18,18 @@ const NAV_ITEMS = [
 ];
 
 export default function App() {
-  const { authReady, currentUser, loginUser, loginWithGoogle, logoutUser, profile, registerUser } = useAuth();
+  const {
+    authReady,
+    currentUser,
+    isSaving,
+    lastSavedAt,
+    loginUser,
+    loginWithGoogle,
+    logoutUser,
+    profile,
+    registerUser,
+    saveError,
+  } = useAuth();
 
   if (!authReady) {
     return (
@@ -46,6 +57,10 @@ export default function App() {
 
           <div className="sidebar-section">Pages</div>
 
+          <div className="sync-pill">
+            {isSaving ? "Syncing..." : saveError ? "Sync issue" : lastSavedAt ? "Saved" : "Ready"}
+          </div>
+
           {NAV_ITEMS.map(({ to, label, icon }) => (
             <NavLink
               key={to}
@@ -61,6 +76,7 @@ export default function App() {
           ))}
 
           <div className="sidebar-footer">
+            {saveError && <div className="sync-note">{saveError}</div>}
             <button className="sidebar-action" onClick={logoutUser}>
               Logout
             </button>

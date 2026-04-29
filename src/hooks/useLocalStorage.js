@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 function resolveInitialValue(initialValue) {
@@ -44,7 +44,13 @@ export function useFirestoreState(key, initialValue, version = 1) {
     void updateDashboardData(versionedKey, state);
   }, [authReady, currentUser, state, updateDashboardData, versionedKey]);
 
-  return [state, setState];
+  const updateState = useCallback((valueOrUpdater) => {
+    setState((current) =>
+      typeof valueOrUpdater === "function" ? valueOrUpdater(current) : valueOrUpdater
+    );
+  }, []);
+
+  return [state, updateState];
 }
 
 export const useLocalStorage = useFirestoreState;

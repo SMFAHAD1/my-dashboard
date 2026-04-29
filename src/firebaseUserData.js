@@ -27,6 +27,24 @@ export async function updateUserDashboardField(uid, key, value) {
   }
 }
 
+export async function saveUserDashboardData(uid, dashboardData) {
+  await saveUserData(uid, { dashboardData });
+}
+
+export async function updateUserDashboardFields(uid, updates) {
+  const payload = Object.fromEntries(
+    Object.entries(updates).map(([key, value]) => [`dashboardData.${key}`, value])
+  );
+
+  try {
+    await updateDoc(doc(db, "users", uid), payload);
+  } catch {
+    await saveUserData(uid, {
+      dashboardData: updates,
+    });
+  }
+}
+
 export async function deleteUserDashboardFields(uid, keys) {
   if (!keys.length) return;
 
