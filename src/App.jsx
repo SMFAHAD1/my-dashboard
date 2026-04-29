@@ -18,7 +18,7 @@ const NAV_ITEMS = [
 ];
 
 export default function App() {
-  const { authReady, currentUser, loginUser, logoutUser, profile, registerUser } = useAuth();
+  const { authReady, currentUser, loginUser, loginWithGoogle, logoutUser, profile, registerUser } = useAuth();
 
   if (!authReady) {
     return (
@@ -32,7 +32,7 @@ export default function App() {
   }
 
   if (!currentUser) {
-    return <AuthScreen loginUser={loginUser} registerUser={registerUser} />;
+    return <AuthScreen loginUser={loginUser} loginWithGoogle={loginWithGoogle} registerUser={registerUser} />;
   }
 
   return (
@@ -84,7 +84,7 @@ export default function App() {
   );
 }
 
-function AuthScreen({ loginUser, registerUser }) {
+function AuthScreen({ loginUser, loginWithGoogle, registerUser }) {
   const [mode, setMode] = useState("login");
   const [name, setName] = useState("");
   const [contactNumber, setContactNumber] = useState("");
@@ -92,6 +92,7 @@ function AuthScreen({ loginUser, registerUser }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -108,6 +109,19 @@ function AuthScreen({ loginUser, registerUser }) {
       setError(submitError?.message || "Authentication failed.");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleGoogleLogin() {
+    setError("");
+    setGoogleLoading(true);
+
+    try {
+      await loginWithGoogle();
+    } catch (submitError) {
+      setError(submitError?.message || "Google sign-in failed.");
+    } finally {
+      setGoogleLoading(false);
     }
   }
 
@@ -137,6 +151,14 @@ function AuthScreen({ loginUser, registerUser }) {
           >
             Register
           </button>
+        </div>
+
+        <button className="auth-google" type="button" onClick={handleGoogleLogin} disabled={googleLoading || submitting}>
+          {googleLoading ? "Connecting Google..." : "Continue with Google"}
+        </button>
+
+        <div className="auth-divider">
+          <span>or use email</span>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>

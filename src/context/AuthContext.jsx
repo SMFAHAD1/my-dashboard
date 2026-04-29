@@ -1,8 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   updateProfile,
 } from "firebase/auth";
@@ -15,6 +17,7 @@ import {
 } from "../firebaseUserData";
 
 const AuthContext = createContext(null);
+const googleProvider = new GoogleAuthProvider();
 
 function emptyDashboardData(value) {
   return value && typeof value === "object" ? value : {};
@@ -82,6 +85,28 @@ export function AuthProvider({ children }) {
     return userCredential.user;
   }, []);
 
+  const loginWithGoogle = useCallback(async () => {
+    const userCredential = await signInWithPopup(auth, googleProvider);
+    const user = userCredential.user;
+    const existingData = await getUserData(user.uid);
+
+    if (!existingData) {
+      const nextProfile = {
+        name: user.displayName || "",
+        email: user.email || "",
+        contactNumber: "",
+        createdAt: new Date().toISOString(),
+        dashboardData: {},
+      };
+
+      await saveUserData(user.uid, nextProfile);
+      setProfile(nextProfile);
+      setDashboardData({});
+    }
+
+    return user;
+  }, []);
+
   const logoutUser = useCallback(async () => {
     await signOut(auth);
   }, []);
@@ -114,12 +139,13 @@ export function AuthProvider({ children }) {
       profile,
       dashboardData,
       loginUser,
+      loginWithGoogle,
       logoutUser,
       registerUser,
       updateDashboardData,
       clearDashboardData,
     }),
-    [authReady, currentUser, profile, dashboardData, loginUser, logoutUser, registerUser, updateDashboardData, clearDashboardData]
+    [authReady, currentUser, profile, dashboardData, loginUser, loginWithGoogle, logoutUser, registerUser, updateDashboardData, clearDashboardData]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
