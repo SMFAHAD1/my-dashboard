@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD20k1TIvhHhFM1huo927VrJAe__RfcnUU",
@@ -9,9 +10,11 @@ const firebaseConfig = {
   storageBucket: "my-dashboard-7e60e.firebasestorage.app",
   messagingSenderId: "185148003951",
   appId: "1:185148003951:web:78f8805b50a6c426ccdf9a",
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
 };
 
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const realtimeDb = getDatabase(app);
