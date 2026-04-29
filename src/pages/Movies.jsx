@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useFirestoreState } from "../hooks/useLocalStorage";
 
 const APIKEY = "trilogy";
 const today = new Date().toISOString().split("T")[0];
@@ -140,8 +140,8 @@ function YearAnalysis({ movies }) {
 }
 
 export default function Movies() {
-  const [movies, setMovies] = useLocalStorage("dashboard-movies", [], 1);
-  const [watchlist, setWatchlist] = useLocalStorage("dashboard-movies-watchlist", [], 1);
+  const [movies, setMovies] = useFirestoreState("dashboard-movies", [], 1);
+  const [watchlist, setWatchlist] = useFirestoreState("dashboard-movies-watchlist", [], 1);
   const [form, setForm] = useState({ ...watchedDefaults });
   const [watchlistForm, setWatchlistForm] = useState({ ...watchlistDefaults });
   const [editId, setEditId] = useState(null);

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useFirestoreState } from "../hooks/useLocalStorage";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -216,7 +216,7 @@ function AnalysisPanel({ plans, period }) {
 }
 
 export default function MyPlan() {
-  const [plans, setPlans] = useLocalStorage("dashboard-my-plan-items", [], 1);
+  const [plans, setPlans] = useFirestoreState("dashboard-my-plan-items", [], 1);
   const [analysisPeriod, setAnalysisPeriod] = useState("weekly");
   const [filter, setFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("all");

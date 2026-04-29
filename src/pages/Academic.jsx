@@ -1,6 +1,6 @@
 // src/pages/Academic.jsx
 import { useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useFirestoreState } from "../hooks/useLocalStorage";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -769,13 +769,13 @@ function ClassTests({ terms, tests, setTests }) {
 
 // ── Main Component ────────────────────────────────────────────────────────
 export default function Academic() {
-  const [terms, setTerms]                 = useLocalStorage("dashboard-academic-terms", [], 1);
+  const [terms, setTerms]                 = useFirestoreState("dashboard-academic-terms", [], 1);
   const [newTermName, setNewTermName]     = useState("");
   const [newTermStatus, setNewTermStatus] = useState("ongoing");
   const [editingTermId, setEditingTermId] = useState(null);
 
-  const [tasks, setTasks]               = useLocalStorage("dashboard-academic-tasks", [], 1);
-  const [tests, setTests]               = useLocalStorage("dashboard-academic-tests", [], 1);
+  const [tasks, setTasks]               = useFirestoreState("dashboard-academic-tasks", [], 1);
+  const [tests, setTests]               = useFirestoreState("dashboard-academic-tests", [], 1);
   const [taskTitle, setTaskTitle]       = useState("");
   const [taskSubject, setTaskSubject]   = useState("");
   const [taskDue, setTaskDue]           = useState("");

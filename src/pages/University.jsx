@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useFirestoreState } from "../hooks/useLocalStorage";
 
 const DEGREE_TYPES = ["Masters", "PhD"];
 const STATUS_OPTIONS = ["Interested", "Researching", "Applied", "Accepted", "Rejected", "Enrolled"];
@@ -70,7 +70,7 @@ function Divider({ label }) {
 }
 
 export default function University() {
-  const [universities, setUniversities] = useLocalStorage("dashboard-universities", [], 1);
+  const [universities, setUniversities] = useFirestoreState("dashboard-universities", [], 1);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(cloneEntry(EMPTY_FORM));
   const [editingId, setEditingId] = useState(null);

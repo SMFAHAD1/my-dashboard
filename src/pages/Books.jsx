@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useFirestoreState } from "../hooks/useLocalStorage";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -117,7 +117,7 @@ function YearAnalysis({ books }) {
 }
 
 export default function Books() {
-  const [books, setBooks] = useLocalStorage("dashboard-books", [], 1);
+  const [books, setBooks] = useFirestoreState("dashboard-books", [], 1);
   const [editingReadingId, setEditingReadingId] = useState(null);
   const [editingBuyId, setEditingBuyId] = useState(null);
 

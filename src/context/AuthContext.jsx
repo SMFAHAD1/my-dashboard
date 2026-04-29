@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -6,8 +6,13 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db } from "../../firebase";
+import { auth } from "../../firebase";
+import {
+  deleteUserDashboardFields,
+  getUserData,
+  saveUserData,
+  updateUserDashboardField,
+} from "../firebaseUserData";
 
 const AuthContext = createContext(null);
 
@@ -23,7 +28,6 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setAuthReady(false);
       setCurrentUser(user);
 
       if (!user) {
@@ -34,8 +38,7 @@ export function AuthProvider({ children }) {
       }
 
       try {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        const data = snap.exists() ? snap.data() : {};
+        const data = (await getUserData(user.uid)) || {};
         setProfile(data);
         setDashboardData(emptyDashboardData(data.dashboardData));
       } catch (error) {
@@ -50,7 +53,7 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  async function registerUser(name, email, password, contactNumber) {
+  const registerUser = useCallback(async (name, email, password, contactNumber) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     const trimmedName = name.trim();
@@ -68,54 +71,41 @@ export function AuthProvider({ children }) {
       dashboardData: {},
     };
 
-    await setDoc(doc(db, "users", user.uid), nextProfile, { merge: true });
+    await saveUserData(user.uid, nextProfile);
     setProfile(nextProfile);
     setDashboardData({});
     return user;
-  }
+  }, []);
 
-  async function loginUser(email, password) {
+  const loginUser = useCallback(async (email, password) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return userCredential.user;
-  }
+  }, []);
 
-  async function logoutUser() {
+  const logoutUser = useCallback(async () => {
     await signOut(auth);
-  }
+  }, []);
 
-  async function updateDashboardData(key, value) {
+  const updateDashboardData = useCallback(async (key, value) => {
     if (!auth.currentUser) return;
 
     setDashboardData((current) => ({ ...current, [key]: value }));
 
-    await setDoc(
-      doc(db, "users", auth.currentUser.uid),
-      {
-        dashboardData: {
-          [key]: value,
-        },
-      },
-      { merge: true }
-    );
-  }
+    await updateUserDashboardField(auth.currentUser.uid, key, value);
+  }, []);
 
-  async function clearDashboardData(prefix = "") {
+  const clearDashboardData = useCallback(async (prefix = "") => {
     if (!auth.currentUser) return;
 
+    const keysToDelete = Object.keys(dashboardData).filter((key) => key.startsWith(prefix));
     const nextDashboardData = Object.fromEntries(
-      Object.entries(dashboardData).filter(([key]) => !key.startsWith(prefix))
+      Object.entries(dashboardData).filter(([key]) => !keysToDelete.includes(key))
     );
 
     setDashboardData(nextDashboardData);
 
-    await setDoc(
-      doc(db, "users", auth.currentUser.uid),
-      {
-        dashboardData: nextDashboardData,
-      },
-      { merge: true }
-    );
-  }
+    await deleteUserDashboardFields(auth.currentUser.uid, keysToDelete);
+  }, [dashboardData]);
 
   const value = useMemo(
     () => ({
@@ -129,7 +119,7 @@ export function AuthProvider({ children }) {
       updateDashboardData,
       clearDashboardData,
     }),
-    [authReady, currentUser, profile, dashboardData]
+    [authReady, currentUser, profile, dashboardData, loginUser, logoutUser, registerUser, updateDashboardData, clearDashboardData]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

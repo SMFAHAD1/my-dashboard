@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useFirestoreState } from "../hooks/useLocalStorage";
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -45,9 +45,9 @@ const RESOURCE_TYPES = ["Course", "Book", "Platform", "YouTube", "Article", "Pra
 const EMPTY_LINK = { label: "", url: "" };
 
 export default function JobPrep() {
-  const [applications, setApplications] = useLocalStorage("dashboard-jobs-applications", [], 1);
-  const [skills, setSkills] = useLocalStorage("dashboard-jobs-skills", [], 1);
-  const [resources, setResources] = useLocalStorage("dashboard-jobs-resources", [], 1);
+  const [applications, setApplications] = useFirestoreState("dashboard-jobs-applications", [], 1);
+  const [skills, setSkills] = useFirestoreState("dashboard-jobs-skills", [], 1);
+  const [resources, setResources] = useFirestoreState("dashboard-jobs-resources", [], 1);
 
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
