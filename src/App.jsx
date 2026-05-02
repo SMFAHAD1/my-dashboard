@@ -87,7 +87,7 @@ function Home() {
           </div>
           <div className="hero-stat">
             <strong>100%</strong>
-            <span>Browser storage based</span>
+            <span>Firebase cloud sync</span>
           </div>
           <div className="hero-stat">
             <strong>Vercel</strong>
