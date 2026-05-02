@@ -1,0 +1,572 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Length 1672 >>
+stream
+BT
+/F1 11 Tf
+0 g
+1 0 0 1 54 734 Tm (Fahad Dashboard Site Build Process) Tj
+1 0 0 1 54 718 Tm () Tj
+1 0 0 1 54 702 Tm (Project overview) Tj
+1 0 0 1 54 686 Tm () Tj
+1 0 0 1 54 670 Tm (Fahad Dashboard is a React + Vite personal dashboard website with six connected) Tj
+1 0 0 1 54 654 Tm (sections:) Tj
+1 0 0 1 54 638 Tm () Tj
+1 0 0 1 54 622 Tm (1. Academic) Tj
+1 0 0 1 54 606 Tm (2. My Plan) Tj
+1 0 0 1 54 590 Tm (3. Movies) Tj
+1 0 0 1 54 574 Tm (4. Job Prep) Tj
+1 0 0 1 54 558 Tm (5. Books) Tj
+1 0 0 1 54 542 Tm (6. University) Tj
+1 0 0 1 54 526 Tm () Tj
+1 0 0 1 54 510 Tm (The site is built as a single-page application. Navigation happens with React Router,) Tj
+1 0 0 1 54 494 Tm (and each section is a separate page component inside src/pages.) Tj
+1 0 0 1 54 478 Tm () Tj
+1 0 0 1 54 462 Tm (Main technologies used) Tj
+1 0 0 1 54 446 Tm () Tj
+1 0 0 1 54 430 Tm (- React 18) Tj
+1 0 0 1 54 414 Tm (- Vite 5) Tj
+1 0 0 1 54 398 Tm (- React Router DOM 6) Tj
+1 0 0 1 54 382 Tm (- Browser localStorage for saving data) Tj
+1 0 0 1 54 366 Tm (- CSS in src/styles.css) Tj
+1 0 0 1 54 350 Tm (- Vercel-ready deployment setup) Tj
+1 0 0 1 54 334 Tm () Tj
+1 0 0 1 54 318 Tm (Folder structure) Tj
+1 0 0 1 54 302 Tm () Tj
+1 0 0 1 54 286 Tm (``text) Tj
+1 0 0 1 54 270 Tm (src/) Tj
+1 0 0 1 54 254 Tm (App.jsx) Tj
+1 0 0 1 54 238 Tm (main.jsx) Tj
+1 0 0 1 54 222 Tm (styles.css) Tj
+1 0 0 1 54 206 Tm (hooks/) Tj
+1 0 0 1 54 190 Tm (useLocalStorage.js) Tj
+1 0 0 1 54 174 Tm (pages/) Tj
+1 0 0 1 54 158 Tm (Academic.jsx) Tj
+1 0 0 1 54 142 Tm (Books.jsx) Tj
+1 0 0 1 54 126 Tm (JobPrep.jsx) Tj
+1 0 0 1 54 110 Tm (Movies.jsx) Tj
+1 0 0 1 54 94 Tm (MyPlan.jsx) Tj
+1 0 0 1 54 78 Tm (University.jsx) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 22 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Length 1812 >>
+stream
+BT
+/F1 11 Tf
+0 g
+1 0 0 1 54 734 Tm (scripts/) Tj
+1 0 0 1 54 718 Tm (generate-summary-pdf.mjs) Tj
+1 0 0 1 54 702 Tm (docs/) Tj
+1 0 0 1 54 686 Tm (Site-Build-Process-Summary.md) Tj
+1 0 0 1 54 670 Tm (`) Tj
+1 0 0 1 54 654 Tm () Tj
+1 0 0 1 54 638 Tm (How the site is built) Tj
+1 0 0 1 54 622 Tm () Tj
+1 0 0 1 54 606 Tm (1. App entry) Tj
+1 0 0 1 54 590 Tm () Tj
+1 0 0 1 54 574 Tm (The app starts from src/main.jsx. This file mounts the React app into the root HTML) Tj
+1 0 0 1 54 558 Tm (element and usually wraps the app with the router.) Tj
+1 0 0 1 54 542 Tm () Tj
+1 0 0 1 54 526 Tm (2. Main layout and routing) Tj
+1 0 0 1 54 510 Tm () Tj
+1 0 0 1 54 494 Tm (src/App.jsx is the central controller of the site.) Tj
+1 0 0 1 54 478 Tm () Tj
+1 0 0 1 54 462 Tm (It does three important jobs:) Tj
+1 0 0 1 54 446 Tm () Tj
+1 0 0 1 54 430 Tm (- defines the six dashboard pages) Tj
+1 0 0 1 54 414 Tm (- creates the sidebar navigation) Tj
+1 0 0 1 54 398 Tm (- connects routes to page components) Tj
+1 0 0 1 54 382 Tm () Tj
+1 0 0 1 54 366 Tm (The pages array in App.jsx is the backbone of the app. Each object includes:) Tj
+1 0 0 1 54 350 Tm () Tj
+1 0 0 1 54 334 Tm (- path) Tj
+1 0 0 1 54 318 Tm (- label) Tj
+1 0 0 1 54 302 Tm (- description) Tj
+1 0 0 1 54 286 Tm (- accent) Tj
+1 0 0 1 54 270 Tm (- element) Tj
+1 0 0 1 54 254 Tm () Tj
+1 0 0 1 54 238 Tm (That single array is reused for both:) Tj
+1 0 0 1 54 222 Tm () Tj
+1 0 0 1 54 206 Tm (- sidebar links) Tj
+1 0 0 1 54 190 Tm (- route generation) Tj
+1 0 0 1 54 174 Tm () Tj
+1 0 0 1 54 158 Tm (This is a smart structure because one source controls navigation and page rendering) Tj
+1 0 0 1 54 142 Tm (together.) Tj
+1 0 0 1 54 126 Tm () Tj
+1 0 0 1 54 110 Tm (3. Shared visual design) Tj
+1 0 0 1 54 94 Tm () Tj
+1 0 0 1 54 78 Tm (The main visual system is in src/styles.css.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 22 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 1851 >>
+stream
+BT
+/F1 11 Tf
+0 g
+1 0 0 1 54 734 Tm () Tj
+1 0 0 1 54 718 Tm (The stylesheet provides:) Tj
+1 0 0 1 54 702 Tm () Tj
+1 0 0 1 54 686 Tm (- app shell layout) Tj
+1 0 0 1 54 670 Tm (- sidebar styling) Tj
+1 0 0 1 54 654 Tm (- page panel styling) Tj
+1 0 0 1 54 638 Tm (- hero section styling) Tj
+1 0 0 1 54 622 Tm (- reusable card and table styles) Tj
+1 0 0 1 54 606 Tm (- responsive behavior for tablet and mobile) Tj
+1 0 0 1 54 590 Tm () Tj
+1 0 0 1 54 574 Tm (The design uses:) Tj
+1 0 0 1 54 558 Tm () Tj
+1 0 0 1 54 542 Tm (- Fraunces for major headings) Tj
+1 0 0 1 54 526 Tm (- Manrope for body text) Tj
+1 0 0 1 54 510 Tm (- soft gradients) Tj
+1 0 0 1 54 494 Tm (- glass-like panels) Tj
+1 0 0 1 54 478 Tm (- rounded cards) Tj
+1 0 0 1 54 462 Tm () Tj
+1 0 0 1 54 446 Tm (4. Data persistence) Tj
+1 0 0 1 54 430 Tm () Tj
+1 0 0 1 54 414 Tm (The reusable hook src/hooks/useLocalStorage.js saves data inside the browser.) Tj
+1 0 0 1 54 398 Tm () Tj
+1 0 0 1 54 382 Tm (Pattern used:) Tj
+1 0 0 1 54 366 Tm () Tj
+1 0 0 1 54 350 Tm (1. read existing data from localStorage) Tj
+1 0 0 1 54 334 Tm (2. fall back to a default value if nothing is stored) Tj
+1 0 0 1 54 318 Tm (3. save updates automatically with useEffect) Tj
+1 0 0 1 54 302 Tm (4. attach a version suffix like __v1 to storage keys) Tj
+1 0 0 1 54 286 Tm () Tj
+1 0 0 1 54 270 Tm (This means the whole dashboard works without a backend database.) Tj
+1 0 0 1 54 254 Tm () Tj
+1 0 0 1 54 238 Tm (Page-by-page build explanation) Tj
+1 0 0 1 54 222 Tm () Tj
+1 0 0 1 54 206 Tm (Academic page) Tj
+1 0 0 1 54 190 Tm () Tj
+1 0 0 1 54 174 Tm (src/pages/Academic.jsx is the largest and most advanced page.) Tj
+1 0 0 1 54 158 Tm () Tj
+1 0 0 1 54 142 Tm (It tracks:) Tj
+1 0 0 1 54 126 Tm () Tj
+1 0 0 1 54 110 Tm (- terms or semesters) Tj
+1 0 0 1 54 94 Tm (- courses per term) Tj
+1 0 0 1 54 78 Tm (- grades and credits) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 22 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 2087 >>
+stream
+BT
+/F1 11 Tf
+0 g
+1 0 0 1 54 734 Tm (- automatic GPA and CGPA calculation) Tj
+1 0 0 1 54 718 Tm (- class tests) Tj
+1 0 0 1 54 702 Tm (- assignments and tasks) Tj
+1 0 0 1 54 686 Tm () Tj
+1 0 0 1 54 670 Tm (Important build ideas:) Tj
+1 0 0 1 54 654 Tm () Tj
+1 0 0 1 54 638 Tm (- helper functions convert grades to GPA points) Tj
+1 0 0 1 54 622 Tm (- term GPA is calculated from completed courses) Tj
+1 0 0 1 54 606 Tm (- final CGPA is calculated from completed terms) Tj
+1 0 0 1 54 590 Tm (- tasks and tests are stored separately in local storage) Tj
+1 0 0 1 54 574 Tm (- the page is broken into subcomponents like CGPASummary, TermBlock, and ClassTests) Tj
+1 0 0 1 54 558 Tm () Tj
+1 0 0 1 54 542 Tm (This page shows how to build a mini dashboard with calculations, forms, editing,) Tj
+1 0 0 1 54 526 Tm (filtering, and summary cards in one component.) Tj
+1 0 0 1 54 510 Tm () Tj
+1 0 0 1 54 494 Tm (My Plan page) Tj
+1 0 0 1 54 478 Tm () Tj
+1 0 0 1 54 462 Tm (src/pages/MyPlan.jsx is a personal goal tracker.) Tj
+1 0 0 1 54 446 Tm () Tj
+1 0 0 1 54 430 Tm (It supports:) Tj
+1 0 0 1 54 414 Tm () Tj
+1 0 0 1 54 398 Tm (- daily plans) Tj
+1 0 0 1 54 382 Tm (- weekly plans) Tj
+1 0 0 1 54 366 Tm (- monthly plans) Tj
+1 0 0 1 54 350 Tm (- yearly plans) Tj
+1 0 0 1 54 334 Tm (- status tracking) Tj
+1 0 0 1 54 318 Tm (- category grouping) Tj
+1 0 0 1 54 302 Tm (- analysis by time period) Tj
+1 0 0 1 54 286 Tm () Tj
+1 0 0 1 54 270 Tm (Important build ideas:) Tj
+1 0 0 1 54 254 Tm () Tj
+1 0 0 1 54 238 Tm (- plans are filtered by status and period) Tj
+1 0 0 1 54 222 Tm (- analysis groups items by day, week, month, or year) Tj
+1 0 0 1 54 206 Tm (- a custom SVG pie chart is generated directly in React) Tj
+1 0 0 1 54 190 Tm (- success rate is calculated from completed and rejected items) Tj
+1 0 0 1 54 174 Tm () Tj
+1 0 0 1 54 158 Tm (This page is useful as a model for productivity and analytics features.) Tj
+1 0 0 1 54 142 Tm () Tj
+1 0 0 1 54 126 Tm (Movies page) Tj
+1 0 0 1 54 110 Tm () Tj
+1 0 0 1 54 94 Tm (src/pages/Movies.jsx tracks watched titles and a watchlist.) Tj
+1 0 0 1 54 78 Tm () Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 22 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 2036 >>
+stream
+BT
+/F1 11 Tf
+0 g
+1 0 0 1 54 734 Tm (It includes:) Tj
+1 0 0 1 54 718 Tm () Tj
+1 0 0 1 54 702 Tm (- watched items) Tj
+1 0 0 1 54 686 Tm (- type selection like movie, series, documentary, and anime) Tj
+1 0 0 1 54 670 Tm (- rating input) Tj
+1 0 0 1 54 654 Tm (- start and finish dates) Tj
+1 0 0 1 54 638 Tm (- poster fetching from OMDb) Tj
+1 0 0 1 54 622 Tm (- search suggestions from OMDb) Tj
+1 0 0 1 54 606 Tm (- watchlist with posters) Tj
+1 0 0 1 54 590 Tm (- year-by-year analysis) Tj
+1 0 0 1 54 574 Tm () Tj
+1 0 0 1 54 558 Tm (Important build ideas:) Tj
+1 0 0 1 54 542 Tm () Tj
+1 0 0 1 54 526 Tm (- fetch is used to talk to the OMDb API) Tj
+1 0 0 1 54 510 Tm (- data from the API enriches the manual form data) Tj
+1 0 0 1 54 494 Tm (- the page stores both a table view and card view of watched items) Tj
+1 0 0 1 54 478 Tm (- a separate watchlist is maintained with its own local storage key) Tj
+1 0 0 1 54 462 Tm () Tj
+1 0 0 1 54 446 Tm (This page shows how the site mixes external APIs with local browser storage.) Tj
+1 0 0 1 54 430 Tm () Tj
+1 0 0 1 54 414 Tm (Job Prep page) Tj
+1 0 0 1 54 398 Tm () Tj
+1 0 0 1 54 382 Tm (src/pages/JobPrep.jsx is a career preparation dashboard.) Tj
+1 0 0 1 54 366 Tm () Tj
+1 0 0 1 54 350 Tm (It tracks:) Tj
+1 0 0 1 54 334 Tm () Tj
+1 0 0 1 54 318 Tm (- applications) Tj
+1 0 0 1 54 302 Tm (- skills to learn) Tj
+1 0 0 1 54 286 Tm (- learning resources) Tj
+1 0 0 1 54 270 Tm (- multiple links per item) Tj
+1 0 0 1 54 254 Tm (- requirements and deadlines) Tj
+1 0 0 1 54 238 Tm (- recent activity) Tj
+1 0 0 1 54 222 Tm () Tj
+1 0 0 1 54 206 Tm (Important build ideas:) Tj
+1 0 0 1 54 190 Tm () Tj
+1 0 0 1 54 174 Tm (- status-based filtering for applications) Tj
+1 0 0 1 54 158 Tm (- reusable link arrays for forms) Tj
+1 0 0 1 54 142 Tm (- derived success-rate calculation) Tj
+1 0 0 1 54 126 Tm (- normalization of older data shapes into the current format) Tj
+1 0 0 1 54 110 Tm () Tj
+1 0 0 1 54 94 Tm (This page is a good example of handling complex forms and structured lists.) Tj
+1 0 0 1 54 78 Tm () Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 22 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 1821 >>
+stream
+BT
+/F1 11 Tf
+0 g
+1 0 0 1 54 734 Tm (Books page) Tj
+1 0 0 1 54 718 Tm () Tj
+1 0 0 1 54 702 Tm (src/pages/Books.jsx has two systems:) Tj
+1 0 0 1 54 686 Tm () Tj
+1 0 0 1 54 670 Tm (- reading list) Tj
+1 0 0 1 54 654 Tm (- books to buy) Tj
+1 0 0 1 54 638 Tm () Tj
+1 0 0 1 54 622 Tm (It supports:) Tj
+1 0 0 1 54 606 Tm () Tj
+1 0 0 1 54 590 Tm (- title, author, rating, and dates) Tj
+1 0 0 1 54 574 Tm (- finish tracking) Tj
+1 0 0 1 54 558 Tm (- estimated buy cost) Tj
+1 0 0 1 54 542 Tm (- book cover fetching from Open Library) Tj
+1 0 0 1 54 526 Tm (- year-by-year reading analysis) Tj
+1 0 0 1 54 510 Tm () Tj
+1 0 0 1 54 494 Tm (Important build ideas:) Tj
+1 0 0 1 54 478 Tm () Tj
+1 0 0 1 54 462 Tm (- cover images are fetched when a book is added) Tj
+1 0 0 1 54 446 Tm (- missing covers are hydrated later with useEffect) Tj
+1 0 0 1 54 430 Tm (- analysis groups reading activity by year) Tj
+1 0 0 1 54 414 Tm () Tj
+1 0 0 1 54 398 Tm (This page shows async data enrichment and list analysis in a simple way.) Tj
+1 0 0 1 54 382 Tm () Tj
+1 0 0 1 54 366 Tm (University page) Tj
+1 0 0 1 54 350 Tm () Tj
+1 0 0 1 54 334 Tm (src/pages/University.jsx manages Masters and PhD targets.) Tj
+1 0 0 1 54 318 Tm () Tj
+1 0 0 1 54 302 Tm (It tracks:) Tj
+1 0 0 1 54 286 Tm () Tj
+1 0 0 1 54 270 Tm (- degree type) Tj
+1 0 0 1 54 254 Tm (- university name) Tj
+1 0 0 1 54 238 Tm (- ranking) Tj
+1 0 0 1 54 222 Tm (- country) Tj
+1 0 0 1 54 206 Tm (- application status) Tj
+1 0 0 1 54 190 Tm (- requirements like IELTS, TOEFL, GRE, GMAT, SOP, CV, and LOR) Tj
+1 0 0 1 54 174 Tm (- deadline) Tj
+1 0 0 1 54 158 Tm (- tuition and scholarship) Tj
+1 0 0 1 54 142 Tm (- notes and extra links) Tj
+1 0 0 1 54 126 Tm () Tj
+1 0 0 1 54 110 Tm (Important build ideas:) Tj
+1 0 0 1 54 94 Tm () Tj
+1 0 0 1 54 78 Tm (- tab-based switching between Masters and PhD) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 22 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 1962 >>
+stream
+BT
+/F1 11 Tf
+0 g
+1 0 0 1 54 734 Tm (- expandable details for each university) Tj
+1 0 0 1 54 718 Tm (- modal-style add/edit form) Tj
+1 0 0 1 54 702 Tm (- search and status filters) Tj
+1 0 0 1 54 686 Tm () Tj
+1 0 0 1 54 670 Tm (This page is a good pattern for detailed record management.) Tj
+1 0 0 1 54 654 Tm () Tj
+1 0 0 1 54 638 Tm (Reusable patterns across the site) Tj
+1 0 0 1 54 622 Tm () Tj
+1 0 0 1 54 606 Tm (The same build method is repeated across almost all pages:) Tj
+1 0 0 1 54 590 Tm () Tj
+1 0 0 1 54 574 Tm (1. create local state with useState) Tj
+1 0 0 1 54 558 Tm (2. store lists with useLocalStorage) Tj
+1 0 0 1 54 542 Tm (3. create add, edit, delete, and reset functions) Tj
+1 0 0 1 54 526 Tm (4. calculate summary values from stored data) Tj
+1 0 0 1 54 510 Tm (5. render forms at the top) Tj
+1 0 0 1 54 494 Tm (6. render cards, tables, or analysis sections below) Tj
+1 0 0 1 54 478 Tm () Tj
+1 0 0 1 54 462 Tm (This consistency makes the project easier to expand.) Tj
+1 0 0 1 54 446 Tm () Tj
+1 0 0 1 54 430 Tm (How to build a similar site step by step) Tj
+1 0 0 1 54 414 Tm () Tj
+1 0 0 1 54 398 Tm (Step 1. Create the project) Tj
+1 0 0 1 54 382 Tm () Tj
+1 0 0 1 54 366 Tm (`bash) Tj
+1 0 0 1 54 350 Tm (npm create vite@latest fahad-dashboard -- --template react) Tj
+1 0 0 1 54 334 Tm (cd fahad-dashboard) Tj
+1 0 0 1 54 318 Tm (npm install) Tj
+1 0 0 1 54 302 Tm (npm install react-router-dom) Tj
+1 0 0 1 54 286 Tm (`) Tj
+1 0 0 1 54 270 Tm () Tj
+1 0 0 1 54 254 Tm (Step 2. Create the base files) Tj
+1 0 0 1 54 238 Tm () Tj
+1 0 0 1 54 222 Tm (Create:) Tj
+1 0 0 1 54 206 Tm () Tj
+1 0 0 1 54 190 Tm (- src/App.jsx) Tj
+1 0 0 1 54 174 Tm (- src/styles.css) Tj
+1 0 0 1 54 158 Tm (- src/hooks/useLocalStorage.js) Tj
+1 0 0 1 54 142 Tm (- one page file for each dashboard section) Tj
+1 0 0 1 54 126 Tm () Tj
+1 0 0 1 54 110 Tm (Step 3. Add routing) Tj
+1 0 0 1 54 94 Tm () Tj
+1 0 0 1 54 78 Tm (Use react-router-dom and define all page routes in App.jsx.) Tj
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 22 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 1660 >>
+stream
+BT
+/F1 11 Tf
+0 g
+1 0 0 1 54 734 Tm () Tj
+1 0 0 1 54 718 Tm (Step 4. Build the layout) Tj
+1 0 0 1 54 702 Tm () Tj
+1 0 0 1 54 686 Tm (Create:) Tj
+1 0 0 1 54 670 Tm () Tj
+1 0 0 1 54 654 Tm (- sidebar) Tj
+1 0 0 1 54 638 Tm (- page header) Tj
+1 0 0 1 54 622 Tm (- content panel) Tj
+1 0 0 1 54 606 Tm (- home page cards) Tj
+1 0 0 1 54 590 Tm () Tj
+1 0 0 1 54 574 Tm (Step 5. Build each page one by one) Tj
+1 0 0 1 54 558 Tm () Tj
+1 0 0 1 54 542 Tm (Recommended order:) Tj
+1 0 0 1 54 526 Tm () Tj
+1 0 0 1 54 510 Tm (1. Academic) Tj
+1 0 0 1 54 494 Tm (2. My Plan) Tj
+1 0 0 1 54 478 Tm (3. Books) Tj
+1 0 0 1 54 462 Tm (4. Job Prep) Tj
+1 0 0 1 54 446 Tm (5. University) Tj
+1 0 0 1 54 430 Tm (6. Movies) Tj
+1 0 0 1 54 414 Tm () Tj
+1 0 0 1 54 398 Tm (This order works well because the first five can be built mostly with local forms and) Tj
+1 0 0 1 54 382 Tm (storage before adding movie API integration.) Tj
+1 0 0 1 54 366 Tm () Tj
+1 0 0 1 54 350 Tm (Step 6. Add local storage persistence) Tj
+1 0 0 1 54 334 Tm () Tj
+1 0 0 1 54 318 Tm (Use a reusable hook so every page can save data automatically without repeating the same) Tj
+1 0 0 1 54 302 Tm (logic.) Tj
+1 0 0 1 54 286 Tm () Tj
+1 0 0 1 54 270 Tm (Step 7. Add analytics and summaries) Tj
+1 0 0 1 54 254 Tm () Tj
+1 0 0 1 54 238 Tm (After CRUD is working, add:) Tj
+1 0 0 1 54 222 Tm () Tj
+1 0 0 1 54 206 Tm (- counters) Tj
+1 0 0 1 54 190 Tm (- status summaries) Tj
+1 0 0 1 54 174 Tm (- GPA calculations) Tj
+1 0 0 1 54 158 Tm (- year analysis) Tj
+1 0 0 1 54 142 Tm (- success rates) Tj
+1 0 0 1 54 126 Tm (- charts) Tj
+1 0 0 1 54 110 Tm () Tj
+1 0 0 1 54 94 Tm (Step 8. Make the UI responsive) Tj
+1 0 0 1 54 78 Tm () Tj
+ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 22 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 1841 >>
+stream
+BT
+/F1 11 Tf
+0 g
+1 0 0 1 54 734 Tm (Use CSS media queries so the sidebar and content work on smaller screens.) Tj
+1 0 0 1 54 718 Tm () Tj
+1 0 0 1 54 702 Tm (Step 9. Build for production) Tj
+1 0 0 1 54 686 Tm () Tj
+1 0 0 1 54 670 Tm (`bash) Tj
+1 0 0 1 54 654 Tm (npm run build) Tj
+1 0 0 1 54 638 Tm (`) Tj
+1 0 0 1 54 622 Tm () Tj
+1 0 0 1 54 606 Tm (Vite outputs the final production files into dist/.) Tj
+1 0 0 1 54 590 Tm () Tj
+1 0 0 1 54 574 Tm (Step 10. Deploy) Tj
+1 0 0 1 54 558 Tm () Tj
+1 0 0 1 54 542 Tm (This site is ready for Vercel deployment.) Tj
+1 0 0 1 54 526 Tm () Tj
+1 0 0 1 54 510 Tm (Current deployment-friendly files:) Tj
+1 0 0 1 54 494 Tm () Tj
+1 0 0 1 54 478 Tm (- vercel.json) Tj
+1 0 0 1 54 462 Tm (- vite.config.js) Tj
+1 0 0 1 54 446 Tm () Tj
+1 0 0 1 54 430 Tm (Strengths of this project structure) Tj
+1 0 0 1 54 414 Tm () Tj
+1 0 0 1 54 398 Tm (- simple and easy to understand) Tj
+1 0 0 1 54 382 Tm (- no backend required) Tj
+1 0 0 1 54 366 Tm (- each page is independent) Tj
+1 0 0 1 54 350 Tm (- reusable storage hook) Tj
+1 0 0 1 54 334 Tm (- centralized routing) Tj
+1 0 0 1 54 318 Tm (- easy to deploy) Tj
+1 0 0 1 54 302 Tm (- easy to add new dashboard sections) Tj
+1 0 0 1 54 286 Tm () Tj
+1 0 0 1 54 270 Tm (Possible future improvements) Tj
+1 0 0 1 54 254 Tm () Tj
+1 0 0 1 54 238 Tm (- split very large page files into smaller components) Tj
+1 0 0 1 54 222 Tm (- move shared helpers into utility files) Tj
+1 0 0 1 54 206 Tm (- hide API keys in environment variables) Tj
+1 0 0 1 54 190 Tm (- add export and import of saved data) Tj
+1 0 0 1 54 174 Tm (- add charts with a chart library if needed) Tj
+1 0 0 1 54 158 Tm (- add authentication and cloud sync later) Tj
+1 0 0 1 54 142 Tm () Tj
+1 0 0 1 54 126 Tm (Commands to run the site) Tj
+1 0 0 1 54 110 Tm () Tj
+1 0 0 1 54 94 Tm (Development) Tj
+1 0 0 1 54 78 Tm () Tj
+ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 22 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 18 0 R >>
+endobj
+20 0 obj
+<< /Length 1375 >>
+stream
+BT
+/F1 11 Tf
+0 g
+1 0 0 1 54 734 Tm (`bash) Tj
+1 0 0 1 54 718 Tm (npm run dev) Tj
+1 0 0 1 54 702 Tm (`) Tj
+1 0 0 1 54 686 Tm () Tj
+1 0 0 1 54 670 Tm (Production build) Tj
+1 0 0 1 54 654 Tm () Tj
+1 0 0 1 54 638 Tm (`bash) Tj
+1 0 0 1 54 622 Tm (npm run build) Tj
+1 0 0 1 54 606 Tm (`) Tj
+1 0 0 1 54 590 Tm () Tj
+1 0 0 1 54 574 Tm (Preview build) Tj
+1 0 0 1 54 558 Tm () Tj
+1 0 0 1 54 542 Tm (`bash) Tj
+1 0 0 1 54 526 Tm (npm run preview) Tj
+1 0 0 1 54 510 Tm (``) Tj
+1 0 0 1 54 494 Tm () Tj
+1 0 0 1 54 478 Tm (Final summary) Tj
+1 0 0 1 54 462 Tm () Tj
+1 0 0 1 54 446 Tm (This site is built as a multi-page personal dashboard using React, Vite, React Router,) Tj
+1 0 0 1 54 430 Tm (custom CSS, and browser local storage.) Tj
+1 0 0 1 54 414 Tm () Tj
+1 0 0 1 54 398 Tm (The overall build flow is:) Tj
+1 0 0 1 54 382 Tm () Tj
+1 0 0 1 54 366 Tm (1. create a shared layout) Tj
+1 0 0 1 54 350 Tm (2. define routes in one place) Tj
+1 0 0 1 54 334 Tm (3. build one feature page at a time) Tj
+1 0 0 1 54 318 Tm (4. save page data with local storage) Tj
+1 0 0 1 54 302 Tm (5. add summaries, calculations, and analysis) Tj
+1 0 0 1 54 286 Tm (6. deploy the final build on Vercel) Tj
+1 0 0 1 54 270 Tm () Tj
+1 0 0 1 54 254 Tm (If you want, this same structure can easily be extended with more pages like Finance,) Tj
+1 0 0 1 54 238 Tm (Habits, Health, or Notes.) Tj
+1 0 0 1 54 222 Tm () Tj
+ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 22 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 20 0 R >>
+endobj
+22 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R] /Count 10 >>
+endobj
+23 0 obj
+<< /Type /Catalog /Pages 22 0 R >>
+endobj
+xref
+0 24
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000001803 00000 n 
+0000001930 00000 n 
+0000003794 00000 n 
+0000003921 00000 n 
+0000005824 00000 n 
+0000005951 00000 n 
+0000008090 00000 n 
+0000008217 00000 n 
+0000010306 00000 n 
+0000010435 00000 n 
+0000012309 00000 n 
+0000012438 00000 n 
+0000014453 00000 n 
+0000014582 00000 n 
+0000016295 00000 n 
+0000016424 00000 n 
+0000018318 00000 n 
+0000018447 00000 n 
+0000019875 00000 n 
+0000020004 00000 n 
+0000020123 00000 n 
+trailer
+<< /Size 24 /Root 23 0 R >>
+startxref
+20174
+%%EOF
