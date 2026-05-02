@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { auth, db } from "../firebase";
-import {
-  collection,
-  doc,
-  onSnapshot,
-  writeBatch,
-} from "firebase/firestore";
+import { collection, doc, onSnapshot, writeBatch } from "firebase/firestore";
 
 function sanitizeSegment(value) {
   return String(value).replace(/[^a-zA-Z0-9_-]/g, "-");
@@ -35,7 +30,7 @@ function areEqual(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-export function useLocalStorage(key, initialValue, version = 1) {
+export function useFirestoreCollection(key, initialValue, version = 1) {
   const initialValueRef = useRef(initialValue);
   const collectionName = useMemo(
     () => sanitizeSegment(`${key}__v${version}`),
@@ -58,31 +53,36 @@ export function useLocalStorage(key, initialValue, version = 1) {
 
     const collectionRef = collection(db, "users", user.uid, collectionName);
 
-    const unsubscribe = onSnapshot(collectionRef, (snapshot) => {
-      const nextState = snapshot.docs
-        .map((snapshotDoc) => {
-          const data = snapshotDoc.data();
-          return {
-            ...data,
-            id: data.id ?? snapshotDoc.id,
-          };
-        })
-        .sort((a, b) => (a.__order ?? 0) - (b.__order ?? 0))
-        .map(({ __order, ...item }) => item);
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      (snapshot) => {
+        const nextState = snapshot.docs
+          .map((snapshotDoc) => {
+            const data = snapshotDoc.data();
+            return {
+              ...data,
+              id: data.id ?? snapshotDoc.id,
+            };
+          })
+          .sort((a, b) => (a.__order ?? 0) - (b.__order ?? 0))
+          .map(({ __order, ...item }) => item);
 
-      stateRef.current = nextState;
-      setState(nextState);
-    });
+        stateRef.current = nextState;
+        setState(nextState);
+      },
+      (error) => {
+        console.error(`Firestore read failed for ${collectionName}:`, error);
+      }
+    );
 
     return unsubscribe;
   }, [collectionName]);
 
   const persistState = useCallback(
-    async (nextState) => {
+    async (previousState, nextState) => {
       const user = auth.currentUser;
       if (!user) return;
 
-      const previousState = stateRef.current;
       const previousMap = new Map(
         previousState.map((item) => [String(item.id), item])
       );
@@ -147,9 +147,13 @@ export function useLocalStorage(key, initialValue, version = 1) {
 
       writeQueueRef.current = writeQueueRef.current
         .catch(() => undefined)
-        .then(() => persistState(nextState));
+        .then(() => persistState(currentState, nextState))
+        .catch((error) => {
+          console.error(`Firestore write failed for ${collectionName}:`, error);
+          throw error;
+        });
     },
-    [persistState]
+    [collectionName, persistState]
   );
 
   return [state, setFirestoreState];
