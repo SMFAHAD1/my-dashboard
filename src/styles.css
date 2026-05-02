@@ -152,6 +152,79 @@ textarea {
   padding: 2rem;
 }
 
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.auth-card {
+  width: min(100%, 520px);
+  padding: 2rem;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(186, 200, 217, 0.7);
+  box-shadow: 0 24px 70px rgba(27, 53, 84, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.auth-card h1 {
+  margin: 0;
+  font-family: "Fraunces", serif;
+  font-size: clamp(2rem, 3vw, 2.7rem);
+  line-height: 1.05;
+}
+
+.auth-copy {
+  margin: 0.85rem 0 0;
+  color: var(--muted);
+}
+
+.auth-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+
+.auth-field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.auth-field span {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.auth-error {
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+  border-radius: 12px;
+  background: #fff2ef;
+  border: 1px solid #f0c8bc;
+  color: #9a4028;
+}
+
+.auth-switch {
+  margin: 1rem 0 0;
+  color: var(--muted);
+}
+
+.text-button {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--brand);
+  font-weight: 800;
+}
+
+.auth-loading {
+  text-align: center;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -179,6 +252,41 @@ textarea {
   max-width: 520px;
   margin: 0;
   color: var(--muted);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.account-chip {
+  padding: 0.85rem 1rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid #dce5f0;
+}
+
+.account-chip strong,
+.account-chip span {
+  display: block;
+}
+
+.account-chip strong {
+  font-size: 0.95rem;
+}
+
+.account-chip span {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.logout-button {
+  min-height: 46px;
+  border-radius: 999px;
+  padding-inline: 1rem;
 }
 
 .page-panel {
@@ -410,6 +518,10 @@ textarea {
   .page-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .header-actions {
+    justify-content: flex-start;
   }
 
   .hero-card {

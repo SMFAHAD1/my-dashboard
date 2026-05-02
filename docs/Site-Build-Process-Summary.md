@@ -1,8 +1,8 @@
-# Fahad Dashboard Site Build Process
+# My Dashboard Site Build Process
 
 ## Project overview
 
-Fahad Dashboard is a React + Vite personal dashboard website with six connected sections:
+My Dashboard is a React + Vite personal dashboard website with six connected sections:
 
 1. Academic
 2. My Plan
@@ -269,8 +269,8 @@ This consistency makes the project easier to expand.
 ### Step 1. Create the project
 
 ```bash
-npm create vite@latest fahad-dashboard -- --template react
-cd fahad-dashboard
+npm create vite@latest my-dashboard -- --template react
+cd my-dashboard
 npm install
 npm install react-router-dom
 ```

@@ -1,4 +1,4 @@
-# Fahad Dashboard
+# My Dashboard
 
 A personal multi-page dashboard built with React and Vite. It combines six focused pages into one site for academic tracking, personal planning, movies, job preparation, books, and university applications.
 
